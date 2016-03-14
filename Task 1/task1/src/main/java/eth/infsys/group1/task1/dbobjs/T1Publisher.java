@@ -32,8 +32,8 @@ public class T1Publisher extends T1DomainObject implements Publisher {
 
     public void setPublications(Set<Publication> publications) {
     	zooActivateWrite();
-    	this.publications.clear();
-    	this.publications.addAll(publications);
+    	//this.publications.clear(); null
+    	this.publications = publications;
     }
     
 }

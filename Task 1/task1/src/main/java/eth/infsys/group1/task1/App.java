@@ -24,6 +24,7 @@ import eth.infsys.group1.task1.dbobjs.T1DomainObject;
 import eth.infsys.group1.task1.dbobjs.T1InProceedings;
 import eth.infsys.group1.task1.dbobjs.T1Person;
 import eth.infsys.group1.task1.dbobjs.T1Proceedings;
+import eth.infsys.group1.task1.dbobjs.T1Publication;
 import eth.infsys.group1.task1.dbobjs.T1Publisher;
 
 /**
@@ -70,7 +71,9 @@ public class App
  * Task1
  * Problems:	-Definition/passing of the arguments
  * 				-authors field?
- *             	-add_to_editedPublications(pm, p, newp);
+ * 				-implement Series and Conference
+ * 				-add_to_editedPublications type problem object add to set?
+ * 				-add_to_proceedings (Task2) and add_to_publications are the "same" Publication vs InProceedings.. templates??
  */
         //check if proceedings exist
         String id = "conf/hmi/1987";
@@ -88,11 +91,10 @@ public class App
 
         //!!!!!!! for Task1
     	pm.currentTransaction().begin();
-
-        if (!!proceedings_exist(pm, id)){
+        if (!proceedings_exist(pm, id)){
            
             System.out.println("create Id=" + id );
-            T1Proceedings newp = new T1Proceedings();
+        	T1Proceedings newp = new T1Proceedings();
             pm.makePersistent(newp);
             /**
              * DomainObject
@@ -107,49 +109,48 @@ public class App
             //create Editors; add Puplication(=Preceeding to Person); setEditors
             Set<Person> Editors = create_and_return_editors(pm, editors);
             for (Person p: Editors){
-            	add_to_editedPublications(pm, p, newp);
+            	add_to_editedPublications(pm, (T1Person) p, newp);
             }
             newp.setEditors(Editors);
-
         
             newp.setYear(year);
             newp.setElectronicEdition(electronicEdition);
+            
             /**
              * Proceedings
              */
             newp.setNote(note);
             newp.setNumber(number);
             
-            //create Publisher
-            newp.setPublisher(create_and_return_publisher(pm, publisher));
+            //create Publisher; add publications(=Preceeding to Publisher; setPublisher
+            Publisher pub = create_and_return_publisher(pm, publisher);
+            add_to_publications(pm, pub, newp);
+            newp.setPublisher(pub);
             
             newp.setVolume(volume);
             newp.setIsbn(isbn);
             //newp.setSeries(series);
             //newp.setConferenceEdition(conferenceEdition);
-            
-            //Set<Publication>
-            //newp.setPublications(publications);
-            
+                      
             //empty Set... constructor???
             Set<InProceedings> publications = new HashSet<InProceedings>();
             newp.setPublications(publications);
-            
-            //!!!!!!! for Task1
-    		pm.currentTransaction().commit();
-
+        }
+        else {
+            System.out.println("Proceeding with Id=" + id + " already exists!");
+        }
+        //!!!!!!! for Task1
+		pm.currentTransaction().commit();
  
             
 /**
-* Task2
+* Task2:	-create and add Inproceedings
+* Problems:	-how to pass arguments? => create function/class
 */
-            /*
-             * create and add Inproceedings
-             * how to pass arguments?
-             */
-           
-            pm.currentTransaction().begin();
-            //add check: if (!inproceedings_exist(pm, id))....
+        pm.currentTransaction().begin();
+		T1Proceedings newp = get_proceeding(pm, id);
+        id = "conf/hmi/Estrin87";
+		if (!inproceeding_exist(pm, id, newp)) {
             T1InProceedings inp1 = new T1InProceedings();
             pm.makePersistent(inp1); //????
             //DomainObject
@@ -180,16 +181,19 @@ public class App
             
             inp1.setProceedings(newp);
             add_to_proceedings(pm, inp1, newp);
-
-    		pm.currentTransaction().commit();
+		}
+		else {
+            System.out.println("Inproceeding with Id=" + id + " already exists!");
+		}
+		pm.currentTransaction().commit();
 
             
 /**
 * Task3
-*/    
-            pm.currentTransaction().begin();
-
-            //add check: if (!inproceedings_exist(pm, id))....
+*/                
+		id = "conf/hmi/Hammond87";
+        pm.currentTransaction().begin();
+		if (!inproceeding_exist(pm, id, newp)) {
             T1InProceedings inp2 = new T1InProceedings();
             pm.makePersistent(inp2); //????
             //DomainObject
@@ -215,38 +219,60 @@ public class App
             note = "";
             inp2.setNote(note);
             
-            pages = "153-164";
+            String pages = "153-164";
             inp2.setPages(pages);
             
             inp2.setProceedings(newp);
             add_to_proceedings(pm, inp2, newp);
 
-    		pm.currentTransaction().commit();
-
-
         }
-        else {
-            System.out.println("Id=" + id + " already exists!");
-        }
-   
+		else {
+            System.out.println("Inproceeding with Id=" + id + " already exists!");
+		}
+		pm.currentTransaction().commit();
 
+        
 		closeDB(pm);
 		
 	}
 	
-	private static void add_to_editedPublications(PersistenceManager pm, Person p, Publication newp) {
+	private static void add_to_publications(PersistenceManager pm, Publisher pub, T1Proceedings newp) {
+		Set<Publication> old_set = pub.getPublications();
+        Set<Publication> publications = new HashSet<Publication>();
+        boolean already_exist = false;
+        for (Publication publication: old_set){
+    		System.out.println("existing publication: " + publication.getTitle());
+    		publications.add(publication);
+    		if( publication.getId().equals(newp.getId())) {
+    			already_exist = true;
+    		}
+        }
+        //add new Publication (if already exists: problem
+        if (!already_exist){
+        	publications.add(newp);
+        }
+        pub.setPublications(publications);
+	
+	}
+
+	private static void add_to_editedPublications(PersistenceManager pm, T1Person p, T1Publication newp) {
 		Set<Publication> old_set = p.getEditedPublications();
         Set<Publication> editedPublications = new HashSet<Publication>();
+        boolean already_exist = false;
         //copy existing Publication
         for (Publication pub: old_set){
-    		System.out.println("existing Publication: " + pub.getTitle());
+    		System.out.println("existing Publication Id=" + pub.getId());
     		editedPublications.add(pub);
+    		if ( pub.getId().equals(newp.getId()) ){
+    			already_exist = true;
+        		System.out.println("new Publication already exists " + pub.getId());
+    		}
         }
-        //add new Publication (if already exists: not a problem, is a Set
-       
+        //add new Publication (if already exists: problem
         //Object "comparison"... newp already in Set with different objectID
-        //editedPublications.add(newp);
-        
+        if (!already_exist){
+            editedPublications.add(newp);
+        }
         p.setEditedPublications(editedPublications);
 	}
 
@@ -273,6 +299,20 @@ public class App
 		
 	}*/
 
+	private static T1Proceedings get_proceeding(PersistenceManager pm, String id) {
+		Extent<T1Proceedings> ext = pm.getExtent(T1Proceedings.class);
+        for (T1Proceedings p: ext) {
+        	if (p.getId().equals(id)){
+        		//System.out.println("already exists: " + p.getId());
+                ext.closeAll();
+                return p;
+        	}
+        }
+        ext.closeAll();
+        return null;
+	}
+
+	
 	private static boolean proceedings_exist(PersistenceManager pm, String id) {
 
 		//using reference in query {
@@ -291,6 +331,18 @@ public class App
         	}
         }
         ext.closeAll();
+
+		return false;
+	}
+	private static boolean inproceeding_exist(PersistenceManager pm, String id, T1Proceedings newp) {
+		Set<InProceedings> old_set = newp.getPublications();
+        for (InProceedings inp: old_set) {
+        	if (inp.getId().equals(id)){
+        		//System.out.println("inproceeding_exist: " + inp.getId());
+                return true;
+        	}
+        }
+		System.out.println("nix gefunden...");
 
 		return false;
 	}
@@ -362,7 +414,7 @@ public class App
          * Publisher
          */
         newp.setName(name);
-        //newp.setPublications(publications);
+        newp.setPublications(publications);
 		
         return newp;
 	}
