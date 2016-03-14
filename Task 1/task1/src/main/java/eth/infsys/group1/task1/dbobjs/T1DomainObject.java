@@ -10,7 +10,7 @@ import org.zoodb.api.impl.ZooPC;
 public abstract class T1DomainObject extends ZooPC implements DomainObject {
 
 	private String id;
-	
+		
 	public T1DomainObject() { }
 	
 	public T1DomainObject(String id) {

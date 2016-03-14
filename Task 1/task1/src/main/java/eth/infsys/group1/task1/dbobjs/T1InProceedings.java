@@ -17,7 +17,10 @@ public class T1InProceedings extends T1Publication implements InProceedings {
     	zooActivateRead();
 		return this.note;
 	}
-
+    
+    /**
+     *<pages> from XML-File
+     */
     public void setNote(String note) {
     	zooActivateWrite();
     	this.note = note;
@@ -28,6 +31,9 @@ public class T1InProceedings extends T1Publication implements InProceedings {
 		return this.pages;
 	}
 
+/**
+ *<pages> from XML-File
+ */
     public void setPages(String pages) {
     	zooActivateWrite();
     	this.pages = pages;

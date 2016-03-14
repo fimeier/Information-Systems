@@ -36,8 +36,9 @@ public class T1Publication extends T1DomainObject {
 
     public void setAuthors(List<Person> authors) {
     	zooActivateWrite();
-    	this.authors.clear();
-    	this.authors.addAll(authors);
+    	//this.authors.clear();  probably a empty List
+    	this.authors = authors;
+
 	}
 
     public Set<Person> getEditors() {
@@ -47,8 +48,8 @@ public class T1Publication extends T1DomainObject {
 
     public void setEditors(Set<Person> editors) {
     	zooActivateWrite();
-    	this.editors.clear();
-    	this.editors.addAll(authors);
+    	//this.editors.clear(); probably a empty Set
+    	this.editors = editors;
 	}
 
     public int getYear() {

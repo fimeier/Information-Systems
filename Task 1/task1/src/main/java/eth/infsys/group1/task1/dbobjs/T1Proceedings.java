@@ -98,8 +98,8 @@ public class T1Proceedings extends T1Publication implements Proceedings {
 
     public void setPublications(Set<InProceedings> publications) {
     	zooActivateWrite();
-    	this.publications.clear();
-    	this.publications.addAll(publications);
+    	//this.publications.clear(); empty..publications.
+    	this.publications = publications;
     }
 
 }
