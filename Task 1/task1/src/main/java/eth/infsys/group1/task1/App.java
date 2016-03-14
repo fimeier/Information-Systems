@@ -68,6 +68,9 @@ public class App
  
 /**
  * Task1
+ * Problems:	-Definition/passing of the arguments
+ * 				-authors field?
+ *             	-add_to_editedPublications(pm, p, newp);
  */
         //check if proceedings exist
         String id = "conf/hmi/1987";
@@ -86,7 +89,7 @@ public class App
         //!!!!!!! for Task1
     	pm.currentTransaction().begin();
 
-        if (!proceedings_exist(pm, id)){
+        if (!!proceedings_exist(pm, id)){
            
             System.out.println("create Id=" + id );
             T1Proceedings newp = new T1Proceedings();
@@ -101,7 +104,12 @@ public class App
             newp.setTitle(title);
             //newp.setAuthors(authors to empty list???);
             
-            newp.setEditors(create_and_return_editors(pm, editors));
+            //create Editors; add Puplication(=Preceeding to Person); setEditors
+            Set<Person> Editors = create_and_return_editors(pm, editors);
+            for (Person p: Editors){
+            	add_to_editedPublications(pm, p, newp);
+            }
+            newp.setEditors(Editors);
 
         
             newp.setYear(year);
@@ -226,6 +234,21 @@ public class App
 		
 	}
 	
+	private static void add_to_editedPublications(PersistenceManager pm, Person p, Publication newp) {
+		Set<Publication> old_set = p.getEditedPublications();
+        Set<Publication> editedPublications = new HashSet<Publication>();
+        //copy existing Publication
+        for (Publication pub: old_set){
+    		System.out.println("existing Publication: " + pub.getTitle());
+    		editedPublications.add(pub);
+        }
+        //add new Publication (if already exists: not a problem, is a Set
+       
+        //Object "comparison"... newp already in Set with different objectID
+        //editedPublications.add(newp);
+        
+        p.setEditedPublications(editedPublications);
+	}
 
 	private static void add_to_proceedings(PersistenceManager pm, T1InProceedings inp1, T1Proceedings newp) {
 		
@@ -362,8 +385,8 @@ public class App
          * Person
          */
         newp.setName(name);
-        //newp.setAuthoredPublications(authoredPublications);
-        //newp.setEditedPublications(editedPublications);
+        newp.setAuthoredPublications(authoredPublications);
+        newp.setEditedPublications(editedPublications);
 		
         return newp;
 		

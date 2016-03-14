@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.Publication} interface for ZooDB.
  */
-public class T1Publication extends T1DomainObject {
+public class T1Publication extends T1DomainObject implements Publication {
 
 	private String title;
 	private List<Person> authors;

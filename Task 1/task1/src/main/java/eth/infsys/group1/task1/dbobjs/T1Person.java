@@ -32,8 +32,8 @@ public class T1Person extends T1DomainObject implements Person {
     }
 
     public void setAuthoredPublications(Set<Publication> authoredPublications) {
-    	this.authoredPublications.clear();
-    	this.authoredPublications.addAll(authoredPublications);
+    	//this.authoredPublications.clear(); NULL
+    	this.authoredPublications = authoredPublications;
     }
 
     public Set<Publication> getEditedPublications() {
@@ -43,8 +43,8 @@ public class T1Person extends T1DomainObject implements Person {
 
     public void setEditedPublications(Set<Publication> editedPublications) {
     	zooActivateWrite();
-    	this.editedPublications.clear();
-    	this.editedPublications.addAll(editedPublications);
+    	//this.editedPublications.clear(); null
+    	this.editedPublications = editedPublications;
     }
 
 }
