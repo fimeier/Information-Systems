@@ -172,7 +172,6 @@ public class App
             
             inp1.setProceedings(newp);
             add_to_proceedings(pm, inp1, newp);
-            add_to_proceedings(pm, inp1, newp);
 
     		pm.currentTransaction().commit();
 
