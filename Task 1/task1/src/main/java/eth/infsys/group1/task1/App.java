@@ -315,12 +315,12 @@ public class App
 	
 	private static boolean proceedings_exist(PersistenceManager pm, String id) {
 
-		//using reference in query {
-		//Query q = pm.newQuery(T1Proceedings.class, getId() == id );
-		//Collection<T1Proceedings> asdf = (Collection<T1Proceedings>)q.execute();
-        //Query q = pm.newQuery("select unique from eth.infsys.group1.task1.dbobjs.T1Proceedings where id == '" + id + "'");
 		
-        //T1Proceedings asdf = (T1Proceedings) q.execute();
+		//Query q = pm.newQuery(T1Proceedings.class, Id == "huhu" );
+		//Collection<T1Proceedings> asdf = (Collection<T1Proceedings>)q.execute();
+       
+		//Query q = pm.newQuery("select unique from eth.infsys.group1.task1.dbobjs.T1Proceedings where Id == '" + id + "'");
+		//T1Proceedings asdf = (T1Proceedings) q.execute();
         
         Extent<T1Proceedings> ext = pm.getExtent(T1Proceedings.class);
         for (T1Proceedings p: ext) {
