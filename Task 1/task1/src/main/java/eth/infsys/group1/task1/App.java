@@ -460,6 +460,7 @@ public class App
         createDB(dbName);
         create_some_stuff(dbName);
         
+        //test 2
         /*
         //set test
         Set<String> myset = new HashSet<String>();
