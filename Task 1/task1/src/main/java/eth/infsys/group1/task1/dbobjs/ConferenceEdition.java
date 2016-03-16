@@ -1,17 +1,20 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import ch.ethz.globis.isk.domain.*;
-
-/**
- * Implementation of the {@link ch.ethz.globis.isk.domain.ConferenceEdition} interface for ZooDB.
- */
-public class ConferenceEdition extends DomainObject implements ConferenceEdition {
+public class ConferenceEdition extends DomainObject {
 
     private Conference conference;
 	private int year;
 	private Proceedings proceedings;
-
-	public ConferenceEdition() { }
+	
+	/**
+	 * Should only be used by the database
+	 */
+	protected ConferenceEdition() { }
+	
+	public ConferenceEdition(Conference conference, int year) {
+		this.conference = conference;
+		this.year = year;
+	}
 
 	public Conference getConference() {
 		zooActivateRead();

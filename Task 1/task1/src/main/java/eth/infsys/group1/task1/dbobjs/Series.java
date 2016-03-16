@@ -1,19 +1,23 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import ch.ethz.globis.isk.domain.*;
-
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Implementation of the {@link ch.ethz.globis.isk.domain.Series} interface for ZooDB.
- */
-public class Series extends DomainObject implements Series {
+public class Series extends DomainObject {
 
     private String name;
-	private Set<Publication> publications;
+	private Set<Publication> publications = new HashSet<>();
     
-    public Series() { }
+	/**
+	 * Should only be used by the database
+	 */
+    protected Series() { }
+    
+    public Series(String name) {
+    	this.name = name;
+    }
 
 	public String getName() {
     	zooActivateRead();
@@ -25,15 +29,34 @@ public class Series extends DomainObject implements Series {
     	this.name = name;
     }
 
+    public boolean addPublication(Publication e) {
+    	zooActivateWrite();
+    	return this.publications.add(e);
+    }
+    
+    public boolean addPublications(Collection<? extends Publication> e) {
+    	zooActivateWrite();
+    	return this.publications.addAll(e);
+    }
+    
     public Set<Publication> getPublications() {
     	zooActivateRead();
 		return Collections.unmodifiableSet(this.publications);
 	}
+    
+    public boolean removePublication(Object e) {
+    	zooActivateWrite();
+    	return this.publications.remove(e);
+    }
+    
+    public boolean removePublications(Collection<?> e) {
+    	zooActivateWrite();
+    	return this.publications.removeAll(e);
+    }
 
     public void setPublications(Set<Publication> publications) {
     	zooActivateWrite();
-    	this.publications.clear();
-    	this.publications.addAll(publications);
+    	this.publications = new HashSet<>(publications);
     }
     
 }

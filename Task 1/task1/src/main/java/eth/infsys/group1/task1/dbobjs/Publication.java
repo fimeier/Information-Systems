@@ -1,23 +1,25 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import ch.ethz.globis.isk.domain.*;
-
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-/**
- * Implementation of the {@link ch.ethz.globis.isk.domain.Publication} interface for ZooDB.
- */
-public class Publication extends DomainObject implements Publication {
+public abstract class Publication extends DomainObject {
 
 	private String title;
-	private List<Person> authors;
-	private Set<Person> editors;
+	private List<Person> authors = new ArrayList<>(); // can be authors (InProceedings) or editors (Proceedings)
 	private int year;
 	private String electronicEdition;
 
-	public Publication() { }
+	/**
+	 * Should only be used by the database
+	 */
+	protected Publication() { }
+	
+	public Publication(String title, int year) {
+		this.title = title;
+		this.year = year;
+	}
 	
     public String getTitle() {
     	zooActivateRead();
@@ -36,20 +38,7 @@ public class Publication extends DomainObject implements Publication {
 
     public void setAuthors(List<Person> authors) {
     	zooActivateWrite();
-    	//this.authors.clear();  probably a empty List
-    	this.authors = authors;
-
-	}
-
-    public Set<Person> getEditors() {
-    	zooActivateRead();
-		return Collections.unmodifiableSet(this.editors);
-	}
-
-    public void setEditors(Set<Person> editors) {
-    	zooActivateWrite();
-    	//this.editors.clear(); probably a empty Set
-    	this.editors = editors;
+    	this.authors = new ArrayList<>(authors);
 	}
 
     public int getYear() {

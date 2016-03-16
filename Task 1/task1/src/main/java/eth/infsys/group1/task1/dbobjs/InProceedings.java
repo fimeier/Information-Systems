@@ -1,26 +1,27 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import ch.ethz.globis.isk.domain.*;
-
-/**
- * Implementation of the {@link ch.ethz.globis.isk.domain.InProceedings} interface for ZooDB.
- */
-public class InProceedings extends Publication implements InProceedings {
+public class InProceedings extends Publication {
 	
 	private String note;
 	private String pages;
 	private Proceedings proceedings;
 
-	public InProceedings() { }
+	/**
+	 * Should only be used by the database
+	 */
+	protected InProceedings() { }
+	
+	public InProceedings(Proceedings proceedings, String pages, String note) {
+		this.proceedings = proceedings;
+		this.pages = pages;
+		this.note = note;
+	}
 
     public String getNote() {
     	zooActivateRead();
 		return this.note;
 	}
-    
-    /**
-     *<pages> from XML-File
-     */
+
     public void setNote(String note) {
     	zooActivateWrite();
     	this.note = note;
@@ -31,9 +32,6 @@ public class InProceedings extends Publication implements InProceedings {
 		return this.pages;
 	}
 
-/**
- *<pages> from XML-File
- */
     public void setPages(String pages) {
     	zooActivateWrite();
     	this.pages = pages;

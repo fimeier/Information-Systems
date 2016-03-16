@@ -1,20 +1,23 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import ch.ethz.globis.isk.domain.*;
-
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Implementation of the {@link ch.ethz.globis.isk.domain.Person} interface for ZooDB.
- */
-public class Person extends DomainObject implements Person {
+public class Person extends DomainObject {
 
-	public Person() { }
+	/**
+	 * Should only be used by the database
+	 */
+	protected Person() { }
+	
+	public Person(String name) {
+		this.name = name;
+	}
 	
     private String name;
-	private Set<Publication> authoredPublications;
-	private Set<Publication> editedPublications;
+	private Set<Publication> authoredPublications = new HashSet<>();
+	private Set<Publication> editedPublications = new HashSet<>();
 
 	public String getName() {
     	zooActivateRead();
@@ -32,8 +35,8 @@ public class Person extends DomainObject implements Person {
     }
 
     public void setAuthoredPublications(Set<Publication> authoredPublications) {
-    	//this.authoredPublications.clear(); NULL
-    	this.authoredPublications = authoredPublications;
+    	zooActivateWrite();
+    	this.authoredPublications = new HashSet<>(authoredPublications);
     }
 
     public Set<Publication> getEditedPublications() {
@@ -43,8 +46,7 @@ public class Person extends DomainObject implements Person {
 
     public void setEditedPublications(Set<Publication> editedPublications) {
     	zooActivateWrite();
-    	//this.editedPublications.clear(); null
-    	this.editedPublications = editedPublications;
+    	this.editedPublications = new HashSet<>(editedPublications);
     }
 
 }

@@ -1,14 +1,10 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import ch.ethz.globis.isk.domain.*;
-
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Implementation of the {@link ch.ethz.globis.isk.domain.Proceedings} interface for ZooDB.
- */
-public class Proceedings extends Publication implements Proceedings {
+public class Proceedings extends Publication {
 
 	private String note;
 	private int number;
@@ -17,9 +13,16 @@ public class Proceedings extends Publication implements Proceedings {
 	private String isbn;
 	private Series series;
 	private ConferenceEdition conferenceEdtion;
-	private Set<InProceedings> publications;
+	private Set<InProceedings> publications = new HashSet<>();
 	
-	public Proceedings() { }
+	/**
+	 * Should only be used by the database
+	 */
+	protected Proceedings() { }
+	
+	public Proceedings(String title, ConferenceEdition confEdition) {
+		super(title, confEdition.getYear());
+	}
 	
     public String getNote() {
     	zooActivateRead();
@@ -98,8 +101,7 @@ public class Proceedings extends Publication implements Proceedings {
 
     public void setPublications(Set<InProceedings> publications) {
     	zooActivateWrite();
-    	//this.publications.clear(); empty..publications.
-    	this.publications = publications;
+    	this.publications = new HashSet<>(publications);
     }
 
 }
