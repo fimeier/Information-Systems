@@ -8,9 +8,9 @@ import java.util.Set;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.Person} interface for ZooDB.
  */
-public class T1Person extends T1DomainObject implements Person {
+public class Person extends DomainObject implements Person {
 
-	public T1Person() { }
+	public Person() { }
 	
     private String name;
 	private Set<Publication> authoredPublications;

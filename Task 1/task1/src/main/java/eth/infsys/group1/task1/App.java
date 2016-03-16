@@ -20,12 +20,12 @@ import ch.ethz.globis.isk.domain.Person;
 import ch.ethz.globis.isk.domain.Proceedings;
 import ch.ethz.globis.isk.domain.Publication;
 import ch.ethz.globis.isk.domain.Publisher;
-import eth.infsys.group1.task1.dbobjs.T1DomainObject;
-import eth.infsys.group1.task1.dbobjs.T1InProceedings;
-import eth.infsys.group1.task1.dbobjs.T1Person;
-import eth.infsys.group1.task1.dbobjs.T1Proceedings;
-import eth.infsys.group1.task1.dbobjs.T1Publication;
-import eth.infsys.group1.task1.dbobjs.T1Publisher;
+import eth.infsys.group1.task1.dbobjs.DomainObject;
+import eth.infsys.group1.task1.dbobjs.InProceedings;
+import eth.infsys.group1.task1.dbobjs.Person;
+import eth.infsys.group1.task1.dbobjs.Proceedings;
+import eth.infsys.group1.task1.dbobjs.Publication;
+import eth.infsys.group1.task1.dbobjs.Publisher;
 
 /**
  * Hello world!
@@ -94,7 +94,7 @@ public class App
         if (!proceedings_exist(pm, id)){
            
             System.out.println("create Id=" + id );
-        	T1Proceedings newp = new T1Proceedings();
+        	Proceedings newp = new Proceedings();
             pm.makePersistent(newp);
             /**
              * DomainObject
@@ -109,7 +109,7 @@ public class App
             //create Editors; add Puplication(=Preceeding to Person); setEditors
             Set<Person> Editors = create_and_return_editors(pm, editors);
             for (Person p: Editors){
-            	add_to_editedPublications(pm, (T1Person) p, newp);
+            	add_to_editedPublications(pm, (Person) p, newp);
             }
             newp.setEditors(Editors);
         
@@ -148,10 +148,10 @@ public class App
 * Problems:	-how to pass arguments? => create function/class
 */
         pm.currentTransaction().begin();
-		T1Proceedings newp = get_proceeding(pm, id);
+		Proceedings newp = get_proceeding(pm, id);
         id = "conf/hmi/Estrin87";
 		if (!inproceeding_exist(pm, id, newp)) {
-            T1InProceedings inp1 = new T1InProceedings();
+            InProceedings inp1 = new InProceedings();
             pm.makePersistent(inp1); //????
             //DomainObject
             id = "conf/hmi/Estrin87";
@@ -194,7 +194,7 @@ public class App
 		id = "conf/hmi/Hammond87";
         pm.currentTransaction().begin();
 		if (!inproceeding_exist(pm, id, newp)) {
-            T1InProceedings inp2 = new T1InProceedings();
+            InProceedings inp2 = new InProceedings();
             pm.makePersistent(inp2); //????
             //DomainObject
             id = "conf/hmi/Hammond87";
@@ -236,7 +236,7 @@ public class App
 		
 	}
 	
-	private static void add_to_publications(PersistenceManager pm, Publisher pub, T1Proceedings newp) {
+	private static void add_to_publications(PersistenceManager pm, Publisher pub, Proceedings newp) {
 		Set<Publication> old_set = pub.getPublications();
         Set<Publication> publications = new HashSet<Publication>();
         boolean already_exist = false;
@@ -255,7 +255,7 @@ public class App
 	
 	}
 
-	private static void add_to_editedPublications(PersistenceManager pm, T1Person p, T1Publication newp) {
+	private static void add_to_editedPublications(PersistenceManager pm, Person p, Publication newp) {
 		Set<Publication> old_set = p.getEditedPublications();
         Set<Publication> editedPublications = new HashSet<Publication>();
         boolean already_exist = false;
@@ -276,7 +276,7 @@ public class App
         p.setEditedPublications(editedPublications);
 	}
 
-	private static void add_to_proceedings(PersistenceManager pm, T1InProceedings inp1, T1Proceedings newp) {
+	private static void add_to_proceedings(PersistenceManager pm, InProceedings inp1, Proceedings newp) {
 		
 		Set<InProceedings> old_set = newp.getPublications();
 		//not working...
@@ -299,9 +299,9 @@ public class App
 		
 	}*/
 
-	private static T1Proceedings get_proceeding(PersistenceManager pm, String id) {
-		Extent<T1Proceedings> ext = pm.getExtent(T1Proceedings.class);
-        for (T1Proceedings p: ext) {
+	private static Proceedings get_proceeding(PersistenceManager pm, String id) {
+		Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
+        for (Proceedings p: ext) {
         	if (p.getId().equals(id)){
         		//System.out.println("already exists: " + p.getId());
                 ext.closeAll();
@@ -322,8 +322,8 @@ public class App
 		//Query q = pm.newQuery("select unique from eth.infsys.group1.task1.dbobjs.T1Proceedings where Id == '" + id + "'");
 		//T1Proceedings asdf = (T1Proceedings) q.execute();
         
-        Extent<T1Proceedings> ext = pm.getExtent(T1Proceedings.class);
-        for (T1Proceedings p: ext) {
+        Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
+        for (Proceedings p: ext) {
         	if (p.getId().equals(id)){
         		//System.out.println("already exists: " + p.getId());
                 ext.closeAll();
@@ -334,7 +334,7 @@ public class App
 
 		return false;
 	}
-	private static boolean inproceeding_exist(PersistenceManager pm, String id, T1Proceedings newp) {
+	private static boolean inproceeding_exist(PersistenceManager pm, String id, Proceedings newp) {
 		Set<InProceedings> old_set = newp.getPublications();
         for (InProceedings inp: old_set) {
         	if (inp.getId().equals(id)){
@@ -349,8 +349,8 @@ public class App
 	
 	private static List<Person> create_and_return_authors(PersistenceManager pm, List<String> authors){
 		List<Person> set_authors = new ArrayList<Person>();
-		Extent<T1Person> ext = pm.getExtent(T1Person.class);
-        for (T1Person p: ext) {
+		Extent<Person> ext = pm.getExtent(Person.class);
+        for (Person p: ext) {
         	if(authors.remove(p.getName())){
         		//Author already exists as a Person; add object to Set
         		System.out.println("Author (" + p.getName() + ") already exists as a Person ");
@@ -368,8 +368,8 @@ public class App
 	
 	private static Set<Person> create_and_return_editors(PersistenceManager pm, Set<String> editors){
 		Set<Person> set_editors = new HashSet<Person>();
-		Extent<T1Person> ext = pm.getExtent(T1Person.class);
-        for (T1Person p: ext) {
+		Extent<Person> ext = pm.getExtent(Person.class);
+        for (Person p: ext) {
         	if(editors.remove(p.getName())){
         		//Editor already exists as a Person; add object to Set
         		System.out.println("Editor (" + p.getName() + ") already exists as a Person ");
@@ -389,8 +389,8 @@ public class App
 	};
 
 	private static Publisher create_and_return_publisher(PersistenceManager pm, String publisher) {
-		Extent<T1Publisher> ext = pm.getExtent(T1Publisher.class);
-        for (T1Publisher p: ext) {
+		Extent<Publisher> ext = pm.getExtent(Publisher.class);
+        for (Publisher p: ext) {
         	if( publisher.equals(p.getName()) ){
         		//Publisher already exists; return Publisher as object
         		System.out.println("Publisher (" + p.getName() + ") already exists");
@@ -404,7 +404,7 @@ public class App
 		Set<Publication> publications = new HashSet<Publication>();
 		
 		System.out.println("create publisher = " + name );
-        T1Publisher newp = new T1Publisher();
+        Publisher newp = new Publisher();
         pm.makePersistent(newp);
 		/**
          * DomainObject
@@ -427,7 +427,7 @@ public class App
 		Set<Publication> editedPublications = new HashSet<Publication>();
 		
 		System.out.println("create person = " + name );
-        T1Person newp = new T1Person();
+        Person newp = new Person();
         pm.makePersistent(newp);
 		/**
          * DomainObject

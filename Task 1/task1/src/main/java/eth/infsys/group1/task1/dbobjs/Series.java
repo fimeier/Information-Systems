@@ -8,12 +8,12 @@ import java.util.Set;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.Series} interface for ZooDB.
  */
-public class T1Series extends T1DomainObject implements Series {
+public class Series extends DomainObject implements Series {
 
     private String name;
 	private Set<Publication> publications;
     
-    public T1Series() { }
+    public Series() { }
 
 	public String getName() {
     	zooActivateRead();

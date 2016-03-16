@@ -5,13 +5,13 @@ import ch.ethz.globis.isk.domain.*;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.ConferenceEdition} interface for ZooDB.
  */
-public class T1ConferenceEdition extends T1DomainObject implements ConferenceEdition {
+public class ConferenceEdition extends DomainObject implements ConferenceEdition {
 
     private Conference conference;
 	private int year;
 	private Proceedings proceedings;
 
-	public T1ConferenceEdition() { }
+	public ConferenceEdition() { }
 
 	public Conference getConference() {
 		zooActivateRead();

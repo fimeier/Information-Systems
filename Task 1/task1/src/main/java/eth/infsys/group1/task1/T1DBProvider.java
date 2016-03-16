@@ -9,7 +9,7 @@ import eth.infsys.group1.task1.dbobjs.*;
 import eth.infsys.group1.ui.DBProvider;
 
 public class T1DBProvider extends
-		DBProvider<T1Conference, T1ConferenceEdition, T1InProceedings, T1Person, T1Proceedings, T1Publication, T1Publisher, T1Series> {
+		DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
 
 	private PersistenceManager persistenceManager;
 	
@@ -18,18 +18,18 @@ public class T1DBProvider extends
 	}
 
 	@Override
-	public T1InProceedings createInProceedings() {
+	public InProceedings createInProceedings() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getTitle(T1InProceedings inProceedings) {
+	public String getTitle(InProceedings inProceedings) {
 		return inProceedings.getTitle();
 	}
 
 	@Override
-	public List<T1Conference> getConferences(int startIndex, int endIndex, int sort) {
+	public List<Conference> getConferences(int startIndex, int endIndex, int sort) {
 		switch (sort) {
 		case SORT_BY_NAME:
 		default:
@@ -38,66 +38,66 @@ public class T1DBProvider extends
 	}
 
 	@Override
-	public List<T1ConferenceEdition> getConferenceEditions(int startIndex, int endIndex, int sort,
-			T1Conference conference) {
+	public List<ConferenceEdition> getConferenceEditions(int startIndex, int endIndex, int sort,
+			Conference conference) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1InProceedings> getInProceedings(int startIndex, int endIndex, int sort) {
+	public List<InProceedings> getInProceedings(int startIndex, int endIndex, int sort) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1InProceedings> getInProceedings(int startIndex, int endIndex, int sort, T1Person authorFilter) {
+	public List<InProceedings> getInProceedings(int startIndex, int endIndex, int sort, Person authorFilter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1Proceedings> getProceedings(int startIndex, int endIndex, int sort) {
+	public List<Proceedings> getProceedings(int startIndex, int endIndex, int sort) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1Proceedings> getProceedings(int startIndex, int endIndex, int sort, T1Person authorFilter) {
+	public List<Proceedings> getProceedings(int startIndex, int endIndex, int sort, Person authorFilter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1Publisher> getPublishers(int startIndex, int endIndex, int sort) {
+	public List<Publisher> getPublishers(int startIndex, int endIndex, int sort) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1Person> getPersons(int startIndex, int endIndex, int sort) {
+	public List<Person> getPersons(int startIndex, int endIndex, int sort) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1Person> getPersons(int startIndex, int endIndex, int sort, String nameFilter) {
+	public List<Person> getPersons(int startIndex, int endIndex, int sort, String nameFilter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<T1Series> getSeries(int startIndex, int endIndex, int sort) {
+	public List<Series> getSeries(int startIndex, int endIndex, int sort) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public Set<T1Publication> getAuthoredPublications(T1Person person) {
+	public Set<Publication> getAuthoredPublications(Person person) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public Set<T1Publication> getEditedPublications(T1Person person) {
+	public Set<Publication> getEditedPublications(Person person) {
 		// TODO Auto-generated method stub
 		return null;
 	}

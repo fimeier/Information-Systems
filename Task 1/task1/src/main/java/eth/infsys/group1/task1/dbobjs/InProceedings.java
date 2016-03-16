@@ -5,13 +5,13 @@ import ch.ethz.globis.isk.domain.*;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.InProceedings} interface for ZooDB.
  */
-public class T1InProceedings extends T1Publication implements InProceedings {
+public class InProceedings extends Publication implements InProceedings {
 	
 	private String note;
 	private String pages;
 	private Proceedings proceedings;
 
-	public T1InProceedings() { }
+	public InProceedings() { }
 
     public String getNote() {
     	zooActivateRead();

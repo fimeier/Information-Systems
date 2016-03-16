@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.Proceedings} interface for ZooDB.
  */
-public class T1Proceedings extends T1Publication implements Proceedings {
+public class Proceedings extends Publication implements Proceedings {
 
 	private String note;
 	private int number;
@@ -19,7 +19,7 @@ public class T1Proceedings extends T1Publication implements Proceedings {
 	private ConferenceEdition conferenceEdtion;
 	private Set<InProceedings> publications;
 	
-	public T1Proceedings() { }
+	public Proceedings() { }
 	
     public String getNote() {
     	zooActivateRead();

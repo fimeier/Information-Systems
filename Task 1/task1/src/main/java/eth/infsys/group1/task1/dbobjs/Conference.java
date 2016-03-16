@@ -8,12 +8,12 @@ import java.util.Set;
 /**
  * Implementation of the {@link ch.ethz.globis.isk.domain.Conference} interface for ZooDB.
  */
-public class T1Conference extends T1DomainObject implements Conference {
+public class Conference extends DomainObject implements Conference {
 	
 	private String name;
 	private Set<ConferenceEdition> editions;
 	
-	public T1Conference() { }
+	public Conference() { }
 
 	public String getName() {
     	zooActivateRead();
