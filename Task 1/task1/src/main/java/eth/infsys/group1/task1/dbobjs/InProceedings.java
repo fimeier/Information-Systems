@@ -1,6 +1,11 @@
 package eth.infsys.group1.task1.dbobjs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InProceedings extends Publication {
+	
+	private List<Person> authors = new ArrayList<>();
 	
 	private String note;
 	private String pages;
@@ -9,12 +14,26 @@ public class InProceedings extends Publication {
 	/**
 	 * Should only be used by the database
 	 */
-	protected InProceedings() { }
+	public InProceedings() { }
 	
-	public InProceedings(Proceedings proceedings, String pages, String note) {
-		this.proceedings = proceedings;
-		this.pages = pages;
+	public InProceedings(String title, String electronicEdition, List<Person> authors, String note, String pages, Proceedings proc) {
+    	super(title, proc.getConferenceEdition().getYear(), electronicEdition);
+
+    	this.authors = new ArrayList<>(authors);
+    	for (Person p: this.authors){
+    		p.addAuthoredPublications(this);
+    	}
+    	
 		this.note = note;
+		this.pages = pages;
+    	
+		this.proceedings = proc;
+		proc.addInProceedings(this);
+		
+		String id = (proc.getId() + "/" + authors.get(0).getName()).toUpperCase();
+        System.out.println("calculated id in inproceedings constructor=" + this.getId());
+
+    	this.setId(id);
 	}
 
     public String getNote() {

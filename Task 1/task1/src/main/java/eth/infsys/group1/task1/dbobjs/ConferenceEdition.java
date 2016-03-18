@@ -14,6 +14,9 @@ public class ConferenceEdition extends DomainObject {
 	public ConferenceEdition(Conference conference, int year) {
 		this.conference = conference;
 		this.year = year;
+		conference.addEdition(this);
+		String id = conference.getName() + "/" + year;
+		this.setId(id);
 	}
 
 	public Conference getConference() {

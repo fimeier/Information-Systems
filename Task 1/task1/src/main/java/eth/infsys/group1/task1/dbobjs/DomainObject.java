@@ -15,7 +15,7 @@ public abstract class DomainObject extends ZooPC {
 
     public void setId(String id) {
     	zooActivateWrite();
-    	this.id = id;
+    	this.id = id.toUpperCase();
     }
     
 }

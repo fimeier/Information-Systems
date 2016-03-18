@@ -7,7 +7,7 @@ import java.util.List;
 public abstract class Publication extends DomainObject {
 
 	private String title;
-	private List<Person> authors = new ArrayList<>(); // can be authors (InProceedings) or editors (Proceedings)
+	//private List<Person> authors = new ArrayList<>(); // can be authors (InProceedings) or editors (Proceedings)
 	private int year;
 	private String electronicEdition;
 
@@ -16,9 +16,10 @@ public abstract class Publication extends DomainObject {
 	 */
 	protected Publication() { }
 	
-	public Publication(String title, int year) {
+	public Publication(String title, int year, String electronicEdition) {
 		this.title = title;
 		this.year = year;
+		this.electronicEdition = electronicEdition;
 	}
 	
     public String getTitle() {
@@ -31,6 +32,7 @@ public abstract class Publication extends DomainObject {
     	this.title = title;
     }
 
+    /*
     public List<Person> getAuthors() {
     	zooActivateRead();
 		return Collections.unmodifiableList(this.authors);
@@ -39,7 +41,7 @@ public abstract class Publication extends DomainObject {
     public void setAuthors(List<Person> authors) {
     	zooActivateWrite();
     	this.authors = new ArrayList<>(authors);
-	}
+	}*/
 
     public int getYear() {
     	zooActivateRead();
