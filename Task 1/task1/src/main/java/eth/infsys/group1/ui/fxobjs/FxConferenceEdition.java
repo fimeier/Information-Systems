@@ -7,6 +7,24 @@ import javafx.beans.property.StringProperty;
 
 public class FxConferenceEdition<TRConferenceEdition> extends FxDomainObject<TRConferenceEdition> {
 
+	public static enum SortOption {
+		//BY_NAME("Sort by Name"), BY_YEAR("Sort by Year"),
+		BY_NAME_YEAR("Sort by Name and Year"),
+		BY_YEAR_NAME("Sort by Year and Name"),
+		BY_ID("Sort by ID");
+		
+		public final String description;
+		
+		SortOption(String description) {
+			this.description = description;
+		}
+		
+		@Override
+		public String toString() {
+			return this.description;
+		}
+	}
+	
 	private StringProperty conferenceName;
 	private IntegerProperty year;
 	private StringProperty proceedingsTitle;

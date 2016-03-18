@@ -11,11 +11,19 @@ public abstract class DBProvider<TRConference,
 								TRPublication,
 								TRPublisher,
 								TRSeries> {
+	
+	public static final class InvalidDBRepException extends Exception {
 
-	public static final int SORT_BY_ID = 2;
-	public static final int SORT_BY_NAME = 3;
-	public static final int SORT_BY_TITLE = 5;
-	public static final int SORT_BY_YEAR = 7;
+		private static final long serialVersionUID = -3845406311284661251L;
+		
+		public final Object invalidRep;
+		
+		public InvalidDBRepException(Object invalidRep) {
+			super("Invalid DB representation argument");
+			this.invalidRep = invalidRep;
+		}
+		
+	}
 
 	public DBProvider() { }
 
@@ -31,18 +39,20 @@ public abstract class DBProvider<TRConference,
 	 * and sets the DBRepresentation and ID fields of the passed FX object.
 	 * @param fxObj The FX object representing the conference edition
 	 * @param conference The conference
+	 * @throws InvalidDBRepException If {@code conference} is not a valid conference representation
 	 */
 	public abstract void createConferenceEdition(FxConferenceEdition<TRConferenceEdition> fxObj,
-			TRConference conference);
+			TRConference conference) throws InvalidDBRepException;
 	
 	/**
 	 * Uses the provided data to create a new in-proceedings publication
 	 * and sets the DBRepresentation and ID fields of the passed FX object.
 	 * @param fxObj The FX object representing the publication
 	 * @param proceedings The proceedings
+	 * @throws InvalidDBRepException If {@code proceedings} is not a valid proceedings representation
 	 */
 	public abstract void createInProceedings(FxInProceedings<TRInProceedings> fxObj,
-			TRProceedings proceedings);
+			TRProceedings proceedings) throws InvalidDBRepException;
 	
 	/**
 	 * Uses the provided data to create a new person
@@ -56,9 +66,10 @@ public abstract class DBProvider<TRConference,
 	 * and sets the DBRepresentation and ID fields of the passed FX object.
 	 * @param fxObj The FX object representing the person
 	 * @param confEdition The conference edition
+	 * @throws InvalidDBRepException If {@code confEdition} is not a valid conference edition representation
 	 */
 	public abstract void createProceedings(FxPerson<TRPerson> fxObj,
-			TRConferenceEdition confEdition);
+			TRConferenceEdition confEdition) throws InvalidDBRepException;
 	
 	/**
 	 * Uses the provided data to create a new publisher
@@ -83,40 +94,58 @@ public abstract class DBProvider<TRConference,
 	public abstract TRPublisher getPublisherByID(String id);
 	public abstract TRSeries getSeriesByID(String id);
 	
-	public abstract void getConferences(int startIndex, int endIndex, int sort,
+	public abstract void getConferences(int startIndex, int endIndex, FxConference.SortOption sort,
 			String searchTerm, List<FxConference<TRConference>> out);
 	
-	public abstract void getConferenceEditions(int startIndex, int endIndex, int sort,
-			String searchTerm, List<FxConferenceEdition<TRConferenceEdition>> out);
+	public abstract void getConferenceEditions(int startIndex, int endIndex,
+			FxConferenceEdition.SortOption sort, String searchTerm,
+			List<FxConferenceEdition<TRConferenceEdition>> out);
 	
-	public abstract void getConferenceEditions(int startIndex, int endIndex, int sort,
+	public abstract void getConferenceEditions(int startIndex, int endIndex,
+			FxConferenceEdition.SortOption sort,
 			TRConference conference, String searchTerm,
 			List<FxConferenceEdition<TRConferenceEdition>> out);
 	
-	public abstract void getInProceedings(int startIndex, int endIndex, int sort,
-			String searchTerm, List<FxInProceedings<TRInProceedings>> out);
-	
-	public abstract void getInProceedingsOfAuthor(int startIndex, int endIndex, int sort,
-			TRPerson author, String searchTerm, List<FxInProceedings<TRInProceedings>> out);
-	
-	public abstract void getInProceedingsOfProceedings(int startIndex, int endIndex, int sort,
-			TRProceedings proceedings, String searchTerm,
+	public abstract void getInProceedings(int startIndex, int endIndex,
+			FxInProceedings.SortOption sort, String searchTerm,
 			List<FxInProceedings<TRInProceedings>> out);
 	
-	public abstract void getProceedings(int startIndex, int endIndex, int sort,
-			String searchTerm, List<FxInProceedings<TRProceedings>> out);
+	public abstract void getInProceedingsOfAuthor(int startIndex, int endIndex,
+			FxInProceedings.SortOption sort, TRPerson author, String searchTerm,
+			List<FxInProceedings<TRInProceedings>> out);
 	
-	public abstract void getProceedingsOfEditor(int startIndex, int endIndex, int sort,
-			TRPerson author, String searchTerm,
-			List<FxInProceedings<TRProceedings>> out);
+	public abstract void getInProceedingsOfProceedings(int startIndex, int endIndex,
+			FxInProceedings.SortOption sort, TRProceedings proceedings, String searchTerm,
+			List<FxInProceedings<TRInProceedings>> out);
 	
-	public abstract void getPublishers(int startIndex, int endIndex, int sort,
-			String searchTerm, List<FxInProceedings<TRPublisher>> out);
+	public abstract void getProceedings(int startIndex, int endIndex,
+			FxProceedings.SortOption sort, String searchTerm,
+			List<FxProceedings<TRProceedings>> out);
 	
-	public abstract void getPersons(int startIndex, int endIndex, int sort,
-			String searchTerm, List<FxInProceedings<TRPerson>> out);
+	public abstract void getProceedingsOfEditor(int startIndex, int endIndex,
+			FxProceedings.SortOption sort, TRPerson author, String searchTerm,
+			List<FxProceedings<TRProceedings>> out);
 	
-	public abstract void getSeries(int startIndex, int endIndex, int sort,
-			String searchTerm, List<FxSeries<TRSeries>> out);
-
+	public abstract void getPublishers(int startIndex, int endIndex,
+			FxPublisher.SortOption sort, String searchTerm,
+			List<FxInProceedings<TRPublisher>> out);
+	
+	public abstract void getPersons(int startIndex, int endIndex,
+			FxPerson.SortOption sort, String searchTerm, List<FxPerson<TRPerson>> out);
+	
+	public abstract void getSeries(int startIndex, int endIndex,
+			FxSeries.SortOption sort, String searchTerm, List<FxSeries<TRSeries>> out);
+	
+	public abstract void setConferenceTitle(TRConference conference, String title);
+	public abstract void setConferenceEditionYear(TRConferenceEdition edition, int year);
+	public abstract void setPersonName(TRPerson person, String name);
+	
+	public abstract void updateConferenceData(List<FxConference<TRConference>> data);
+	public abstract void updateConferenceEditionData(List<FxConferenceEdition<TRConferenceEdition>> data);
+	public abstract void updateInProceedingsData(List<FxInProceedings<TRInProceedings>> data);
+	public abstract void updatePersonData(List<FxPerson<TRPerson>> data);
+	public abstract void updateProceedingsData(List<FxProceedings<TRProceedings>> data);
+	public abstract void updatePublicationData(List<FxPublication<TRPublication>> data);
+	public abstract void updatePublisherData(List<FxPublisher<TRPublisher>> data);
+	public abstract void updateSeriesData(List<FxSeries<TRSeries>> data);
 }

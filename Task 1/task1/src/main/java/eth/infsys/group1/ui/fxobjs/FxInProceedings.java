@@ -9,6 +9,24 @@ import javafx.collections.ObservableList;
 
 public class FxInProceedings<TRInProceedings> extends FxPublication<TRInProceedings> {
 
+	public static enum SortOption {
+		//BY_TITLE("Sort by Title"), BY_YEAR("Sort by Year"),
+		BY_TITLE_YEAR("Sort by Title and Year"),
+		BY_YEAR_TITLE("Sort by Year and Title"),
+		BY_ID("Sort by ID");
+		
+		public final String description;
+		
+		SortOption(String description) {
+			this.description = description;
+		}
+		
+		@Override
+		public String toString() {
+			return this.description;
+		}
+	}
+	
 	private ObservableList<String> authors;
 	private StringProperty note;
 	private StringProperty pages;

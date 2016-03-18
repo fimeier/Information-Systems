@@ -3,17 +3,34 @@ package eth.infsys.group1.ui.fxobjs;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class FxPerson<TRPerson> extends FxDomainObject<TRPerson> {
+	
+	public static enum SortOption {
+		BY_NAME("Sort by Name"), BY_ID("Sort by ID");
+		
+		public final String description;
+		
+		SortOption(String description) {
+			this.description = description;
+		}
+		
+		@Override
+		public String toString() {
+			return this.description;
+		}
+	}
 	
     private StringProperty name;
 	private IntegerProperty authoredPublicationCount;
 	private IntegerProperty editedPublicationCount;
 	private NumberBinding totalPublicationCount;
 
-	public FxPerson(TRPerson dbRep, String id) {
+	public FxPerson(TRPerson dbRep, String id, String name) {
 		super(dbRep, id);
+		this.name = new SimpleStringProperty(name);
 		this.totalPublicationCount = Bindings.add(this.authoredPublicationCount, this.editedPublicationCount);
 	}
 

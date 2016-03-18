@@ -13,6 +13,26 @@ import javafx.collections.ObservableSet;
 
 public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 
+	public static enum SortOption {
+		//BY_TITLE("Sort by Title"), BY_YEAR("Sort by Year"),
+		BY_TITLE_YEAR("Sort by Title and Year"),
+		BY_YEAR_TITLE("Sort by Year and Title"),
+		BY_CONFID_YEAR("Sort by Conference ID and Year"),
+		BY_YEAR_CONFID("Sort by Year and Conference ID"),
+		BY_ID("Sort by ID");
+		
+		public final String description;
+		
+		SortOption(String description) {
+			this.description = description;
+		}
+		
+		@Override
+		public String toString() {
+			return this.description;
+		}
+	}
+	
 	private ObservableSet<String> editors;
 	private StringProperty note;
 	private IntegerProperty number;

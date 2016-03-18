@@ -6,6 +6,23 @@ import javafx.beans.property.StringProperty;
 
 public class FxSeries<TRSeries> extends FxDomainObject<TRSeries> {
 
+	public static enum SortOption {
+		BY_NAME("Sort by Name"),
+		BY_PUBCOUNT("Sort by Number of Publications"),
+		BY_ID("Sort by ID");
+		
+		public final String description;
+		
+		SortOption(String description) {
+			this.description = description;
+		}
+		
+		@Override
+		public String toString() {
+			return this.description;
+		}
+	}
+	
 	private StringProperty name;
     private IntegerProperty publicationCount;
 	

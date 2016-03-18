@@ -7,6 +7,21 @@ import javafx.beans.property.StringProperty;
 
 public final class FxConference<TRConference> extends FxDomainObject<TRConference> {
 	
+	public static enum SortOption {
+		BY_NAME("Sort by Name"), BY_ID("Sort by ID");
+		
+		public final String description;
+		
+		SortOption(String description) {
+			this.description = description;
+		}
+		
+		@Override
+		public String toString() {
+			return this.description;
+		}
+	}
+	
 	private StringProperty name;
 	private IntegerProperty editionCount;
 	
