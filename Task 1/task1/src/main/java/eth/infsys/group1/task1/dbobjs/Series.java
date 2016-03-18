@@ -17,6 +17,7 @@ public class Series extends DomainObject {
     
     public Series(String name) {
     	this.name = name;
+    	this.setId(name);
     }
 
 	public String getName() {

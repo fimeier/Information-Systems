@@ -17,6 +17,8 @@ public class Publisher extends DomainObject {
 	
 	public Publisher(String name) {
 		this.name = name;
+		String id = name;
+		this.setId(id);
 	}
 
 	public String getName() {

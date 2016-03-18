@@ -17,6 +17,7 @@ public class Conference extends DomainObject {
 
 	public Conference(String name) {
 		this.name = name;
+		this.setId(name);
 	}
 
 	public String getName() {

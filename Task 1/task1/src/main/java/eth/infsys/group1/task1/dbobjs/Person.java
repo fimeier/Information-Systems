@@ -13,6 +13,7 @@ public class Person extends DomainObject {
 	
 	public Person(String name) {
 		this.name = name;
+		this.setId(name);
 	}
 	
     private String name;
@@ -47,6 +48,11 @@ public class Person extends DomainObject {
     public void setEditedPublications(Set<Publication> editedPublications) {
     	zooActivateWrite();
     	this.editedPublications = new HashSet<>(editedPublications);
+    }
+    
+    public boolean addEditedPublications(Publication e) {
+    	zooActivateWrite();
+    	return this.editedPublications.add(e);
     }
 
 }

@@ -1,6 +1,11 @@
 package eth.infsys.group1.task1.dbobjs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InProceedings extends Publication {
+	
+	private List<Person> authors = new ArrayList<>();
 	
 	private String note;
 	private String pages;
@@ -9,7 +14,7 @@ public class InProceedings extends Publication {
 	/**
 	 * Should only be used by the database
 	 */
-	protected InProceedings() { }
+	public InProceedings() { }
 	
 	public InProceedings(Proceedings proceedings, String pages, String note) {
 		this.proceedings = proceedings;

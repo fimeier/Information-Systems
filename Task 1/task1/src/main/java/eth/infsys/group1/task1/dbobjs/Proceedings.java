@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Proceedings extends Publication {
+	
+	private Set<Person> editors = new HashSet<>();
 
 	private String note;
 	private int number;
@@ -12,19 +14,55 @@ public class Proceedings extends Publication {
 	private String volume;
 	private String isbn;
 	private Series series;
-	private ConferenceEdition conferenceEdtion;
+	private ConferenceEdition conferenceEdition;
 	private Set<InProceedings> publications = new HashSet<>();
 	
 	/**
 	 * Should only be used by the database
 	 */
-	protected Proceedings() { }
+	public Proceedings() { }
 	
+	/*
 	public Proceedings(String title, ConferenceEdition confEdition) {
 		super(title, confEdition.getYear());
-	}
+	}*/
 	
-    public String getNote() {
+    public Proceedings(String title, String electronicEdition, Set<Person> edit, String note, int number,
+			Publisher publ, String volume, String isbn, Series serie, ConferenceEdition confEd) {
+    	super(title, confEd.getYear(), electronicEdition);
+    	
+    	this.editors = new HashSet<>(edit);
+    	for (Person p: this.editors){
+    		p.addEditedPublications(this);
+    	}
+    	
+    	this.note = note;
+    	this.number = number;
+    	
+    	this.publisher = publ;
+    	publ.addPublication(this);
+    	
+    	this.volume = volume;
+    	this.isbn = isbn;
+    	
+    	this.series = serie;
+    	serie.addPublication(this);
+    	
+    	this.conferenceEdition = confEd;
+    	confEd.setProceedings(this);
+    	
+    	String id = "conf/" + confEd.getConference().getName() + "/" + confEd.getYear();
+    	this.setId(id);
+        System.out.println("calculated id=" + this.getId());
+	}
+
+
+    public Set<Person> getEditors() {
+    	zooActivateRead();
+		return Collections.unmodifiableSet(this.editors);
+	}
+
+	public String getNote() {
     	zooActivateRead();
 		return this.note;
 	}
@@ -86,12 +124,12 @@ public class Proceedings extends Publication {
 
     public ConferenceEdition getConferenceEdition() {
     	zooActivateRead();
-    	return this.conferenceEdtion;
+    	return this.conferenceEdition;
     }
 
     public void setConferenceEdition(ConferenceEdition conferenceEdition) {
     	zooActivateWrite();
-    	this.conferenceEdtion = conferenceEdition;
+    	this.conferenceEdition = conferenceEdition;
     }
 
     public Set<InProceedings> getPublications() {
