@@ -25,6 +25,9 @@ import eth.infsys.group1.ui.DBProvider;
 public class T1DBProvider extends
 		DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
 
+	public static final int OPEN_DB_APPEND = 20;
+	public static final int OPEN_DB_OVERRIDE = 21;
+	
 	private PersistenceManager pm;
 	
 	/**

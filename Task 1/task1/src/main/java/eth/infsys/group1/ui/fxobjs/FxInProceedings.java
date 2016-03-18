@@ -1,23 +1,39 @@
 package eth.infsys.group1.ui.fxobjs;
 
+import java.util.List;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class FxInProceedings<TRInProceedings> extends FxPublication<TRInProceedings> {
-	
+
+	private ObservableList<String> authors;
 	private StringProperty note;
 	private StringProperty pages;
 	private StringProperty proceedingsTitle;
 
 	public FxInProceedings(TRInProceedings dbRep, String id,
 			String title, int year, String electronicEdition,
-			String proceedingsTitle, String pages, String note) {
+			List<String> authors, String proceedingsTitle,
+			String pages, String note) {
 		super(dbRep, id, title, year, electronicEdition);
+		this.authors = FXCollections.observableArrayList(authors);
 		this.proceedingsTitle = new SimpleStringProperty(proceedingsTitle);
 		this.pages = new SimpleStringProperty(pages);
 		this.note = new SimpleStringProperty(note);
 	}
 
+	public List<String> getAuthors() {
+		return this.authors;
+	}
+	
+	public void setAuthors(List<String> values) {
+		this.authors.clear();
+		this.authors.addAll(values);
+	}
+	
     public String getNote() {
 		return this.note.get();
 	}

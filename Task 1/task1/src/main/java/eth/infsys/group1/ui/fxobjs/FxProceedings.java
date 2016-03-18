@@ -1,14 +1,19 @@
 package eth.infsys.group1.ui.fxobjs;
 
+import java.util.Set;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
 public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 
+	private ObservableSet<String> editors;
 	private StringProperty note;
 	private IntegerProperty number;
 	private StringProperty publisher;
@@ -21,10 +26,12 @@ public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 	private IntegerProperty inProceedingsCount;
 	
 	public FxProceedings(TRProceedings dbRep, String id, String title,
-			int year, String electronicEdition, String note, int number,
-			String publisher, String volume, String isbn, String seriesTitle,
-			String conferenceName, int conferenceYear, int inProceedingsCount) {
+			int year, String electronicEdition, Set<String> editors,
+			String note, int number, String publisher, String volume, String isbn,
+			String seriesTitle, String conferenceName, int conferenceYear,
+			int inProceedingsCount) {
 		super(dbRep, id, title, year, electronicEdition);
+		this.editors = FXCollections.observableSet(editors);
 		this.note = new SimpleStringProperty(note);
 		this.number = new SimpleIntegerProperty(number);
 		this.publisher = new SimpleStringProperty(publisher);
@@ -37,6 +44,15 @@ public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 				() -> this.conferenceName.get() + this.conferenceYear.get(),
 				this.conferenceName, this.conferenceYear);
 		this.inProceedingsCount = new SimpleIntegerProperty(inProceedingsCount);
+	}
+
+	public Set<String> getEditors() {
+		return this.editors;
+	}
+	
+	public void setEditors(Set<String> value) {
+		this.editors.clear();
+		this.editors.addAll(value);
 	}
 	
     public String getNote() {

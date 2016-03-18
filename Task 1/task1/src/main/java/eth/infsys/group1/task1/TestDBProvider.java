@@ -1,4 +1,4 @@
-package eth.infsys.group1.ui;
+package eth.infsys.group1.task1;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,23 +7,14 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 
-import eth.infsys.group1.task1.T1DBProvider;
-import eth.infsys.group1.task1.dbobjs.ConferenceEdition;
 import eth.infsys.group1.task1.dbobjs.InProceedings;
 import eth.infsys.group1.task1.dbobjs.Person;
 import eth.infsys.group1.task1.dbobjs.Proceedings;
-import eth.infsys.group1.task1.dbobjs.Publisher;
-import eth.infsys.group1.task1.dbobjs.Series;
+import eth.infsys.group1.ui.DBProvider;
+import eth.infsys.group1.ui.fxobjs.FxInProceedings;
+import eth.infsys.group1.ui.fxobjs.FxProceedings;
 
 public class TestDBProvider {
-
-	public static final int OPEN_DB_APPEND = 20;
-	public static final int OPEN_DB_OVERRIDE = 21;
-
-	public static final int SORT_BY_NAME = 1;
-	public static final int SORT_BY_TITLE = 5;
-	public static final int SORT_BY_YEAR = 7;
-
 
 	/** arguments for a new proceeding
 	 * 
@@ -33,6 +24,7 @@ public class TestDBProvider {
 	//Publication-Fields
 	static String title; //<title>
 	static Set<String> editors; //multiple <editor>
+	static String editorString; //<editor1>, <editor2>, ...
 	static int year; // <year>
 	static String electronicEdition; //<ee>
 	//Proceedings-Fields
@@ -47,6 +39,7 @@ public class TestDBProvider {
 	//static String publications = "";
 	//other fields
 	static String conferenceName; //<booktitle>
+	static FxProceedings<Proceedings> fxProceedings;
 	
 	
 	/** arguments for a new inproceeding
@@ -63,17 +56,13 @@ public class TestDBProvider {
 	//static String note;
 	static String pages;
 	static String proceedings;
+	static FxInProceedings<InProceedings> fxInProceedings;
 	
-
-
-
+	
 	public static void main(String[] args) {
-
-
-
 		String dbName = "Project1_ZooDB_new.zdb";
 
-		T1DBProvider myDB = new T1DBProvider(dbName, OPEN_DB_OVERRIDE);
+		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
 
 		//HACK
 		PersistenceManager pm = myDB.getpm();
@@ -87,7 +76,7 @@ public class TestDBProvider {
 		myDB.createProceeding(id, title, editors, year, electronicEdition, note, number, publisher, volume,isbn,series,conferenceEdition,conferenceName);
 
 		//getProceedings
-		List<Proceedings> proceedings = myDB.getProceedings(0, 0, SORT_BY_NAME);
+		List<Proceedings> proceedings = myDB.getProceedings(0, 0, DBProvider.SORT_BY_NAME);
 		pm.currentTransaction().begin();
 		for (Proceedings p: proceedings){
 			System.out.println("id=" + p.getId());
@@ -115,11 +104,7 @@ public class TestDBProvider {
 		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
 		
 		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
-
-
 	}
-
-
 
 	public static void set_arg_proceeding1() {
 		id = "conf/hmi/1987";
@@ -135,6 +120,7 @@ public class TestDBProvider {
 		series = "";
 		conferenceEdition = year;
 		conferenceName = "dummy-Name";
+		fxProceedings = new FxProceedings<Proceedings>(null, id, title, year, electronicEdition, editors, note, number, publisher, volume, isbn, series, conferenceName, year, 0);
 	}
 
 	public static void set_arg_proceeding2() {
@@ -151,7 +137,9 @@ public class TestDBProvider {
 		series = "The Cambridge Series on Electronic Publishing";
 		conferenceEdition = year;
 		conferenceName = "ECHT";
+		fxProceedings = new FxProceedings<Proceedings>(null, id, title, year, electronicEdition, editors, note, number, publisher, volume, isbn, series, conferenceName, year, 0);
 	}
+	
 	public static void set_arg_inproceeding2A() {
 		id = "conf/echt/HofmannSL90";
 		title = "An Integrated Approach of Knowledge Acquisition by the Hypertext System CONCORDE.";
@@ -165,6 +153,7 @@ public class TestDBProvider {
 		
 		conferenceEdition = year;
 		conferenceName = "ECHT";
+		fxInProceedings = new FxInProceedings<InProceedings>(null, id, title, year, electronicEdition, authors, proceedings, pages, note);
 	}
 }
 
