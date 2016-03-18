@@ -84,6 +84,14 @@ public abstract class DBProvider<TRConference,
 	 * @param fxObj The FX object representing the series
 	 */
 	public abstract void createSeries(FxSeries<TRSeries> fxObj);
+
+	public abstract void deleteConference(TRConference conference);
+	public abstract void deleteConferenceEdition(TRConferenceEdition conferenceEdition);
+	public abstract void deleteInProceedings(TRInProceedings inProceedings);
+	public abstract void deletePerson(TRPerson person);
+	public abstract void deleteProceedings(TRProceedings proceedings);
+	public abstract void deletePublisher(TRPublisher publisher);
+	public abstract void deleteSeries(TRSeries series);
 	
 	public abstract TRConference getConferenceByID(String id);
 	public abstract TRConferenceEdition getConferenceEditionByID(String id);
