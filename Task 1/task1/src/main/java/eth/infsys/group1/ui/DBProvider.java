@@ -27,7 +27,7 @@ public abstract class DBProvider<TRConference,
 	}
 	
 	public abstract TRProceedings createProceeding(String id, String title, Set<String> editors, int year, String electronicEdition, String note, int number, String publisher, String volume, String isbn, String series, int conferenceEdition, String conferenceName);
-	public abstract TRInProceedings createInProceedings(String id, String title, int year, String electronicEdition, List<String> authors, String note, String pages, List<Proceedings> proceedings);
+	public abstract TRInProceedings createInProceedings(String id, String title, int year, String electronicEdition, List<String> authors, String note, String pages, List<Proceedings> proceedings, int conferenceEdition, String conferenceName);
 	
 	
 	public abstract String getTitle(TRInProceedings inProceedings);

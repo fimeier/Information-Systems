@@ -112,7 +112,9 @@ public class TestDBProvider {
 		
 		//create INPROCEEDINGS
 		set_arg_inproceeding2A();
-		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings);
+		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
+		
+		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
 
 
 	}
@@ -158,7 +160,11 @@ public class TestDBProvider {
 		authors = new ArrayList<String>(); authors.add("Martin Hofmann 0002"); authors.add("Uwe Schreiweis"); authors.add("Horst Langendörfer");
 		note = "";
 		pages = "166-179";
+		
 		proceedings = "conf/echt/1990";
+		
+		conferenceEdition = year;
+		conferenceName = "ECHT";
 	}
 }
 

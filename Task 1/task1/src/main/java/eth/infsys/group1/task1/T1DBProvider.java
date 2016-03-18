@@ -105,8 +105,10 @@ public class T1DBProvider extends
     	pm.currentTransaction().commit();
     	//return existing proceeding
     	if ( ! (proc == null) ){
+        	pm.currentTransaction().begin();
             System.out.println("proceeding already exists... id=" + proc.getId() + " and title=" + proc.getTitle());
-    		return proc;
+        	pm.currentTransaction().commit();
+            return proc;
     	}
     	//create new proceeding (one big transaction)
         System.out.println("create new proceeding");
@@ -124,11 +126,11 @@ public class T1DBProvider extends
     	//Editors
     	Set<Person> edit = new HashSet<>();
     	for (String editor_id: editors){
-    		Person editor = get_editor_by_id(editor_id);
+    		Person editor = get_person_by_id(editor_id);
     		if ( editor == null ){
-        		editor = create_editor(editor_id);
-        		edit.add(editor);
+        		editor = create_person(editor_id);
         	}
+    		edit.add(editor);
     	}
     	
     	//Publisher
@@ -163,13 +165,13 @@ public class T1DBProvider extends
 		return null;
 	}
 
-	private Person create_editor(String editor_name) {
-		Person editor = new Person(editor_name);
-		pm.makePersistent(editor);
-		return editor;
+	private Person create_person(String person_name) {
+		Person pers = new Person(person_name);
+		pm.makePersistent(pers);
+		return pers;
 	}
 
-	private Person get_editor_by_id(String editor_id) {
+	private Person get_person_by_id(String person_id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -217,20 +219,89 @@ public class T1DBProvider extends
         	return null;
         }
         return proc;
-		 */
-		return null;
+		 
+		return null;*/
+		Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
+        for (Proceedings p: ext) {
+        	if (p.getId().equals(id)){
+        		//System.out.println("already exists: " + p.getId());
+                ext.closeAll();
+                return p;
+        	}
+        }
+        ext.closeAll();
+        return null;
 	}
 
 	/**
      * Create and return new (or existing) inproceeding
      * 
      * @param id DomainObject id... ignore it
+     * @param proceedings Proceeding id... ignore it
      * @return Inproceedings new_or_existing_inproceeding
      */
 	@Override
-	public InProceedings createInProceedings(String id, String title, int year, String electronicEdition, List<String> authors, String note, String pages, List<Proceedings> proceedings) {
-		return null;
-		
+	public InProceedings createInProceedings(String id, String title, int year, String electronicEdition, List<String> authors, String note, String pages, List<Proceedings> proceedings, int conferenceEdition, String conferenceName) {
+		//calculate Proceeding id
+		String proc_id = ("conf/" + conferenceName + "/" + conferenceEdition).toUpperCase();
+        System.out.println("Searching proceeding by id=" + proc_id);
+    	pm.currentTransaction().begin();
+    	Proceedings proc = get_proceeding_by_id(proc_id);
+    	pm.currentTransaction().commit();
+    	//Abort if Proceeding is not existent (Error???)
+    	if ( proc == null ){
+            System.out.println("Proceeding with id=" + proc_id + " is not existing. Error Inproceeding creation...");
+    		return null;
+    	}
+    	
+    	//calculate inproceeding id
+    	id = (proc_id + "/" + authors.get(0)).toUpperCase();
+        System.out.println("Searching inproceeding by id=" + id);
+        
+    	pm.currentTransaction().begin();
+        InProceedings inproc = get_inproceeding_by_id(id);
+    	pm.currentTransaction().commit();
+    	//return existing InProceeding
+    	if ( !(inproc == null) ){
+        	pm.currentTransaction().begin();
+    		System.out.println("inproceeding already exists... id=" + inproc.getId() + " and title=" + inproc.getTitle());
+        	pm.currentTransaction().commit();
+            return inproc;
+    	}
+
+
+    	//create new inproceeding (one big transaction)
+        System.out.println("create new inproceeding for proceeding with id=" + proc_id);
+    	pm.currentTransaction().begin();
+    	
+    	//Authors
+    	List<Person> auth = new ArrayList<>();
+    	for (String author_id: authors){
+    		Person author = get_person_by_id(author_id);
+    		if ( author == null ){
+        		author = create_person(author_id);
+        	}
+    		auth.add(author);
+    	}
+    	
+    	//!!!!!!!!!Inroceeding!!!!!!!!!!!!
+    	inproc = new InProceedings(title, electronicEdition, auth, note, pages, proc);
+
+    	pm.currentTransaction().commit();
+    	
+    	return inproc;
+	}
+
+	private InProceedings get_inproceeding_by_id(String id) {
+		Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
+        for (InProceedings p: ext) {
+        	if (p.getId().equals(id)){
+                ext.closeAll();
+                return p;
+        	}
+        }
+        ext.closeAll();
+        return null;
 	}
 
 	@Override

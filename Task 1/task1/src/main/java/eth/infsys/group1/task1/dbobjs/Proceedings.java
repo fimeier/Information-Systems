@@ -136,6 +136,11 @@ public class Proceedings extends Publication {
     	zooActivateRead();
     	return Collections.unmodifiableSet(this.publications);
     }
+    
+    public boolean addInProceedings(InProceedings inproc) {
+    	zooActivateWrite();
+    	return this.publications.add(inproc);
+    }
 
     public void setPublications(Set<InProceedings> publications) {
     	zooActivateWrite();

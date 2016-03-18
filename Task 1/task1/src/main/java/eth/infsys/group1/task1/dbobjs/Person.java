@@ -39,6 +39,10 @@ public class Person extends DomainObject {
     	zooActivateWrite();
     	this.authoredPublications = new HashSet<>(authoredPublications);
     }
+    public boolean addAuthoredPublications(Publication e) {
+    	zooActivateWrite();
+    	return this.authoredPublications.add(e);
+    }
 
     public Set<Publication> getEditedPublications() {
     	zooActivateRead();
