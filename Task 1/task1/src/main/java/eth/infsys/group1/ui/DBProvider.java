@@ -21,7 +21,7 @@ public abstract class DBProvider<TRConference,
 
 	/**
 	 * Uses the provided data to create a new conference
-	 * and sets the DBRepresentation and ID fields of the passed FX object.
+	 * and sets the DBRepresentation field of the passed FX object.
 	 * @param fxObj The FX object representing the conference
 	 */
 	public abstract void createConference(FxConference<TRConference> fxObj);
