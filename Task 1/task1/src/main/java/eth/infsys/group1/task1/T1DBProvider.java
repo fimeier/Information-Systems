@@ -21,12 +21,32 @@ import org.zoodb.tools.ZooHelper;
 
 import eth.infsys.group1.task1.dbobjs.*;
 import eth.infsys.group1.ui.DBProvider;
+import eth.infsys.group1.ui.fxobjs.FxConference;
+import eth.infsys.group1.ui.fxobjs.FxConference.SortOption;
+import eth.infsys.group1.ui.fxobjs.FxConferenceEdition;
+import eth.infsys.group1.ui.fxobjs.FxInProceedings;
+import eth.infsys.group1.ui.fxobjs.FxPerson;
+import eth.infsys.group1.ui.fxobjs.FxProceedings;
+import eth.infsys.group1.ui.fxobjs.FxPublication;
+import eth.infsys.group1.ui.fxobjs.FxPublisher;
+import eth.infsys.group1.ui.fxobjs.FxSeries;
 
 public class T1DBProvider extends
 		DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
 
 	public static final int OPEN_DB_APPEND = 20;
 	public static final int OPEN_DB_OVERRIDE = 21;
+	public static final int SORT_BY_NAME = 1;
+	public static final int SORT_BY_YEAR = 2;
+	public static final int SORT_BY_TITLE = 3;
+
+	
+
+	//HACK!!!
+	public PersistenceManager getpm() {
+		return pm;
+	}
+
 	
 	private PersistenceManager pm;
 	
@@ -99,7 +119,8 @@ public class T1DBProvider extends
      * @param id DomainObject id... ignore it
      * @return Proceedings new_or_existing_proceeding
      */
-    public Proceedings createProceeding(String id, String title, Set<String> editors, int year, String electronicEdition, String note, int number, String publisher, String volume, String isbn, String series, int conferenceEdition, String conferenceName) {
+    @Override
+    public Proceedings batch_createProceedings(String id, String title, Set<String> editors, int year, String electronicEdition, String note, int number, String publisher, String volume, String isbn, String series, int conferenceEdition, String conferenceName) {
     	id = "conf/" + conferenceName + "/" + conferenceEdition;
     	id = id.toUpperCase();
 
@@ -244,7 +265,7 @@ public class T1DBProvider extends
      * @return Inproceedings new_or_existing_inproceeding
      */
 	@Override
-	public InProceedings createInProceedings(String id, String title, int year, String electronicEdition, List<String> authors, String note, String pages, List<Proceedings> proceedings, int conferenceEdition, String conferenceName) {
+	public InProceedings batch_createInProceedings(String id, String title, int year, String electronicEdition, List<String> authors, String note, String pages, List<Proceedings> proceedings, int conferenceEdition, String conferenceName) {
 		//calculate Proceeding id
 		String proc_id = ("conf/" + conferenceName + "/" + conferenceEdition).toUpperCase();
         System.out.println("Searching proceeding by id=" + proc_id);
@@ -307,50 +328,12 @@ public class T1DBProvider extends
         return null;
 	}
 
-	@Override
-	public String getTitle(InProceedings inProceedings) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Conference> getConferences(int startIndex, int endIndex, int sort) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ConferenceEdition> getConferenceEditions(int startIndex, int endIndex, int sort,
-			Conference conference) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<InProceedings> getInProceedings(int startIndex, int endIndex, int sort) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<InProceedings> getInProceedingsOfAuthor(int startIndex, int endIndex, int sort, Person author) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<InProceedings> getInProceedingsOfProceedings(int startIndex, int endIndex, int sort,
-			Proceedings proceedings) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
 	/**
      * dummy_implementation
      */
 	@Override
-	public List<Proceedings> getProceedings(int startIndex, int endIndex, int sort) {
+	public List<Proceedings> batch_getProceedings(int startIndex, int endIndex, int sort) {
 		pm.currentTransaction().begin();
 		
 		List<Proceedings> all_proc = new ArrayList<Proceedings>();
@@ -367,39 +350,289 @@ public class T1DBProvider extends
 	}
 
 	@Override
-	public List<Proceedings> getProceedingsOfAuthor(int startIndex, int endIndex, int sort, Person author) {
+	public void createConference(FxConference<Conference> fxObj) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createConferenceEdition(FxConferenceEdition<ConferenceEdition> fxObj, Conference conference)
+			throws eth.infsys.group1.ui.DBProvider.InvalidDBRepException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createInProceedings(FxInProceedings<InProceedings> fxObj, Proceedings proceedings)
+			throws eth.infsys.group1.ui.DBProvider.InvalidDBRepException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createPerson(FxPerson<Person> fxObj) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createProceedings(FxPerson<Person> fxObj, ConferenceEdition confEdition)
+			throws eth.infsys.group1.ui.DBProvider.InvalidDBRepException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createPublisher(FxPublisher<Publisher> fxObj) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createSeries(FxSeries<Series> fxObj) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteConference(Conference conference) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteConferenceEdition(ConferenceEdition conferenceEdition) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteInProceedings(InProceedings inProceedings) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deletePerson(Person person) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteProceedings(Proceedings proceedings) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deletePublisher(Publisher publisher) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteSeries(Series series) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Conference getConferenceByID(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Publisher> getPublishers(int startIndex, int endIndex, int sort) {
+	public ConferenceEdition getConferenceEditionByID(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Person> getPersons(int startIndex, int endIndex, int sort) {
+	public InProceedings getInProceedingsByID(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Person> getPersons(int startIndex, int endIndex, int sort, String nameFilter) {
+	public Person getPersonByID(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Series> getSeries(int startIndex, int endIndex, int sort) {
+	public Proceedings getProceedingsByID(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	//HACK!!!
-	public PersistenceManager getpm() {
-		return pm;
+	@Override
+	public Publication getPublicationByID(String id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	@Override
+	public Publisher getPublisherByID(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Series getSeriesByID(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void getConferences(int startIndex, int endIndex, SortOption sort, String searchTerm,
+			List<FxConference<Conference>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getConferenceEditions(int startIndex, int endIndex,
+			eth.infsys.group1.ui.fxobjs.FxConferenceEdition.SortOption sort, String searchTerm,
+			List<FxConferenceEdition<ConferenceEdition>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getConferenceEditions(int startIndex, int endIndex,
+			eth.infsys.group1.ui.fxobjs.FxConferenceEdition.SortOption sort, Conference conference, String searchTerm,
+			List<FxConferenceEdition<ConferenceEdition>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getInProceedings(int startIndex, int endIndex,
+			eth.infsys.group1.ui.fxobjs.FxInProceedings.SortOption sort, String searchTerm,
+			List<FxInProceedings<InProceedings>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getInProceedingsOfAuthor(int startIndex, int endIndex,
+			eth.infsys.group1.ui.fxobjs.FxInProceedings.SortOption sort, Person author, String searchTerm,
+			List<FxInProceedings<InProceedings>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getInProceedingsOfProceedings(int startIndex, int endIndex,
+			eth.infsys.group1.ui.fxobjs.FxInProceedings.SortOption sort, Proceedings proceedings, String searchTerm,
+			List<FxInProceedings<InProceedings>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getProceedings(int startIndex, int endIndex, eth.infsys.group1.ui.fxobjs.FxProceedings.SortOption sort,
+			String searchTerm, List<FxProceedings<Proceedings>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getProceedingsOfEditor(int startIndex, int endIndex,
+			eth.infsys.group1.ui.fxobjs.FxProceedings.SortOption sort, Person author, String searchTerm,
+			List<FxProceedings<Proceedings>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getPublishers(int startIndex, int endIndex, eth.infsys.group1.ui.fxobjs.FxPublisher.SortOption sort,
+			String searchTerm, List<FxInProceedings<Publisher>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getPersons(int startIndex, int endIndex, eth.infsys.group1.ui.fxobjs.FxPerson.SortOption sort,
+			String searchTerm, List<FxPerson<Person>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getSeries(int startIndex, int endIndex, eth.infsys.group1.ui.fxobjs.FxSeries.SortOption sort,
+			String searchTerm, List<FxSeries<Series>> out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setConferenceTitle(Conference conference, String title) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setConferenceEditionYear(ConferenceEdition edition, int year) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPersonName(Person person, String name) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateConferenceData(List<FxConference<Conference>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateConferenceEditionData(List<FxConferenceEdition<ConferenceEdition>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateInProceedingsData(List<FxInProceedings<InProceedings>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updatePersonData(List<FxPerson<Person>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateProceedingsData(List<FxProceedings<Proceedings>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updatePublicationData(List<FxPublication<Publication>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updatePublisherData(List<FxPublisher<Publisher>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateSeriesData(List<FxSeries<Series>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 	
 

@@ -40,8 +40,8 @@ public class TestDBProvider {
 	//other fields
 	static String conferenceName; //<booktitle>
 	static FxProceedings<Proceedings> fxProceedings;
-	
-	
+
+
 	/** arguments for a new inproceeding
 	 * !!!! id!!! 90 => 1990
 	 */
@@ -57,8 +57,8 @@ public class TestDBProvider {
 	static String pages;
 	static String proceedings;
 	static FxInProceedings<InProceedings> fxInProceedings;
-	
-	
+
+
 	public static void main(String[] args) {
 		String dbName = "Project1_ZooDB_new.zdb";
 
@@ -72,11 +72,14 @@ public class TestDBProvider {
 
 
 		set_arg_proceeding2();
-		System.out.println("id=" + id);
-		myDB.createProceeding(id, title, editors, year, electronicEdition, note, number, publisher, volume,isbn,series,conferenceEdition,conferenceName);
+		//System.out.println("id=" + id);
+		myDB.batch_createProceedings(id, title, editors, year, electronicEdition, note, number, publisher, volume,isbn,series,conferenceEdition,conferenceName);
 
+		
 		//getProceedings
-		List<Proceedings> proceedings = myDB.getProceedings(0, 0, DBProvider.SORT_BY_NAME);
+		List<Proceedings> proceedings = myDB.batch_getProceedings(0, 0, 1);
+		
+		/*
 		pm.currentTransaction().begin();
 		for (Proceedings p: proceedings){
 			System.out.println("id=" + p.getId());
@@ -97,13 +100,13 @@ public class TestDBProvider {
 			System.out.println("conferenceName=" + p.getConferenceEdition().getConference().getName());
 		}
 		pm.currentTransaction().commit();
-		
-		
+*/
+
 		//create INPROCEEDINGS
 		set_arg_inproceeding2A();
-		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
-		
-		myDB.createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
+		//proceedings string or list.. myDB.batch_createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
+
+		///myDB.batch_createInProceedings(id, title, year, electronicEdition, authors, note, pages, proceedings, conferenceEdition, conferenceName);
 	}
 
 	public static void set_arg_proceeding1() {
@@ -139,7 +142,7 @@ public class TestDBProvider {
 		conferenceName = "ECHT";
 		fxProceedings = new FxProceedings<Proceedings>(null, id, title, year, electronicEdition, editors, note, number, publisher, volume, isbn, series, conferenceName, year, 0);
 	}
-	
+
 	public static void set_arg_inproceeding2A() {
 		id = "conf/echt/HofmannSL90";
 		title = "An Integrated Approach of Knowledge Acquisition by the Hypertext System CONCORDE.";
@@ -148,9 +151,9 @@ public class TestDBProvider {
 		authors = new ArrayList<String>(); authors.add("Martin Hofmann 0002"); authors.add("Uwe Schreiweis"); authors.add("Horst Langendörfer");
 		note = "";
 		pages = "166-179";
-		
+
 		proceedings = "conf/echt/1990";
-		
+
 		conferenceEdition = year;
 		conferenceName = "ECHT";
 		fxInProceedings = new FxInProceedings<InProceedings>(null, id, title, year, electronicEdition, authors, proceedings, pages, note);

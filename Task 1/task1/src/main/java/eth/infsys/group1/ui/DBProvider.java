@@ -1,6 +1,10 @@
 package eth.infsys.group1.ui;
 
 import java.util.List;
+import java.util.Set;
+
+import eth.infsys.group1.task1.dbobjs.InProceedings;
+import eth.infsys.group1.task1.dbobjs.Proceedings;
 import eth.infsys.group1.ui.fxobjs.*;
 
 public abstract class DBProvider<TRConference,
@@ -156,4 +160,23 @@ public abstract class DBProvider<TRConference,
 	public abstract void updatePublicationData(List<FxPublication<TRPublication>> data);
 	public abstract void updatePublisherData(List<FxPublisher<TRPublisher>> data);
 	public abstract void updateSeriesData(List<FxSeries<TRSeries>> data);
+
+	public InProceedings batch_createInProceedings(String id, String title, int year, String electronicEdition,
+			List<String> authors, String note, String pages, List<Proceedings> proceedings, int conferenceEdition,
+			String conferenceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Proceedings> batch_getProceedings(int startIndex, int endIndex, int sort) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Proceedings batch_createProceedings(String id, String title, Set<String> editors, int year,
+			String electronicEdition, String note, int number, String publisher, String volume, String isbn,
+			String series, int conferenceEdition, String conferenceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
