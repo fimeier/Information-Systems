@@ -19,8 +19,8 @@ import javax.jdo.Query;
 import org.zoodb.jdo.ZooJdoHelper;
 import org.zoodb.tools.ZooHelper;
 
+import eth.infsys.group1.dbspec.DBProvider;
 import eth.infsys.group1.task1.dbobjs.*;
-import eth.infsys.group1.ui.DBProvider;
 
 public class T1DBProvider extends
 		DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {

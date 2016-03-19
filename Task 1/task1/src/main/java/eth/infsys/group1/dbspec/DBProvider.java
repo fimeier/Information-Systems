@@ -1,7 +1,9 @@
-package eth.infsys.group1.ui;
+package eth.infsys.group1.dbspec;
 
 import java.util.List;
 import eth.infsys.group1.ui.fxobjs.*;
+import eth.infsys.group1.xml.XMLInProceedings;
+import eth.infsys.group1.xml.XMLProceedings;
 
 public abstract class DBProvider<TRConference,
 								TRConferenceEdition,
@@ -55,6 +57,14 @@ public abstract class DBProvider<TRConference,
 			TRProceedings proceedings) throws InvalidDBRepException;
 	
 	/**
+	 * Uses the provided XML data and proceedings to create an inProceedings in the database.
+	 * The authors are created as well if they do not exist yet.
+	 * @param xmlData The XML data object representing the inProceedings
+	 */
+	public abstract TRInProceedings createInProceedings(XMLInProceedings xmlData,
+			TRProceedings proceedings);
+	
+	/**
 	 * Uses the provided data to create a new person
 	 * and sets the DBRepresentation and ID fields of the passed FX object.
 	 * @param fxObj The FX object representing the person
@@ -64,12 +74,20 @@ public abstract class DBProvider<TRConference,
 	/**
 	 * Uses the provided data to create the proceedings of the provided conference edition
 	 * and sets the DBRepresentation and ID fields of the passed FX object.
-	 * @param fxObj The FX object representing the person
+	 * @param fxObj The FX object representing the proceedings
 	 * @param confEdition The conference edition
 	 * @throws InvalidDBRepException If {@code confEdition} is not a valid conference edition representation
 	 */
 	public abstract void createProceedings(FxPerson<TRPerson> fxObj,
 			TRConferenceEdition confEdition) throws InvalidDBRepException;
+	
+	/**
+	 * Uses the provided XML data to create a proceeding in the database.
+	 * The conference, the editors, the publisher and the series are created
+	 * as well if they do not exist yet.
+	 * @param xmlData The XML data object representing the proceedings
+	 */
+	public abstract TRProceedings createProceedings(XMLProceedings xmlData);
 	
 	/**
 	 * Uses the provided data to create a new publisher
