@@ -7,10 +7,10 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 
+import eth.infsys.group1.dbspec.DBProvider;
 import eth.infsys.group1.task1.dbobjs.InProceedings;
 import eth.infsys.group1.task1.dbobjs.Person;
 import eth.infsys.group1.task1.dbobjs.Proceedings;
-import eth.infsys.group1.ui.DBProvider;
 import eth.infsys.group1.ui.fxobjs.FxInProceedings;
 import eth.infsys.group1.ui.fxobjs.FxProceedings;
 

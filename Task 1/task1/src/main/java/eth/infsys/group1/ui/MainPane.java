@@ -1,5 +1,6 @@
 package eth.infsys.group1.ui;
 
+import eth.infsys.group1.dbspec.DBProvider;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
