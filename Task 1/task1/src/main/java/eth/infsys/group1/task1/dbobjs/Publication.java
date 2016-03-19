@@ -1,9 +1,5 @@
 package eth.infsys.group1.task1.dbobjs;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public abstract class Publication extends DomainObject {
 
 	private String title;

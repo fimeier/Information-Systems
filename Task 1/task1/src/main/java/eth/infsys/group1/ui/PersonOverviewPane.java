@@ -2,6 +2,7 @@ package eth.infsys.group1.ui;
 
 import java.util.Optional;
 
+import eth.infsys.group1.dbspec.DBProvider;
 import eth.infsys.group1.ui.fxobjs.FxPerson;
 import eth.infsys.group1.ui.fxobjs.FxPerson.SortOption;
 import javafx.application.Platform;
