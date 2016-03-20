@@ -51,12 +51,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 	public static final int SORT_BY_TITLE = 3;
 
 
-
+/*
 	//HACK!!!
 	public PersistenceManager getpm() {
 		return pm;
 	}
-
+*/
 
 	private PersistenceManager pm;
 
