@@ -13,11 +13,15 @@ public class ConferenceEdition extends DomainObject {
 	
 	public ConferenceEdition(Conference conference, int year) {
 		this.conference = conference;
-		this.year = year;
+		this.year = year; //!!!corresponds to year-tag in Inproceedings (wrong in TaskDescription)
 		conference.addEdition(this);
-		String id = conference.getName() + "/" + year;
-		this.setId(id);
+		this.setId(calculate_conferenceEdition_id(conference.getName(), this.year));
 	}
+	
+	//example "conference/DAGM-Symposium/1980"
+    static public String calculate_conferenceEdition_id(String conferenceName, int conferenceEdition){
+    	return "conference/" + conferenceName + "/" + conferenceEdition;
+    }
 
 	public Conference getConference() {
 		zooActivateRead();

@@ -3,6 +3,8 @@ package eth.infsys.group1.task1.dbobjs;
 import java.util.ArrayList;
 import java.util.List;
 
+import eth.infsys.group1.xmlparser.InProceedings_simple_input;
+
 public class InProceedings extends Publication {
 	
 	private List<Person> authors = new ArrayList<>();
@@ -15,25 +17,28 @@ public class InProceedings extends Publication {
 	 * Should only be used by the database
 	 */
 	public InProceedings() { }
-	
-	public InProceedings(String title, String electronicEdition, List<Person> authors, String note, String pages, Proceedings proc) {
-    	super(title, proc.getConferenceEdition().getYear(), electronicEdition);
+
+	public InProceedings(InProceedings_simple_input args, List<Person> authors, Proceedings proc) {
+    	super(args.title, args.year, args.electronicEdition);
 
     	this.authors = new ArrayList<>(authors);
     	for (Person p: this.authors){
     		p.addAuthoredPublications(this);
     	}
     	
-		this.note = note;
-		this.pages = pages;
+		this.note = args.note;
+		this.pages = args.pages;
     	
 		this.proceedings = proc;
 		proc.addInProceedings(this);
 		
-		String id = (proc.getId() + "/" + authors.get(0).getName()).toUpperCase();
-        System.out.println("calculated id in inproceedings constructor=" + this.getId());
-
-    	this.setId(id);
+    	this.setId(args.id);
+	}
+	
+	//dummy.. always us key from xml
+	//example "conf/uist/Binding88"
+	static public String calculate_Inproceedings_id(String key){
+		return key;
 	}
 
     public String getNote() {
