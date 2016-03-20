@@ -13,10 +13,15 @@ public class Person extends DomainObject {
 	
 	public Person(String name) {
 		this.name = name;
-		this.setId(name);
+		this.setId(calculate_person_id(this.name));
 	}
-	
-    private String name;
+
+	//example "person/Mark Green"
+	static public String calculate_person_id(String name){
+		return "person/" + name;
+	}
+
+	private String name;
 	private Set<Publication> authoredPublications = new HashSet<>();
 	private Set<Publication> editedPublications = new HashSet<>();
 

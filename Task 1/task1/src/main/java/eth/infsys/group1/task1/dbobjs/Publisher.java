@@ -17,8 +17,12 @@ public class Publisher extends DomainObject {
 	
 	public Publisher(String name) {
 		this.name = name;
-		String id = name;
-		this.setId(id);
+		this.setId(calculate_publisher_id(this.name));
+	}
+
+	//example "publisher/ACM"
+	static public String calculate_publisher_id(String name){
+		return "publisher/" + name;
 	}
 
 	public String getName() {

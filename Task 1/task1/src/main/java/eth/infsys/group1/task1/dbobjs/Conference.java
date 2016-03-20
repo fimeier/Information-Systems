@@ -9,7 +9,7 @@ public class Conference extends DomainObject {
 	
 	private String name;
 	private Set<ConferenceEdition> editions = new HashSet<>();
-	
+
 	/**
 	 * Should only be used by the database
 	 */
@@ -17,8 +17,14 @@ public class Conference extends DomainObject {
 
 	public Conference(String name) {
 		this.name = name;
-		this.setId(name);
+		this.setId(calculate_conference_id(name));
 	}
+	
+	//example "conference/DAGM-Symposium" ,1980
+    static public String calculate_conference_id(String conferenceName){
+    	return "conference/" + conferenceName;
+    }
+	
 
 	public String getName() {
     	zooActivateRead();

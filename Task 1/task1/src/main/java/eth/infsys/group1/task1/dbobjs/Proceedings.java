@@ -4,8 +4,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import eth.infsys.group1.xmlparser.Proceedings_simple_input;
+
 public class Proceedings extends Publication {
-	
+
 	private Set<Person> editors = new HashSet<>();
 
 	private String note;
@@ -13,138 +15,143 @@ public class Proceedings extends Publication {
 	private Publisher publisher;
 	private String volume;
 	private String isbn;
-	private Series series;
+	private Series series; //can be null
 	private ConferenceEdition conferenceEdition;
 	private Set<InProceedings> publications = new HashSet<>();
-	
+
 	/**
 	 * Should only be used by the database
 	 */
 	public Proceedings() { }
-	
+
 	/*
 	public Proceedings(String title, ConferenceEdition confEdition) {
 		super(title, confEdition.getYear());
 	}*/
-	
-    public Proceedings(String title, String electronicEdition, Set<Person> edit, String note, int number,
-			Publisher publ, String volume, String isbn, Series serie, ConferenceEdition confEd) {
-    	super(title, confEd.getYear(), electronicEdition);
-    	
-    	this.editors = new HashSet<>(edit);
-    	for (Person p: this.editors){
-    		p.addEditedPublications(this);
-    	}
-    	
-    	this.note = note;
-    	this.number = number;
-    	
-    	this.publisher = publ;
-    	publ.addPublication(this);
-    	
-    	this.volume = volume;
-    	this.isbn = isbn;
-    	
-    	this.series = serie;
-    	serie.addPublication(this);
-    	
-    	this.conferenceEdition = confEd;
-    	confEd.setProceedings(this);
-    	
-    	String id = "conf/" + confEd.getConference().getName() + "/" + confEd.getYear();
-    	this.setId(id);
-        System.out.println("calculated id=" + this.getId());
+
+	public Proceedings(Proceedings_simple_input args, Set<Person> edit, Publisher publ, Series serie, ConferenceEdition confEd) {
+		super(args.title, args.year, args.electronicEdition);
+
+		this.editors = new HashSet<>(edit);
+		for (Person p: this.editors){
+			p.addEditedPublications(this);
+		}
+
+		this.note = args.note;
+		this.number = args.number;
+
+		this.publisher = publ;
+		publ.addPublication(this);
+
+		this.volume = args.volume;
+		this.isbn = args.isbn;
+
+		this.series = serie;
+		if (this.series != null){
+			serie.addPublication(this);
+		}
+
+		this.conferenceEdition = confEd;
+		confEd.setProceedings(this);
+
+		this.setId(args.id);
+	}
+
+	//dummy.. always us key from xml
+	//example "conf/uist/1988"
+	static public String calculate_proceedings_id(String key){
+		return key;
 	}
 
 
-    public Set<Person> getEditors() {
-    	zooActivateRead();
+	public Set<Person> getEditors() {
+		zooActivateRead();
 		return Collections.unmodifiableSet(this.editors);
 	}
 
 	public String getNote() {
-    	zooActivateRead();
+		zooActivateRead();
 		return this.note;
 	}
 
-    public void setNote(String note) {
-    	zooActivateWrite();
-    	this.note = note;
+	public void setNote(String note) {
+		zooActivateWrite();
+		this.note = note;
 	}
 
-    public int getNumber() {
-    	zooActivateRead();
-    	return this.number;
-    }
+	public int getNumber() {
+		zooActivateRead();
+		return this.number;
+	}
 
-    public void setNumber(int number) {
-    	zooActivateWrite();
-    	this.number = number;
-    }
+	public void setNumber(int number) {
+		zooActivateWrite();
+		this.number = number;
+	}
 
-    public Publisher getPublisher() {
-    	zooActivateRead();
-    	return this.publisher;
-    }
+	public Publisher getPublisher() {
+		zooActivateRead();
+		return this.publisher;
+	}
 
-    public void setPublisher(Publisher publisher) {
-    	zooActivateWrite();
-    	this.publisher = publisher;
-    }
+	public void setPublisher(Publisher publisher) {
+		zooActivateWrite();
+		this.publisher = publisher;
+	}
 
-    public String getVolume() {
-    	zooActivateRead();
-    	return this.volume;
-    }
+	public String getVolume() {
+		zooActivateRead();
+		return this.volume;
+	}
 
-    public void setVolume(String volume) {
-    	zooActivateWrite();
-    	this.volume = volume;
-    }
+	public void setVolume(String volume) {
+		zooActivateWrite();
+		this.volume = volume;
+	}
 
-    public String getIsbn() {
-    	zooActivateRead();
-    	return this.isbn;
-    }
+	public String getIsbn() {
+		zooActivateRead();
+		return this.isbn;
+	}
 
-    public void setIsbn(String isbn) {
-    	zooActivateWrite();
-    	this.isbn = isbn;
-    }
+	public void setIsbn(String isbn) {
+		zooActivateWrite();
+		this.isbn = isbn;
+	}
 
-    public Series getSeries() {
-    	zooActivateRead();
-    	return this.series;
-    }
+	public Series getSeries() {
+		zooActivateRead();
+		return this.series;
+	}
 
-    public void setSeries(Series series) {
-    	zooActivateWrite();
-    	this.series = series;
-    }
+	public void setSeries(Series series) {
+		zooActivateWrite();
+		this.series = series;
+	}
 
-    public ConferenceEdition getConferenceEdition() {
-    	zooActivateRead();
-    	return this.conferenceEdition;
-    }
+	public ConferenceEdition getConferenceEdition() {
+		zooActivateRead();
+		return this.conferenceEdition;
+	}
 
-    public void setConferenceEdition(ConferenceEdition conferenceEdition) {
-    	zooActivateWrite();
-    	this.conferenceEdition = conferenceEdition;
-    }
+	public void setConferenceEdition(ConferenceEdition conferenceEdition) {
+		zooActivateWrite();
+		this.conferenceEdition = conferenceEdition;
+	}
 
-    public Set<InProceedings> getPublications() {
-    	zooActivateRead();
-    	return Collections.unmodifiableSet(this.publications);
-    }
-    
-    public boolean addInProceedings(InProceedings inproc) {
-    	zooActivateWrite();
-    	return this.publications.add(inproc);
-    }
+	public Set<InProceedings> getPublications() {
+		zooActivateRead();
+		return Collections.unmodifiableSet(this.publications);
+	}
 
-    public void setPublications(Set<InProceedings> publications) {
-    	zooActivateWrite();
-    	this.publications = new HashSet<>(publications);
-    }
+	public boolean addInProceedings(InProceedings inproc) {
+		zooActivateWrite();
+		return this.publications.add(inproc);
+	}
+
+	public void setPublications(Set<InProceedings> publications) {
+		zooActivateWrite();
+		this.publications = new HashSet<>(publications);
+	}
 
 }

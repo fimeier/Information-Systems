@@ -17,8 +17,14 @@ public class Series extends DomainObject {
     
     public Series(String name) {
     	this.name = name;
-    	this.setId(name);
+    	this.setId(calculate_series_id(name));
     }
+    
+	//example "series/Lecture Notes in Computer Science"
+	static public String calculate_series_id(String name){
+		return "series/" + name;
+	}
+
 
 	public String getName() {
     	zooActivateRead();
