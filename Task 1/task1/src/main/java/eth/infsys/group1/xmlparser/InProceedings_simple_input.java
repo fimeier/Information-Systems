@@ -1,8 +1,5 @@
 package eth.infsys.group1.xmlparser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class InProceedings_simple_input {
 	
 	private static String[] noAuthors = new String[0];
