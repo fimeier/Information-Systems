@@ -9,11 +9,21 @@ import javafx.collections.ObservableList;
 
 public class FxInProceedings<TRInProceedings> extends FxPublication<TRInProceedings> {
 
+	public static class QueryOptions extends FxPublication.QueryOptionBase<SortOption> {
+		
+		public QueryOptions(int startIndex, int endIndex,
+				SortOption sorting, String searchTerm, int year) {
+			super(startIndex, endIndex, sorting, searchTerm, year);
+		}
+		
+	}
+	
 	public static enum SortOption {
-		//BY_TITLE("Sort by Title"), BY_YEAR("Sort by Year"),
-		BY_TITLE_YEAR("Sort by Title and Year"),
-		BY_YEAR_TITLE("Sort by Year and Title"),
-		BY_ID("Sort by ID");
+
+		NONE("None"),
+		BY_TITLE_ASC("Title Asc"), BY_TITLE_DESC("Title Desc"),
+		BY_YEAR_ASC("Year Asc"), BY_YEAR_DESC("Year Desc"),
+		BY_ID_ASC("ID Asc"), BY_ID_DESC("ID Desc");
 		
 		public final String description;
 		
@@ -25,6 +35,7 @@ public class FxInProceedings<TRInProceedings> extends FxPublication<TRInProceedi
 		public String toString() {
 			return this.description;
 		}
+	
 	}
 	
 	private ObservableList<String> authors;
@@ -43,7 +54,7 @@ public class FxInProceedings<TRInProceedings> extends FxPublication<TRInProceedi
 		this.note = new SimpleStringProperty(note);
 	}
 
-	public List<String> getAuthors() {
+	public ObservableList<String> getAuthors() {
 		return this.authors;
 	}
 	
@@ -56,36 +67,36 @@ public class FxInProceedings<TRInProceedings> extends FxPublication<TRInProceedi
 		return this.note.get();
 	}
 
-    public StringProperty getNoteProperty() {
-		return this.note;
-	}
-
     public void setNote(String note) {
     	this.note.set(note);
+	}
+
+    public StringProperty noteProperty() {
+		return this.note;
 	}
 
     public String getPages() {
 		return this.pages.get();
 	}
-    
-    public StringProperty getPagesProperty() {
-    	return this.pages;
-    }
 
     public void setPages(String pages) {
     	this.pages.set(pages);
 	}
+    
+    public StringProperty pagesProperty() {
+    	return this.pages;
+    }
 
     public String getProceedingsTitle() {
     	return this.proceedingsTitle.get();
 	}
 
-    public StringProperty getProceedingsTitleProperty() {
-    	return this.proceedingsTitle;
-	}
-
     public void setProceedingsTitle(String value) {
     	this.proceedingsTitle.set(value);
+	}
+
+    public StringProperty proceedingsTitleProperty() {
+    	return this.proceedingsTitle;
 	}
     
 }

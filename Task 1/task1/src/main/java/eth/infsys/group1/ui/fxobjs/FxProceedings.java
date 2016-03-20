@@ -13,13 +13,21 @@ import javafx.collections.ObservableSet;
 
 public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 
+	public static class QueryOptions extends FxPublication.QueryOptionBase<SortOption> {
+		
+		public QueryOptions(int startIndex, int endIndex,
+				SortOption sorting, String searchTerm, int year) {
+			super(startIndex, endIndex, sorting, searchTerm, year);
+		}
+		
+	}
+	
 	public static enum SortOption {
-		//BY_TITLE("Sort by Title"), BY_YEAR("Sort by Year"),
-		BY_TITLE_YEAR("Sort by Title and Year"),
-		BY_YEAR_TITLE("Sort by Year and Title"),
-		BY_CONFID_YEAR("Sort by Conference ID and Year"),
-		BY_YEAR_CONFID("Sort by Year and Conference ID"),
-		BY_ID("Sort by ID");
+
+		NONE("None"),
+		BY_TITLE_ASC("Title Asc"), BY_TITLE_DESC("Title Desc"),
+		BY_YEAR_ASC("Year Asc"), BY_YEAR_DESC("Year Desc"),
+		BY_ID_ASC("ID Asc"), BY_ID_DESC("ID Desc");
 		
 		public final String description;
 		
@@ -31,6 +39,7 @@ public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 		public String toString() {
 			return this.description;
 		}
+	
 	}
 	
 	private ObservableSet<String> editors;
@@ -66,7 +75,7 @@ public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
 		this.inProceedingsCount = new SimpleIntegerProperty(inProceedingsCount);
 	}
 
-	public Set<String> getEditors() {
+	public ObservableSet<String> getEditors() {
 		return this.editors;
 	}
 	
@@ -78,104 +87,104 @@ public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
     public String getNote() {
     	return this.note.get();
 	}
-	
-    public StringProperty getNoteProperty() {
-    	return this.note;
-	}
 
     public void setNote(String value) {
     	this.note.set(value);
+	}
+	
+    public StringProperty noteProperty() {
+    	return this.note;
 	}
 
     public int getNumber() {
     	return this.number.get();
     }
-    
-    public IntegerProperty getNumberProperty() {
-    	return this.number;
-    }
 
     public void setNumber(int value) {
     	this.number.set(value);
+    }
+    
+    public IntegerProperty numberProperty() {
+    	return this.number;
     }
 
     public String getPublisher() {
     	return this.publisher.get();
     }
 
-    public StringProperty getPublisherProperty() {
-    	return this.publisher;
-    }
-
     public void setPublisher(String value) {
     	this.publisher.set(value);
+    }
+
+    public StringProperty publisherProperty() {
+    	return this.publisher;
     }
 
     public String getVolume() {
     	return this.volume.get();
     }
 
-    public StringProperty getVolumeProperty() {
-    	return this.volume;
-    }
-
     public void setVolume(String value) {
     	this.volume.set(value);
+    }
+
+    public StringProperty volumeProperty() {
+    	return this.volume;
     }
 
     public String getIsbn() {
     	return this.isbn.get();
     }
-    
-    public StringProperty getIsbnProperty() {
-    	return this.isbn;
-    }
 
     public void setIsbn(String value) {
     	this.isbn.set(value);
+    }
+    
+    public StringProperty isbnProperty() {
+    	return this.isbn;
     }
 
     public String getSeriesTitle() {
     	return this.seriesTitle.get();
     }
 
-    public StringProperty getSeriesTitleProperty() {
-    	return this.seriesTitle;
-    }
-
     public void setSeriesTitle(String value) {
     	this.seriesTitle.set(value);
+    }
+
+    public StringProperty seriesTitleProperty() {
+    	return this.seriesTitle;
     }
 
     public String getConferenceName() {
     	return this.conferenceName.get();
     }
 
-    public StringProperty getConferenceNameProperty() {
-    	return this.conferenceName;
-    }
-
     public void setConferenceName(String value) {
     	this.conferenceName.set(value);
+    }
+
+    public StringProperty conferenceNameProperty() {
+    	return this.conferenceName;
     }
 
     public int getConferenceYear() {
     	return this.conferenceYear.get();
     }
 
-    public IntegerProperty getConferenceYearProperty() {
-    	return this.conferenceYear;
-    }
-
     public void setConferenceYear(int value) {
     	this.conferenceYear.set(value);
+    }
+
+    public IntegerProperty conferenceYearProperty() {
+    	return this.conferenceYear;
     }
 
     public String getConferenceTitleWithYear() {
     	return this.conferenceTitleWithYear.get();
     }
 
-    public StringBinding getConferenceTitleWithYearBinding() {
+    public StringBinding conferenceTitleWithYearBinding() {
     	return this.conferenceTitleWithYear;
     }
 
@@ -183,12 +192,12 @@ public class FxProceedings<TRProceedings> extends FxPublication<TRProceedings> {
     	return this.inProceedingsCount.get();
     }
 
-    public IntegerProperty getPublicationCountProperty() {
-    	return this.inProceedingsCount;
-    }
-
     public void setPublicationCount(int value) {
     	this.inProceedingsCount.set(value);
+    }
+
+    public IntegerProperty publicationCountProperty() {
+    	return this.inProceedingsCount;
     }
 
 }

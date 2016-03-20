@@ -174,12 +174,6 @@ public class PersonOverviewPane<TRPerson> extends BorderPane {
 		}
 	}
 	
-	private void searchButtonClicked(MouseEvent event) {
-		if (event.getButton() == MouseButton.PRIMARY) {
-			doSearch(this.searchNewText.getText(), true);
-		}
-	}
-	
 	private void prevResButtonClicked(MouseEvent event) {
 		if (event.getButton() == MouseButton.PRIMARY) {
 			startIndex.subtract(10);

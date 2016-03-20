@@ -8,8 +8,24 @@ import javafx.beans.property.StringProperty;
 
 public class FxPerson<TRPerson> extends FxDomainObject<TRPerson> {
 	
+	public static class QueryOptions extends FxDomainObject.QueryOptions<SortOption> {
+		
+		public QueryOptions(int startIndex, int endIndex,
+				SortOption sorting, String searchTerm) {
+			super(startIndex, endIndex, sorting, searchTerm);
+		}
+		
+	}
+	
 	public static enum SortOption {
-		BY_NAME("Sort by Name"), BY_ID("Sort by ID");
+
+		NONE("None"),
+		BY_ID_ASC("ID Asc"), BY_ID_DESC("ID Desc"),
+		BY_NAME_ASC("Name Asc"), BY_NAME_DESC("Name Desc"),
+		BY_AUTHORED_PUBLS_ASC("Authored Publications Asc"),
+		BY_AUTHORED_PUBLS_DESC("Authored Publications Desc"),
+		BY_EDITED_PUBLS_ASC("Edited Publications Asc"),
+		BY_EDITED_PUBLS_DESC("Edited Publications Desc");
 		
 		public final String description;
 		
@@ -21,6 +37,7 @@ public class FxPerson<TRPerson> extends FxDomainObject<TRPerson> {
 		public String toString() {
 			return this.description;
 		}
+	
 	}
 	
     private StringProperty name;
@@ -37,44 +54,44 @@ public class FxPerson<TRPerson> extends FxDomainObject<TRPerson> {
 	public String getName() {
     	return this.name.get();
     }
-	
-	public StringProperty getNameProperty() {
-		return this.name;
-	}
 
     public void setName(String name) {
     	this.name.set(name);
     }
+	
+	public StringProperty nameProperty() {
+		return this.name;
+	}
 
     public int getAuthoredPublicationCount() {
     	return this.authoredPublicationCount.get();
-    }
-
-    public IntegerProperty getAuthoredPublicationCountProperty() {
-    	return this.authoredPublicationCount;
     }
 
     public void setAuthoredPublicationCount(int value) {
     	this.authoredPublicationCount.set(value);
     }
 
-    public int getEditedPublicationCount() {
-    	return this.editedPublicationCount.get();
+    public IntegerProperty authoredPublicationCountProperty() {
+    	return this.authoredPublicationCount;
     }
 
-    public IntegerProperty getEditedPublicationCountProperty() {
-    	return this.editedPublicationCount;
+    public int getEditedPublicationCount() {
+    	return this.editedPublicationCount.get();
     }
 
     public void setEditedPublicationCount(int value) {
     	this.editedPublicationCount.set(value);
     }
 
+    public IntegerProperty editedPublicationCountProperty() {
+    	return this.editedPublicationCount;
+    }
+
     public int getTotalPublicationCount() {
     	return this.totalPublicationCount.intValue();
     }
 
-    public NumberBinding getTotalPublicationCountBinding() {
+    public NumberBinding totalPublicationCountBinding() {
     	return this.totalPublicationCount;
     }
 

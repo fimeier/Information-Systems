@@ -6,10 +6,21 @@ import javafx.beans.property.StringProperty;
 
 public class FxPublisher<TRPublisher> extends FxDomainObject<TRPublisher> {
 	
+	public static class QueryOptions extends FxDomainObject.QueryOptions<SortOption> {
+		
+		public QueryOptions(int startIndex, int endIndex,
+				SortOption sorting, String searchTerm) {
+			super(startIndex, endIndex, sorting, searchTerm);
+		}
+		
+	}
+	
 	public static enum SortOption {
-		BY_NAME("Sort by Name"),
-		BY_PUBCOUNT("Sort by Number of Publications"),
-		BY_ID("Sort by ID");
+
+		NONE("None"),
+		BY_NAME_ASC("Name Asc"), BY_NAME_DESC("Title Desc"),
+		BY_PUBCOUNT_ASC("Number of Publ. Asc"), BY_YEAR_DESC("Number of Publ. Desc"),
+		BY_ID_ASC("ID Asc"), BY_ID_DESC("ID Desc");
 		
 		public final String description;
 		
@@ -21,6 +32,7 @@ public class FxPublisher<TRPublisher> extends FxDomainObject<TRPublisher> {
 		public String toString() {
 			return this.description;
 		}
+	
 	}
 	
     private StringProperty name;
@@ -35,24 +47,24 @@ public class FxPublisher<TRPublisher> extends FxDomainObject<TRPublisher> {
     	return this.name.get();
     }
 
-	public StringProperty getNameProperty() {
-    	return this.name;
-    }
-
     public void setName(String name) {
     	this.name.set(name);
+    }
+
+	public StringProperty nameProperty() {
+    	return this.name;
     }
 
     public int getPublicationCount() {
     	return this.publicationCount.get();
     }
 
-    public IntegerProperty getPublicationCountProperty() {
-    	return this.publicationCount;
-    }
-
     public void setPublications(int value) {
     	this.publicationCount.set(value);
+    }
+
+    public IntegerProperty publicationCountProperty() {
+    	return this.publicationCount;
     }
     
 }
