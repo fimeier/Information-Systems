@@ -11,11 +11,19 @@ public abstract class Publication extends DomainObject {
 	 * Should only be used by the database
 	 */
 	protected Publication() { }
-	
+
 	public Publication(String title, int year, String electronicEdition) {
-		this.title = title;
+		if (title != null){
+			this.title = title;}
+		else {
+			this.title = "";}
+
 		this.year = year;
-		this.electronicEdition = electronicEdition;
+
+		if (electronicEdition != null){
+			this.electronicEdition = electronicEdition;}
+		else {
+			this.electronicEdition = "";}
 	}
 	
     public String getTitle() {

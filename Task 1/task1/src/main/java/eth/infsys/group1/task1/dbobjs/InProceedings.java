@@ -1,7 +1,9 @@
 package eth.infsys.group1.task1.dbobjs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import eth.infsys.group1.xmlparser.InProceedings_simple_input;
 
@@ -39,6 +41,11 @@ public class InProceedings extends Publication {
 	//example "conf/uist/Binding88"
 	static public String calculate_Inproceedings_id(String key){
 		return key;
+	}
+	
+	public List<Person> getAuthors() {
+		zooActivateRead();
+		return Collections.unmodifiableList(this.authors);
 	}
 
     public String getNote() {
