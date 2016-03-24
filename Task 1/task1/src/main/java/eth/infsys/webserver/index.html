@@ -1,0 +1,73 @@
+<h1>MAIN....</h1>
+<form action="../test" accept-charset="UTF-8">
+
+<style>
+ul#menu li {
+    display:inline;
+}
+</style>
+</head>
+<body>
+<ul id="menu">
+	<li>
+		<h3>Find a publication by id</h3>
+  		<form>
+			<input type="hidden" name="func" value="proceeding_by_id"><br>
+			<input type="text" name="key" value='conf/isola/Zimmermann04a'><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find a publication by filter</h3>
+  		<form>
+  		<!-- func=pupl_by_title_offset#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
+			<input type="hidden" name="func" value="pupl_by_title_offset">
+			<input type="text" name="title" value="title"><br>
+			<input type="text" name="begin-offset" value="0"><br>
+			<input type="text" name="end-offset" value="0"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find a publication by filter ordered by</h3>
+  		<form>
+  		<!-- func=publication_by_filter#title=<title-value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
+			<input type="hidden" name="func" value="pupl_by_title_offset_order">
+			<input type="text" name="title" value="title"><br>
+			<input type="text" name="begin-offset" value="0"><br>
+			<input type="text" name="end-offset" value="0"><br>
+			<fieldset>
+				<input type="radio" id="obt" name="order_by" value="title" checked><label for="obt">title</label>
+				<br>
+				<input type="radio" id="oby" name="order_by" value="year"><label for="oby">year</label>
+			</fieldset>
+			<fieldset>
+				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
+				<br>
+				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
+			</fieldset>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find publications of a person</h3>
+  		<form>
+  		<!-- func=publication_by_person#name=value	 -->
+			<input type="hidden" name="func" value="publication_by_person">
+			<input type="text" name="name" value="Christian Kelber"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find the co-authors of a person</h3>
+  		<form>
+  		<!-- func=find_co_authors_order_by#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
+			<input type="hidden" name="func" value="find_co_authors_order_by">
+			<input type="text" name="name" value="Christian Kelber"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+</ul>
+
+  
+

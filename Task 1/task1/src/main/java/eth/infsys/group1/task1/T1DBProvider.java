@@ -7,8 +7,12 @@
 package eth.infsys.group1.task1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -38,21 +42,21 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 	public static final int OPEN_DB_APPEND = 20;
 	public static final int OPEN_DB_OVERRIDE = 21;
-	
-	
+
+
 	public static final int SORT_BY_NAME = 1;
 	public static final int SORT_BY_YEAR = 2;
 	public static final int SORT_BY_TITLE = 3;
-	
-	
 
 
-/*
+
+
+	/*
 	//HACK!!!
 	public PersistenceManager getpm() {
 		return pm;
 	}
-*/
+	 */
 
 	private PersistenceManager pm;
 
@@ -84,13 +88,13 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			 */
 			this.pm = ZooJdoHelper.openOrCreateDB(dbName);
 			//pm.currentTransaction().setRetainValues(true);
-			
+
 			/*
 			pm.currentTransaction().begin();
 			ZooJdoHelper.schema(pm).addClass(DomainObject.class);
 			pm.currentTransaction().commit();
-			
-*/
+
+			 */
 			//schemaManager();
 
 			break;
@@ -138,7 +142,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		pm = ZooJdoHelper.openDB(dbName);
 
 	}
-	
+
 	public void tr_begin() {
 		this.pm.currentTransaction().begin();
 	}
@@ -233,14 +237,60 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Query q = pm.newQuery ("select unique from eth.infsys.group1.task1.dbobjs.DomainObject where id == :id");
 		return (Publication) q.execute(publ_id);
 	}
+
+
+	private Collection<Publication> get_publ_by_filter_offset(String filter, int boff, int eoff, String order_by) {
+		//String order_by = "title ascending";
+		Query q = pm.newQuery (Publication.class);
+		//q.setFilter("title.contains('"+title+"')");
+		//q.setFilter("title.toLowerCase().contains('"+title.toLowerCase()+"')");
+		q.setFilter(filter);
+		q.setOrdering(order_by);
+
+		//unsupportedOperation
+		//q.setRange(boff +","+eoff);
+
+		//Query q = pm.newQuery ("select from eth.infsys.group1.task1.dbobjs.Publication GROUP BY title RANGE :boff, :eoff");
+		Collection<Publication> publs = (Collection<Publication>)q.execute();
+
+		int collection_size = publs.size();
+		int skip = boff-eoff;
+		if (collection_size < boff){
+			return null;
+		}
+		if (boff==0 && eoff==0){
+			System.out.println("Return all....");
+			return publs;
+		}
+
+		Collection<Publication> publs_range = new ArrayList<>();
+
+		/**
+		 * iterator points "to nothing"
+		 * first iter.next() gives the first element in the list
+		 */
+		Iterator<Publication> iter = publs.iterator();
+
+
+		int i;
+		for(i=1; i<boff;i++){
+			iter.next();
+		}
+		for(;i<=eoff && iter.hasNext();i++){
+			publs_range.add(iter.next());
+		}
 	
-	
-	
-	
+		return publs_range;
+	}
+
+
+
+
+
 	/**
 	 * Batch-Loader-methods
 	 */
-	
+
 	/**
 	 * Creates and returns a new (or existing) proceeding
 	 * 
@@ -354,7 +404,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 	}
 
-	
+
 	/**
 	 * Creates and returns a new (or existing) inproceeding
 	 * 
@@ -416,14 +466,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		return ret_val;
 	}
 
-	
+
 
 	/**
 	 * IO-methods: helper
 	 */
 
-		
-	
+
+
 	private PublicationIO fill_PublicationIO(Publication publ){
 		PublicationIO publication = new PublicationIO();
 		if ( publ == null ){
@@ -432,37 +482,37 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		}
 		else if ( publ instanceof Proceedings ){
 			Proceedings proc = (Proceedings) publ;
-			
+
 			publication.is_a_proceeding = true;
 			publication.id = proc.getId();
 			publication.title = proc.getTitle();
 			publication.year = proc.getYear();
 			publication.electronicEdition = proc.getElectronicEdition();
-//check einbauen			
+			//check einbauen			
 			publication.conferenceName = proc.getConferenceEdition().getConference().getName();
 			publication.conferenceEdition = proc.getConferenceEdition().getYear();
-			
+
 			for (Person editor: proc.getEditors()){
 				publication.editors.add(editor.getName());
 			}
 			publication.note = proc.getNote();
 			publication.number = proc.getNumber();
-			
+
 			Publisher publisher = proc.getPublisher();
 			if ( publisher != null){
 				publication.publisher_name = publisher.getName();
 				publication.publisher_id = publisher.getId();
 			}
-			
+
 			publication.volume = proc.getVolume();
 			publication.isbn = proc.getIsbn();
-			
+
 			Series serie = proc.getSeries();
 			if ( serie != null){
 				publication.series_name = serie.getName();
 				publication.series_id = serie.getId();
 			}
-			
+
 			for (InProceedings inprocs: proc.getPublications()){
 				String title = inprocs.getTitle();
 				String id = inprocs.getId();
@@ -472,30 +522,30 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				@Override
 				public int compare(Pair<String, String> o1, Pair<String, String> o2) {
 					return o1.getKey().compareTo(o2.getKey());
-//					int cmp = o1.getKey().compareTo(o2.getKey());
-//					if (cmp==0) {
-//						return o1.getValue().compareTo(o2.getValue());
-//					}
-//					return 0;
+					//					int cmp = o1.getKey().compareTo(o2.getKey());
+					//					if (cmp==0) {
+					//						return o1.getValue().compareTo(o2.getValue());
+					//					}
+					//					return 0;
 				}
 			};
 			publication.inproceedings_title_id.sort(comparePairTitleId);
-			
+
 
 		}
 		else
 		{
 			InProceedings inproc = (InProceedings) publ;
-			
+
 			publication.is_an_inproceeding = true;
 			publication.id = inproc.getId();
 			publication.title = inproc.getTitle();
 			publication.year = inproc.getYear();
 			publication.electronicEdition = inproc.getElectronicEdition();
-//check einbauen			
+			//check einbauen			
 			publication.conferenceName = inproc.getProceedings().getConferenceEdition().getConference().getName();
 			publication.conferenceEdition = inproc.getProceedings().getConferenceEdition().getYear(); //should be the same as year
-			
+
 			for (Person author: inproc.getAuthors()){
 				publication.authors.add(author.getName());
 			}
@@ -505,12 +555,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			publication.proceeding_id = inproc.getProceedings().getId();
 
 
-			
+
 
 		}
 		return publication;
 	}
-	
+
 
 	/**
 	 * IO-methods
@@ -519,9 +569,28 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 	//Query 1
 	public PublicationIO IO_get_publication_by_id(String publ_id){
 		pm.currentTransaction().setNontransactionalRead(true);
-		
+
 		return fill_PublicationIO(get_publication_by_id(publ_id));
-		
+
+	}
+
+	//Query 2, 3
+	public List<PublicationIO> IO_get_publ_by_filter_offset(String filter, int boff, int eoff, String order_by) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		Collection<Publication> publs = get_publ_by_filter_offset(filter, boff, eoff, order_by);
+
+		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
+
+		if (publs.isEmpty()){
+			PublicationIO publ = fill_PublicationIO(null);
+			return_list.add(publ);
+			return return_list;
+		}
+		for (Publication publ: publs){
+			return_list.add(fill_PublicationIO(publ));
+		}
+		return return_list;
 	}
 
 

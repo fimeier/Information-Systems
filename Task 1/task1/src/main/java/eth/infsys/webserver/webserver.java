@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,14 +44,17 @@ public class webserver {
 	static class MyHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
-
+			/*
 			//String[] args = get_args(t.getRequestURI().getQuery());
 			String user_input = t.getRequestURI().getQuery();
 			System.out.println("user_input 777="+user_input);
 
 			//seems to "auto-decode" the input
-			//java.net.URLDecoder.decode(user_input, "UTF-8");
+			user_input = java.net.URLDecoder.decode(user_input, "UTF-8");
 
+			 */
+			String user_input = java.net.URLDecoder.decode(t.getRequestURI().getQuery(), "UTF-8");
+			System.out.println("user_input after decoding: "+user_input);
 			System.out.println("call backend...");
 
 			String response = "";
@@ -68,20 +72,20 @@ public class webserver {
 			os.write(resp);
 			os.close();
 		}
-		
+
 	}
-	
+
 	private static Pair<String,String> parse_name_value(String arg) {
-        final Pattern pattern = Pattern.compile("(?<name>^[a-zA-Z0-9]+)=(?<value>.+)");
-        Matcher matcher = pattern.matcher(arg);
-        
-        if(matcher.find()) {
-        	return new Pair<String,String>(matcher.group("name"),matcher.group("value"));
-        } else {
-        	return null;
-        }
+		final Pattern pattern = Pattern.compile("(?<name>^.+)=(?<value>.+)");
+		Matcher matcher = pattern.matcher(arg);
+
+		if(matcher.find()) {
+			return new Pair<String,String>(matcher.group("name"),matcher.group("value"));
+		} else {
+			return null;
+		}
 	} 
-	
+
 	private static HashMap<String,String> get_args(String arg_in) {
 		HashMap<String,String> args_out = new HashMap<String,String>();
 		if (arg_in==null){
@@ -91,28 +95,28 @@ public class webserver {
 		}
 		String[] args = arg_in.split("\\&");
 		int arg_count = args.length;
-		
-        
+
+
 		Pair<String,String> name_value = parse_name_value(args[0]);
-		
+
 		if ((name_value==null) || (!name_value.getKey().equals("func")) || (WebFunc.fromString(name_value.getValue())==null) ){
 			args_out.put("func", "ERROR");
 			args_out.put("error_message", "not_a_func");	
 			return args_out;
 		}
-		
+
 		if (arg_count != WebFunc.fromString(name_value.getValue()).arg_count ){
 			args_out.put("func", "ERROR");
 			args_out.put("error_message", "arg_count_missmatch");	
 			return args_out;
 		}
-		
+
 
 		for (int i=0; i< arg_count; i++){
 			name_value = parse_name_value(args[i]);
 			if ( name_value == null ){
 				args_out.put("func", "ERROR");
-				args_out.put("error_message", "wrong_arguments");				
+				args_out.put("error_message", "wrong_argument_syntax");				
 				return args_out;
 			}
 			args_out.put(name_value.getKey(), name_value.getValue());
@@ -125,20 +129,42 @@ public class webserver {
 		System.out.println("call get args...");
 		HashMap<String,String> args = get_args(user_input);
 		System.out.println("zurück von get args");
-		
-	
+
+
 		String output = "";
 		String func = args.get("func");
-		
+		String order_by = ""; //default order
+
 		String key ="";
-		
-		
-		
+
+
+
 
 
 
 		WebFunc wf = WebFunc.fromString(func);
 		switch (wf) {
+		case pupl_by_title_offset_order:
+			if ( !args.containsKey("order_by") || !args.containsKey("ob_direction")){
+				args.remove("func");
+				args.put("func", "ERROR");
+				args.put("error_message", "wrong_args");
+			}
+			order_by = args.get("order_by") + " " +args.get("ob_direction");
+
+		case pupl_by_title_offset:
+			if ( !args.containsKey("title") || !args.containsKey("begin-offset") || !args.containsKey("end-offset") ){
+				args.remove("func");
+				args.put("func", "ERROR");
+				args.put("error_message", "wrong_args");	
+			}
+			else {				
+				output += create_header(wf);
+				String filter = "title.toLowerCase().contains('"+args.get("title").toLowerCase()+"')";
+				output += pupl_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
+				output += create_footer(wf);
+				break;
+			}
 		case inproceeding_by_id:
 			output += create_header(wf);
 			output += inproceeding_by_id(args.get("key"));
@@ -154,6 +180,32 @@ public class webserver {
 			output += publication_by_id(args.get("key"));
 			output += create_footer(wf);
 			break;
+/**
+ * Implementieren: Persons.name mit index ergänzen
+ * alle Proceedings/Inproceedings ausgeben
+ * sortieren???
+ */
+		case publication_by_person:
+			if ( !args.containsKey("name") ){
+				args.remove("func");
+				args.put("func", "ERROR");
+				args.put("error_message", "wrong_args");	
+			}
+			output += create_header(wf);
+			String filter = "name.toLowerCase().contains('"+args.get("name").toLowerCase()+"')";
+			output += publication_by_id(args.get("key"));
+			output += create_footer(wf);
+			break;
+			/*case find_co_authors_order_by://	(2),	//func=find_co_authors_order_by#name=value
+			if ( !args.containsKey("name")){
+				args.remove("func");
+				args.put("func", "ERROR");
+				args.put("error_message", "wrong_args");	
+			}
+			output += create_header(wf);
+			output += publication_by_id(args.get("key"));
+			output += create_footer(wf);
+			break;*/
 		case MAIN:
 			output += create_header(WebFunc.MAIN);
 			output += get_main();
@@ -171,10 +223,33 @@ public class webserver {
 			output += create_footer(WebFunc.MAIN);
 
 		}
-		System.out.println(output);
+		//System.out.println(output);
 		return output;
 	}
 
+
+	private static String pupl_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+		int boff, eoff;
+		try {
+			boff = Integer.valueOf(beginoffset);
+			eoff = Integer.valueOf(endoffset);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			boff = 0;
+			eoff = 0;
+		}
+
+		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"<br>";
+
+		List<PublicationIO> publs = myDB.IO_get_publ_by_filter_offset(filter, boff, eoff, order_by);
+		for (PublicationIO publ: publs){
+			Output += publ.get_all() + "<br><br>";
+
+		} 
+
+		return Output;
+	}
 
 	public static String get_error(String error_code) {
 		String Output = "<br>" +error_code +"<br>";
@@ -183,7 +258,7 @@ public class webserver {
 
 
 	private static String get_main() {
-		String path = "../task1/src/test/java/eth/infsys/group1/task1/index.html";
+		String path = "../task1/src/main/java/eth/infsys/webserver/index.html";
 		String output = "";
 		try {
 			output = readFile(path, Charset.defaultCharset());
@@ -229,10 +304,10 @@ public class webserver {
 		String output = publ.get_all();
 		return output;
 	}
-	
+
 	private static String publication_by_id(String id) {
 		PublicationIO publ = myDB.IO_get_publication_by_id(id);
-		
+
 		String output = publ.get_all();
 		return output;
 	}
