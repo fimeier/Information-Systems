@@ -6,6 +6,11 @@ import java.util.Set;
 
 public class Person extends DomainObject {
 
+	private String name;
+	private Set<Publication> authoredPublications = new HashSet<>();
+	private Set<Publication> editedPublications = new HashSet<>();
+
+	
 	/**
 	 * Should only be used by the database
 	 */
@@ -20,10 +25,6 @@ public class Person extends DomainObject {
 	static public String calculate_person_id(String name){
 		return "person/" + name;
 	}
-
-	private String name;
-	private Set<Publication> authoredPublications = new HashSet<>();
-	private Set<Publication> editedPublications = new HashSet<>();
 
 	public String getName() {
     	zooActivateRead();

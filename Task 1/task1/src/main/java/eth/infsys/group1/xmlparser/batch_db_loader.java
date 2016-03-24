@@ -19,18 +19,18 @@ public class batch_db_loader {
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 
 		//Choose DB
-		String dbName = "Project1_ZooDB_new_Import.zdb";
+		String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
 		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
 		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
 		
+//!!!!!!!change override
 
 
-
-		//load_input(myDB);
+		load_input(myDB);
 		//same call again is not a problem...
 		//load_input(myDB);
 
-		queries(myDB);
+		//queries(myDB);
 
 
 
@@ -61,7 +61,7 @@ public class batch_db_loader {
 
 		String id;
 		PublicationIO publ;
-		
+		/*
 		System.out.print("-----------------------------\n");
 		id = "conf/isola/PodpecanZL10";	
 		publ = myDB.IO_get_publication_by_id(id);
@@ -77,7 +77,7 @@ public class batch_db_loader {
 		QueryParameter qp = QueryParameter.fromString(s);
 		System.out.print(qp.db_query);
 		
-
+*/
 
 	}
 	

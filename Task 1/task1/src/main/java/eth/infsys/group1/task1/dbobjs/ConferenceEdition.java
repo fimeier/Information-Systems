@@ -18,9 +18,10 @@ public class ConferenceEdition extends DomainObject {
 		this.setId(calculate_conferenceEdition_id(conference.getName(), this.year));
 	}
 	
-	//example "conference/DAGM-Symposium/1980"
+	//example "conferenceedition/DAGM-Symposium/1980"
     static public String calculate_conferenceEdition_id(String conferenceName, int conferenceEdition){
-    	return "conference/" + conferenceName + "/" + conferenceEdition;
+    	//return "conference/" + conferenceName + "/" + conferenceEdition;
+    	return "conferenceedition/" + conferenceName + "/" + conferenceEdition;
     }
 
 	public Conference getConference() {

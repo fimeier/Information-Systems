@@ -40,12 +40,15 @@ public class PublicationIO {
 	public int conferenceEdition = 0;
 
 	//inproceedings
-	public List<String> authors = new ArrayList<>();
-	//String note; Interface is wrong...
+	//public List<String> authors = new ArrayList<>();
+	public List<Pair<String,String>> authors_name_id = new ArrayList<>();
+
+	//already defined String note; Interface is wrong...
 	public String pages = "";
 	public String proceeding_title = "";
 	public String proceeding_id = "";
 
+	/*
 	public void print_all(){
 		if (is_empty){
 			System.out.println("Publication is empty");
@@ -106,7 +109,7 @@ public class PublicationIO {
 		}
 
 
-	}
+	}*/
 	
 	public String get_all(){
 		String ret="";
@@ -149,7 +152,7 @@ public class PublicationIO {
 				String title = inprTid.getKey().substring(0, Math.min(200,inprTid.getKey().length()));
 				String id = inprTid.getValue();
 				//ret += "(id="+id+") : "+title +"<br>";
-				ret += "<a href=/test/?func=inproceeding_by_id&key=" + id + ">inproceeding-id: "+id+"</a> title: "+title +"<br>";
+				ret += "<a href='/test/?func=inproceeding_by_id&key=" + id + "'>inproceeding-id: "+id+"</a> title: "+title +"<br>";
 				if (--show == 0)
 					break;
 			}		
@@ -158,10 +161,13 @@ public class PublicationIO {
 		else
 		{
 			String aut = "";
-			for (String author: authors){
-				aut = aut + author + ", ";
+			for (Pair<String,String> author: authors_name_id){
+				String name = author.getKey();
+				String id = author.getValue();
+				aut += "<a href='/test/?func=person_by_id&id=" +id+ "'>"+name+"</a>, ";
 			}
 			ret += "authors: " + aut +"<br>";
+
 			ret += "note: " + note +"<br>";
 			ret += "pages: " + pages +"<br>";
 			ret += "proceeding-title: " + proceeding_title +"<br>";
