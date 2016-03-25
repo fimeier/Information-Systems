@@ -47,10 +47,10 @@ public class webserver {
 	static class MyHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
-			
+
 			String user_input = java.net.URLDecoder.decode(t.getRequestURI().getQuery(), "UTF-8");
 			System.out.println("user_input after decoding: "+user_input);
-			
+
 			System.out.println("call backend...");
 			String response = "";
 			try {
@@ -94,7 +94,8 @@ public class webserver {
 
 
 		Pair<String,String> name_value = parse_name_value(args[0]);
-
+		
+		//func
 		if ((name_value==null) || (!name_value.getKey().equals("func")) || (WebFunc.fromString(name_value.getValue())==null) ){
 			args_out.put("func", "ERROR");
 			args_out.put("error_message", "not_a_func");	
@@ -171,7 +172,7 @@ public class webserver {
 			output += inproceeding_by_id(args.get("key"));
 			output += create_footer(wf);
 			break;
-			
+
 		case proceeding_by_id:
 			if ( !args.containsKey("key") ){
 				output += create_header(wf);
@@ -243,6 +244,77 @@ public class webserver {
 			output += person_by_id(args.get("id"));
 			output += create_footer(wf);
 			break;
+		case publisher_by_filter_offset_order:
+			if ( !args.containsKey("order_by") || !args.containsKey("ob_direction") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: order_by or ob_direction missing...");
+				output += create_footer(wf);
+				break;
+			}
+			order_by = args.get("order_by") + " " +args.get("ob_direction");
+			//next statement must be "case publisher_by_filter_offset:"
+
+		case publisher_by_filter_offset:
+			if ( !args.containsKey("name_contains") || !args.containsKey("begin-offset") || !args.containsKey("end-offset") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: name_contains or begin/end-offset missing...");
+				output += create_footer(wf);
+				break;
+			}
+			else {				
+				output += create_header(wf);
+				String filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				output += publisher_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
+				output += create_footer(wf);
+				break;
+			}
+		case publisher_by_id:
+			if ( !args.containsKey("id") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: id missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += publisher_by_id(args.get("id"));
+			output += create_footer(wf);
+			break;
+
+		case series_by_filter_offset_order:
+			if ( !args.containsKey("order_by") || !args.containsKey("ob_direction") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: order_by or ob_direction missing...");
+				output += create_footer(wf);
+				break;
+			}
+			order_by = args.get("order_by") + " " +args.get("ob_direction");
+			//next statement must be "case series_by_filter_offset:"
+
+		case series_by_filter_offset:
+			if ( !args.containsKey("name_contains") || !args.containsKey("begin-offset") || !args.containsKey("end-offset") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: name_contains or begin/end-offset missing...");
+				output += create_footer(wf);
+				break;
+			}
+			else {				
+				output += create_header(wf);
+				String filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				output += series_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
+				output += create_footer(wf);
+				break;
+			}
+		case series_by_id:
+			if ( !args.containsKey("id") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: id missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += series_by_id(args.get("id"));
+			output += create_footer(wf);
+			break;
 		case confEd_by_id:
 			if ( !args.containsKey("id") ){
 				output += create_header(wf);
@@ -301,6 +373,16 @@ public class webserver {
 			output += find_co_authors(args.get("name"));
 			output += create_footer(wf);
 			break;
+		case PAGE:
+			if ( !args.containsKey("name")){
+				output += create_header(wf);
+				output += get_error("wrong_args: number missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += get_page(args.get("name"));
+			break;
+			
 		case MAIN:
 			//output += create_header(WebFunc.MAIN);
 			output += get_main();
@@ -320,6 +402,68 @@ public class webserver {
 
 		}
 		//System.out.println(output);
+		return output;
+	}
+
+
+
+	private static String series_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+		int boff, eoff;
+		try {
+			boff = Integer.valueOf(beginoffset);
+			eoff = Integer.valueOf(endoffset);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			boff = 0;
+			eoff = 0;
+		}
+
+		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
+
+
+		List<DivIO> series = myDB.IO_get_series_by_filter_offset(filter, boff, eoff, order_by);
+		for (DivIO ser: series){
+			Output += ser.get_all() + "<br><br>";
+		} 
+
+		return Output;
+	}
+
+	private static String series_by_id(String series_id) {
+		DivIO series = myDB.IO_get_series_by_id(series_id);
+
+		String output = series.get_all();
+		return output;
+	}
+
+	private static String publisher_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+		int boff, eoff;
+		try {
+			boff = Integer.valueOf(beginoffset);
+			eoff = Integer.valueOf(endoffset);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			boff = 0;
+			eoff = 0;
+		}
+
+		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
+
+
+		List<DivIO> publishers = myDB.IO_get_publisher_by_filter_offset(filter, boff, eoff, order_by);
+		for (DivIO publisher: publishers){
+			Output += publisher.get_all() + "<br><br>";
+		} 
+
+		return Output;
+	}
+
+	private static String publisher_by_id(String publ_id) {
+		DivIO publisher = myDB.IO_get_publisher_by_id(publ_id);
+
+		String output = publisher.get_all();
 		return output;
 	}
 
@@ -389,25 +533,25 @@ public class webserver {
 
 		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
 
-		
+
 		List<DivIO> persons = myDB.IO_get_person_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO person: persons){
 			Output += person.get_all() + "<br><br>";
 		} 
-		
+
 		return Output;
 	}
 
 	private static String publ_by_person(HashMap<String, String> args) {
 		String Output = "<br>filter="+args+"<br>";
-		
-		
+
+
 		List<PublicationIO> publs = myDB.IO_get_publ_by_person(args);
 		for (PublicationIO publ: publs){
 			Output += publ.get_all() + "<br><br>";
 		}
 		Output += "blub";
-		
+
 		return Output;
 
 	}
@@ -447,6 +591,19 @@ public class webserver {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		return output;
+	}
+	
+	private static String get_page(String name) {
+		String path = "../task1/src/main/java/eth/infsys/webserver/page_"+name+".html";
+		String output = "";
+		try {
+			output = readFile(path, Charset.defaultCharset());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			output = get_main();
 		}
 		return output;
 	}

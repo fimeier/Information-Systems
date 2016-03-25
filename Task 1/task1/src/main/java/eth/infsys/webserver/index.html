@@ -24,162 +24,35 @@ nach ÄNDERUNG der DB Schlüssel
 <h1>MAIN....</h1>
 
 <ul id="menu">
-	<li>
-		<h3>Find a publication by id</h3>
-  		<form>
-			<input type="hidden" name="func" value="proceeding_by_id"><br>
-			<input type="text" name="key" value='conf/isola/Zimmermann04a'><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a publication by filter</h3>
-  		<form>
-  		<!-- func=pupl_by_title_offset#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="pupl_by_title_offset">
-			<input type="text" name="title" value="title"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a publication by filter ordered by</h3>
-  		<form>
-  		<!-- func=publication_by_filter#title=<title-value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
-			<input type="hidden" name="func" value="pupl_by_title_offset_order">
-			<input type="text" name="title" value="title"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<fieldset>
-				<input type="radio" id="obt" name="order_by" value="title" checked><label for="obt">title</label>
-				<br>
-				<input type="radio" id="oby" name="order_by" value="year"><label for="oby">year</label>
-			</fieldset>
-			<fieldset>
-				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
-				<br>
-				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
-			</fieldset>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find publications of a person</h3>
-  		<form>
-  		<!-- func=publ_by_person_name_or_id#name=value	 -->
-			<input type="hidden" name="func" value="publ_by_person_name_or_id">
-			<input type="text" name="name" value="Milton Roberto Heinen"><br>
-			<input type="submit" value="Submit">
-			<fieldset>
-				<input type="radio" id="all" name="publ" value="all" checked><label for="all">all</label>
-				<br>
-				<input type="radio" id="auth" name="publ" value="authored"><label for="auth">authored</label>
-				<br>
-				<input type="radio" id="edit" name="publ" value="editored"><label for="edit">editored</label>	
-			</fieldset>
-		</form>
-	</li>
-	<li>
-		<h3>Find a person by id</h3>
-  		<form>
-  		<!-- func=person_by_id#id=<id-value> -->
-			<input type="hidden" name="func" value="person_by_id">
-			<input type="text" name="id" value="person/Minerva M. Yeung"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find the co-authors of a person</h3>
-  		<form>
-  		<!-- func=find_co_authors#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="find_co_authors">
-			<input type="text" name="name" value="Christian Kelber"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a person by filter (contains string in name)</h3>
-  		<form>
-  		<!-- //func=person_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="person_by_filter_offset">
-			<input type="text" name="name_contains" value="Lee"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a person by filter (contains string in name) ordered by</h3>
-  		<form>
-  		<!-- //func=person_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
-			<input type="hidden" name="func" value="person_by_filter_offset_order">
-			<input type="text" name="name_contains" value="Lee"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="hidden" name="order_by" value="name">
-			<fieldset>
-				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
-				<br>
-				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
-			</fieldset>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a conference by filter (contains string in name)</h3>
-  		<form>
-  		<!-- //func=conf_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="conf_by_filter_offset">
-			<input type="text" name="name_contains" value="isola"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a conference by filter (contains string in name) ordered by</h3>
-  		<form>
-  		<!-- func=conf_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
-			<input type="hidden" name="func" value="conf_by_filter_offset_order">
-			<input type="text" name="name_contains" value="isola"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="hidden" name="order_by" value="name">
-			<fieldset>
-				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
-				<br>
-				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
-			</fieldset>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a conference by id</h3>
-  		<form>
-  		 <!-- func=conf_by_id#id=<id-value> --> 		
-			<input type="hidden" name="func" value="conf_by_id"><br>
-			<input type="text" name="id" value='conference/ISoLA'><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a conference edition by id</h3>
-  		<form>
-  		 <!-- func=confEd_by_id#id=<id-value> --> 		
-			<input type="hidden" name="func" value="confEd_by_id"><br>
-			<input type="text" name="id" value='conferenceedition/ISoLA/2007'><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
+
+<!-- Publication -->
+	<h1><a href='/test/?func=PAGE&name=publications'>Publications</a></h1>
+
 	
-		
+<!-- Person -->
+	<h1><a href='/test/?func=PAGE&name=person'>Person</a></h1>
+	
+	
+<!-- Conference & ConferenceEditions -->
+	<h1><a href='/test/?func=PAGE&name=confAconfEd'>Conference & Conference-Editions</a></h1>
+
+	
+<!-- Publisher -->
+	<h1><a href='/test/?func=PAGE&name=publisher'>Publisher</a></h1>
+
+	
+<!-- Series -->
+	<h1><a href='/test/?func=PAGE&name=series'>Series</a></h1>
+
+
+<!-- Queries -->
+	<h1><a href='/test/?func=PAGE&name=queries'>Queries</a></h1>
+
+	
 	
 </ul>
 
 
-	
-  
 
 	
 

@@ -1,0 +1,63 @@
+<a href='/test/?func=MAIN'>HOME</a>
+
+<!-- Publication -->
+
+	<li>
+		<h3>Find publications of a person (by name or id)</h3>
+		<h4>change form... standard=name... for id... add id</h4>
+  		<form>
+  		<!-- func=publ_by_person_name_or_id#name=value	 -->
+			<input type="hidden" name="func" value="publ_by_person_name_or_id">
+			<input type="text" name="name" value="Milton Roberto Heinen"><br>
+			<input type="submit" value="Submit">
+			<fieldset>
+				<input type="radio" id="all" name="publ" value="all" checked><label for="all">all</label>
+				<br>
+				<input type="radio" id="auth" name="publ" value="authored"><label for="auth">authored</label>
+				<br>
+				<input type="radio" id="edit" name="publ" value="editored"><label for="edit">editored</label>	
+			</fieldset>
+		</form>
+	</li>
+
+	<li>
+		<h3>Find a publication by id</h3>
+  		<form>
+			<input type="hidden" name="func" value="proceeding_by_id"><br>
+			<input type="text" name="key" value='conf/isola/2004i'><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find a publication by filter (contains string in title)</h3>
+  		<form>
+  		<!-- func=pupl_by_title_offset#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
+			<input type="hidden" name="func" value="pupl_by_title_offset">
+			<input type="text" name="title" value="title"><br>
+			<input type="text" name="begin-offset" value="0"><br>
+			<input type="text" name="end-offset" value="0"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find a publication by filter (contains string in title) ordered by</h3>
+  		<form>
+  		<!-- func=publication_by_filter#title=<title-value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
+			<input type="hidden" name="func" value="pupl_by_title_offset_order">
+			<input type="text" name="title" value="title"><br>
+			<input type="text" name="begin-offset" value="0"><br>
+			<input type="text" name="end-offset" value="0"><br>
+			<fieldset>
+				<input type="radio" id="obt" name="order_by" value="title" checked><label for="obt">title</label>
+				<br>
+				<input type="radio" id="oby" name="order_by" value="year"><label for="oby">year</label>
+			</fieldset>
+			<fieldset>
+				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
+				<br>
+				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
+			</fieldset>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	

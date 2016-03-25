@@ -90,8 +90,8 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			 * do not delete if already exist
 			 */
 			this.pm = ZooJdoHelper.openOrCreateDB(dbName);
-			
-		
+
+
 			//pm.currentTransaction().setRetainValues(true);
 
 			/*
@@ -170,7 +170,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		return serie;
 	}
 
-	private Series get_serie_by_id(String id) {
+	private Series get_series_by_id(String id) {
 		Query q = pm.newQuery ("select unique from eth.infsys.group1.task1.dbobjs.DomainObject where id == :compare_id");
 		return (Series) q.execute(id);
 	}
@@ -362,12 +362,78 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		return confs_range;
 	}
 
-	
+	private Collection<Publisher> get_publisher_by_filter_offset(String filter, int boff, int eoff, String order_by) {
+		Query q = pm.newQuery (Publisher.class);
+		q.setFilter(filter);
+		q.setOrdering(order_by);
+
+		Collection<Publisher> publishers = (Collection<Publisher>) q.execute();
+
+		int collection_size = publishers.size();
+		int skip = boff-eoff;
+		if (collection_size < boff){
+			return null;
+		}
+		if (boff==0 && eoff==0){
+			System.out.println("Return all....");
+			return publishers;
+		}
+
+		Collection<Publisher> publishers_range = new ArrayList<>();
+
+		Iterator<Publisher> iter = publishers.iterator();
+
+
+		int i;
+		for(i=1; i<boff;i++){
+			iter.next();
+		}
+		for(;i<=eoff && iter.hasNext();i++){
+			publishers_range.add(iter.next());
+		}
+
+		return publishers_range;
+	}
+
+	private Collection<Series> get_series_by_filter_offset(String filter, int boff, int eoff, String order_by) {
+		Query q = pm.newQuery (Series.class);
+		q.setFilter(filter);
+		q.setOrdering(order_by);
+
+		Collection<Series> series = (Collection<Series>) q.execute();
+
+		int collection_size = series.size();
+		int skip = boff-eoff;
+		if (collection_size < boff){
+			return null;
+		}
+		if (boff==0 && eoff==0){
+			System.out.println("Return all....");
+			return series;
+		}
+
+		Collection<Series> series_range = new ArrayList<>();
+
+		Iterator<Series> iter = series.iterator();
+
+
+		int i;
+		for(i=1; i<boff;i++){
+			iter.next();
+		}
+		for(;i<=eoff && iter.hasNext();i++){
+			series_range.add(iter.next());
+		}
+
+		return series_range;
+	}
+
+
 	private DomainObject get_domainobject_by_id(String object_id) {
 		Query q = pm.newQuery ("select unique from eth.infsys.group1.task1.dbobjs.DomainObject where id == :compare_id");
 		return (DomainObject) q.execute(object_id);
 	}
-	
+
 	private ConferenceEdition get_conferenceedition_by_id(String object_id) {
 		Query q = pm.newQuery ("select unique from eth.infsys.group1.task1.dbobjs.ConferenceEdition where id == :compare_id");
 		return (ConferenceEdition) q.execute(object_id);
@@ -468,7 +534,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Series serie = null;
 		if (args.series != null){
 			String series_id = Series.calculate_series_id(args.series);
-			serie = get_serie_by_id(series_id);
+			serie = get_series_by_id(series_id);
 			if ( serie == null ){
 				serie = create_serie(args.series);
 				System.out.println("Series (" + args.series + ") created...");
@@ -560,7 +626,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 	/**
 	 * IO-methods: helper
 	 */
-	
+
 	private Comparator<Pair<String, String>> comparePairTitleId = new Comparator<Pair<String,String>>() {
 		@Override
 		public int compare(Pair<String, String> o1, Pair<String, String> o2) {
@@ -572,14 +638,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			//					return 0;
 		}
 	};
-	
+
 	private Comparator<Pair<Integer, String>> comparePairYearId = new Comparator<Pair<Integer,String>>() {
 		@Override
 		public int compare(Pair<Integer, String> o1, Pair<Integer, String> o2) {
 			return o1.getKey().compareTo(o2.getKey());
 		}
 	};
-	
+
 	private Comparator<DivIO> compareDivIO_Person_name = new Comparator<DivIO>() {
 		@Override
 		public int compare(DivIO o1, DivIO o2) {
@@ -603,13 +669,31 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			publication.title = proc.getTitle();
 			publication.year = proc.getYear();
 			publication.electronicEdition = proc.getElectronicEdition();
-			//check einbauen			
-			publication.conferenceName = proc.getConferenceEdition().getConference().getName();
-			publication.conferenceEdition = proc.getConferenceEdition().getYear();
-
-			for (Person editor: proc.getEditors()){
-				publication.editors.add(editor.getName());
+			
+			if (proc.getConferenceEdition() != null){
+				if (proc.getConferenceEdition().getConference() != null){
+					
+					//Conference
+					String name = proc.getConferenceEdition().getConference().getName();
+					String confid = proc.getConferenceEdition().getConference().getId();
+					publication.Conference_name_id = new Pair(name,confid);
+					
+					//ConferenceEdition	
+					int year = proc.getConferenceEdition().getYear();
+					String confEdid = proc.getConferenceEdition().getId();
+					publication.ConferenceEdition_year_id = new Pair(year,confid);
+				}
 			}
+			
+			/*for (Person editor: proc.getEditors()){
+				publication.editors.add(editor.getName());
+			}*/
+			for (Person editor: proc.getEditors()){
+				String name = editor.getName();
+				String id = editor.getId();
+				publication.editors_name_id.add(new Pair(name, id));
+			}
+			
 			publication.note = proc.getNote();
 			publication.number = proc.getNumber();
 
@@ -633,18 +717,6 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				String id = inprocs.getId();
 				publication.inproceedings_title_id.add(new Pair(title, id));
 			}
-			/*
-			Comparator<Pair<String, String>> comparePairTitleId = new Comparator<Pair<String,String>>() {
-				@Override
-				public int compare(Pair<String, String> o1, Pair<String, String> o2) {
-					return o1.getKey().compareTo(o2.getKey());
-					//					int cmp = o1.getKey().compareTo(o2.getKey());
-					//					if (cmp==0) {
-					//						return o1.getValue().compareTo(o2.getValue());
-					//					}
-					//					return 0;
-				}
-			};*/
 			publication.inproceedings_title_id.sort(comparePairTitleId);
 
 
@@ -659,8 +731,25 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			publication.year = inproc.getYear();
 			publication.electronicEdition = inproc.getElectronicEdition();
 			//check einbauen			
-			publication.conferenceName = inproc.getProceedings().getConferenceEdition().getConference().getName();
-			publication.conferenceEdition = inproc.getProceedings().getConferenceEdition().getYear(); //should be the same as year
+			//publication.conferenceName = inproc.getProceedings().getConferenceEdition().getConference().getName();
+			//publication.conferenceEdition = inproc.getProceedings().getConferenceEdition().getYear(); //should be the same as year
+			Proceedings proc = inproc.getProceedings();
+			if (proc != null){
+				if (proc.getConferenceEdition() != null){
+					if (proc.getConferenceEdition().getConference() != null){
+
+						//Conference
+						String name = proc.getConferenceEdition().getConference().getName();
+						String confid = proc.getConferenceEdition().getConference().getId();
+						publication.Conference_name_id = new Pair(name,confid);
+
+						//ConferenceEdition	
+						int year = proc.getConferenceEdition().getYear();
+						String confEdid = proc.getConferenceEdition().getId();
+						publication.ConferenceEdition_year_id = new Pair(year,confid);
+					}
+				}
+			}
 
 			for (Person author: inproc.getAuthors()){
 				String name = author.getName();
@@ -675,14 +764,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		}
 		return publication;
 	}
-	
+
 	private DivIO fill_DivIO(DomainObject dblp) {
 		DivIO divobj = new DivIO();
 		if ( dblp == null ){
 			divobj.is_empty = true;
 			return divobj;
 		}
-		
+
 		//Conference ok
 		else if ( dblp instanceof Conference ){
 			divobj.is_a_conference = true;
@@ -696,10 +785,10 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				divobj.Conference_editions_year_id.add(new Pair(year, id));
 			}
 			divobj.Conference_editions_year_id.sort(comparePairYearId);
-			
+
 			return divobj;
 		}
-		
+
 		//ConferenceEdition
 		else if ( dblp instanceof ConferenceEdition ){
 			divobj.is_a_conference_edition = true;
@@ -712,21 +801,21 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			divobj.ConferenceEditions_proceedings_id = confed.getProceedings().getId();
 			return divobj;
 		}
-		
+
 		//Person ok
 		else if ( dblp instanceof Person ){
 			divobj.is_a_person = true;
 			Person pers = (Person) dblp;
 			divobj.id = pers.getId();
 			divobj.Person_name = pers.getName();
-			
+
 			for (Publication publ: pers.getAuthoredPublications()){
 				String title = publ.getTitle();
 				String id = publ.getId();
 				divobj.Person_authoredPublications_title_id.add(new Pair(title, id));
 			}
 			divobj.Person_authoredPublications_title_id.sort(comparePairTitleId);
-			
+
 			for (Publication publ: pers.getEditedPublications()){
 				String title = publ.getTitle();
 				String id = publ.getId();
@@ -736,25 +825,38 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 			return divobj;
 		}
-		
-		//Publisher
+
+		//Publisher ok
 		else if ( dblp instanceof Publisher ){
 			divobj.is_a_publisher = true;
-			Publisher publ = (Publisher) dblp;
-			divobj.id = publ.getId();
+			Publisher publisher = (Publisher) dblp;
+			divobj.id = publisher.getId();
+			divobj.Publisher_name = publisher.getName();
 
-			//tbd
+			for (Publication publi: publisher.getPublications()){
+				String title = publi.getTitle();
+				String id = publi.getId();
+				divobj.Publisher_publications_title_id.add(new Pair(title, id));
+			}
+			divobj.Publisher_publications_title_id.sort(comparePairTitleId);
+
 			return divobj;
 		}
 
-		//Series
+		//Series ok
 		else if ( dblp instanceof Series ){
 			divobj.is_a_series = true;
-			Series serie = (Series) dblp;
-			divobj.id = serie.getId();
+			Series series = (Series) dblp;
+			divobj.id = series.getId();
 
-			//tbd
-			return divobj;
+			divobj.Series_name = series.getName();
+
+			for (Publication publi: series.getPublications()){
+				String title = publi.getTitle();
+				String id = publi.getId();
+				divobj.Series_publications_title_id.add(new Pair(title, id));
+			}
+			divobj.Series_publications_title_id.sort(comparePairTitleId);
 		}
 
 		return divobj;
@@ -791,8 +893,8 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			return_list.add(publ);
 			return return_list;
 		}*/
-		
-		
+
+
 		for (Publication publ: publs){
 			return_list.add(fill_PublicationIO(publ));
 		}
@@ -801,10 +903,10 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 	public List<PublicationIO> IO_get_publ_by_person(HashMap<String, String> args) {
 		pm.currentTransaction().setNontransactionalRead(true);
-		
+
 		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
 		Person pers;
-		
+
 		if( args.containsKey("id") ){
 			//get person by id
 			pers = get_person_by_id(args.get("id"));
@@ -813,12 +915,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			//get person by name
 			pers = get_person_by_name(args.get("name"));
 		}
-		
+
 		if ( pers == null ){
 			//return empty list
 			return return_list;
 		}
-				
+
 		String publ_mode = args.get("publ");
 		if ( publ_mode.equals("all") || publ_mode.equals("edited")){
 			//get proceedings
@@ -834,7 +936,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				return_list.add(fill_PublicationIO(publ));
 			}
 		}
-		
+
 		return return_list;
 	}
 
@@ -844,7 +946,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Collection<Person> persons = get_person_by_filter_offset(filter, boff, eoff, order_by);
 
 		List<DivIO> return_list = new ArrayList<DivIO>();
-		
+
 		if (persons == null){
 			return return_list;
 		}
@@ -861,7 +963,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Collection<Conference> confs = get_conference_by_filter_offset(filter, boff, eoff, order_by);
 
 		List<DivIO> return_list = new ArrayList<DivIO>();	
-		
+
 		if (confs == null){
 			return return_list;
 		}
@@ -893,7 +995,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		pm.currentTransaction().setNontransactionalRead(true);
 
 		List<DivIO> return_list = new ArrayList<DivIO>();
-		
+
 		HashSet<Person> all_authors = new HashSet<Person>();	
 
 		Person pers = get_person_by_name(pers_name);
@@ -902,31 +1004,77 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			//return empty list
 			return return_list;
 		}
-	
+
 		//get inproceedings
 		Set<Publication> authoredPublications = pers.getAuthoredPublications();
 		for (Publication publ: authoredPublications){
 			InProceedings inproc = (InProceedings) publ;
 			all_authors.addAll(inproc.getAuthors());
 		}
-		
+
 		for (Person pers1: all_authors){
 			System.out.println(pers1.getName());
 			return_list.add(fill_DivIO(pers1));
 		}
-		
+
 		return_list.sort(compareDivIO_Person_name);
-	
+
 		return return_list;
 
 	}
 
-	
+	public DivIO IO_get_publisher_by_id(String publ_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		return fill_DivIO((get_publisher_by_id(publ_id)));
+	}
+
+	public List<DivIO> IO_get_publisher_by_filter_offset(String filter, int boff, int eoff, String order_by) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		Collection<Publisher> publishers = get_publisher_by_filter_offset(filter, boff, eoff, order_by);
+
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		if (publishers == null){
+			return return_list;
+		}
+
+		for (Publisher publisher: publishers){
+			return_list.add(fill_DivIO(publisher));
+		}
+		return return_list;
+	}
+
+	public DivIO IO_get_series_by_id(String series_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		return fill_DivIO((get_series_by_id(series_id)));
+	}
+
+	public List<DivIO> IO_get_series_by_filter_offset(String filter, int boff, int eoff, String order_by) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		Collection<Series> series = get_series_by_filter_offset(filter, boff, eoff, order_by);
+
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		if (series == null){
+			return return_list;
+		}
+
+		for (Series ser: series){
+			return_list.add(fill_DivIO(ser));
+		}
+		return return_list;
+	}
 
 
 
 
-	
+
+
+
 
 
 

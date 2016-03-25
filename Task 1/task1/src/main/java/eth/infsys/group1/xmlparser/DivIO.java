@@ -46,7 +46,7 @@ public class DivIO {
 		String ret="";
 
 		if (is_empty){
-			ret += "DivIO is empty<br>";
+			ret += "<br>DivIO is empty<br>";
 			return ret;}
 		
 		//Conference ok
@@ -57,13 +57,15 @@ public class DivIO {
 
 
 			int show = -1;
+			ret += "editions: ";
 			for (Pair<Integer,String> confEdYid: Conference_editions_year_id){
 				int year = confEdYid.getKey();
 				String id = confEdYid.getValue();
-				ret += "<a href='/test/?func=confEd_by_id&id=" + id + "'>conference edition-id: "+id+"</a> year: "+year +"<br>";
+				ret += "<a href='/test/?func=confEd_by_id&id=" + id + "'>"+year +"</a> ";
 				if (--show == 0)
 					break;
 			}
+			ret += "<br>";
 		}
 		
 		//ConferenceEdition
@@ -101,20 +103,38 @@ public class DivIO {
 
 		}
 
+		//Publisher ok
 		else if (is_a_publisher){
 			ret += "<Publisher><br>";
 			ret += "id: "+id +"<br>";
+			ret += "name: "+ Publisher_name +"<br>";
+			int show = -1;
+			for (Pair<String,String> publTid: Publisher_publications_title_id){
+				String title = publTid.getKey().substring(0, Math.min(200,publTid.getKey().length()));
+				String id = publTid.getValue();
+				ret += "<a href='/test/?func=publication_by_id&key=" + id + "'>(details) </a>"+title +"<br>";
+				if (--show == 0)
+					break;
+			}
 
 		}
 
-
+		//Series ok
 		else if (is_a_series){
 			ret += "<Series><br>";
 			ret += "id: "+id +"<br>";
+			ret += "name: "+ Series_name +"<br>";
+			int show = -1;
+			for (Pair<String,String> publTid: Series_publications_title_id){
+				String title = publTid.getKey().substring(0, Math.min(200,publTid.getKey().length()));
+				String id = publTid.getValue();
+				ret += "<a href='/test/?func=publication_by_id&key=" + id + "'>(details) </a>"+title +"<br>";
+				if (--show == 0)
+					break;
+			}
+			
 
 		}
-
-
 
 
 		return ret;		

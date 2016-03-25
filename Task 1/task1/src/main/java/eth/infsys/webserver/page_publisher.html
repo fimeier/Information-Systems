@@ -1,0 +1,40 @@
+<a href='/test/?func=MAIN'>HOME</a>
+
+<!-- Publisher -->
+	<li>
+		<h3>Find a publisher by id</h3>
+  		<form>
+  		<!-- func=publisher_by_id#id=<id-value> -->
+			<input type="hidden" name="func" value="publisher_by_id">
+			<input type="text" name="id" value="publisher/Springer"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find a publisher by filter (contains string in name)</h3>
+  		<form>
+  		<!-- func=publisher_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value> -->
+			<input type="hidden" name="func" value="publisher_by_filter_offset">
+			<input type="text" name="name_contains" value="Springer"><br>
+			<input type="text" name="begin-offset" value="0"><br>
+			<input type="text" name="end-offset" value="0"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	<li>
+		<h3>Find a publisher by filter (contains string in name) ordered by</h3>
+  		<form>
+  		<!-- func=publisher_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
+			<input type="hidden" name="func" value="publisher_by_filter_offset_order">
+			<input type="text" name="name_contains" value="Springer"><br>
+			<input type="text" name="begin-offset" value="0"><br>
+			<input type="text" name="end-offset" value="0"><br>
+			<input type="hidden" name="order_by" value="name">
+			<fieldset>
+				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
+				<br>
+				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
+			</fieldset>
+			<input type="submit" value="Submit">
+		</form>
+	</li>

@@ -1,6 +1,12 @@
 package eth.infsys.group1.dbspec;
 
 public enum WebFunc {
+	publisher_by_id(2),						//func=publisher_by_id#id=<id-value>
+	publisher_by_filter_offset(4),			//func=publisher_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value>
+	publisher_by_filter_offset_order(6),	//func=publisher_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction
+	series_by_id(2),						//func=series_by_id#id=<id-value>
+	series_by_filter_offset(4),				//func=series_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value>
+	series_by_filter_offset_order(6),		//func=series_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction
 	person_by_id(2),						//func=person_by_id#id=<id-value>
 	person_by_filter_offset(4),				//func=person_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value>
 	person_by_filter_offset_order(6),		//func=person_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction
@@ -19,6 +25,7 @@ public enum WebFunc {
 	find_co_authors(2),						//func=find_co_authors#name=value
 	
 	//
+	PAGE(2),	//func=PAGE&name=<value>
 	MAIN(1), //func
 	ERROR(1),
 	;
