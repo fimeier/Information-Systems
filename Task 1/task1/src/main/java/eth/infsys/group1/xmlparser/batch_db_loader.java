@@ -19,7 +19,11 @@ public class batch_db_loader {
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 
 		//Choose DB
-		String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
+		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
+		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
+		String dbName = "Project1_4mil.zdb";
+
+
 		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
 		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
 		
@@ -41,7 +45,10 @@ public class batch_db_loader {
 	private static void load_input(T1DBProvider myDB) throws ParserConfigurationException, SAXException, IOException {
 		XMLParser<Proceedings> myParser = new XMLParser<>(myDB);
 		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/dblp_part.xml";
-		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/dblp_part_neu.xml";
+		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/dblp_part_neu.xml";
+		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
+		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
+
 
 		File file = new File(dblp_data);
 		myParser.parseXMLFile(file);

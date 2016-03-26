@@ -40,7 +40,6 @@ public class PublicationIO {
 	public Pair<String,String> Conference_name_id = new Pair("","");
 	public Pair<Integer,String> ConferenceEdition_year_id = new Pair(0,"");
 	
-	Conference asd;
 
 	//inproceedings
 	public List<Pair<String,String>> authors_name_id = new ArrayList<>();

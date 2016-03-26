@@ -62,6 +62,11 @@ public class Proceedings extends Publication {
 	static public String calculate_proceedings_id(String key){
 		return key;
 	}
+	
+	public Boolean removeEditor(Person per){
+    	zooActivateWrite();
+    	return editors.remove(per);
+	}
 
 
 	public Set<Person> getEditors() {

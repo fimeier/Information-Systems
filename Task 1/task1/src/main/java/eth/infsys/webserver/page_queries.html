@@ -1,7 +1,18 @@
+<!-- Fehler
+Ana Maria Tomé link
+http://localhost:8000/test/?func=inproceeding_by_id&key=conf/iwann/StadlthannerTTL03
+allgmein Links mit so schit sonderzeichen
+
+Juan R. Rabuñal funktioniert im Chrome aber nicht im IE
+http://localhost:8000/test/?func=find_author_distance_path&name1=A.+W.+Roscoe&name2=Angel+J.+Rico-Diaz
+-->
+
+
 <a href='/test/?func=MAIN'>HOME</a>
 
 <!-- Queries -->
 
+<!--Find the co-authors of a person-->
 	<li>
 		<h3>Find the co-authors of a person</h3>
   		<form>
@@ -11,4 +22,67 @@
 			<input type="submit" value="Submit">
 		</form>
 	</li>
+	
+	
+<!--Find the author distance and path-->
+	<li>
+		<h3>Find the author distance and path</h3>
+  		<form>
+  		<!-- func=find_author_distance_path#name1=value1#name2=value2 -->
+			<input type="hidden" name="func" value="find_author_distance_path">
+			<input type="text" name="name1" value="A. W. Roscoe"><br>
+			<input type="text" name="name2" value="Angel J. Rico-Diaz"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+
+
+<!-- Calculate average number of authors per inproceedings-->	
+	<li>
+		<h3>Calculate average number of authors per inproceedings</h3>
+  		<form>
+  		<!-- func=avg_authors_per_inproceedings -->
+			<input type="hidden" name="func" value="avg_authors_per_inproceedings">
+			<input type="submit" value="calculate">
+		</form>
+	</li>
+	
+	
+<!--count publications in a given interval-->
+	<li>
+		<h3>count publications in a given interval</h3>
+  		<form>
+  		<!-- func=count_publications_per_interval&year1=<value>&year2=<value> -->
+			<input type="hidden" name="func" value="count_publications_per_interval">
+			<input type="text" name="year1" value="2005"><br>
+			<input type="text" name="year2" value="2008"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	
+<!--count inproceedings for a conference (id)-->
+	<li>
+		<h3>count inproceedings for a conference (id)</h3>
+  		<form>
+  		<!-- func=count_inproceedings_for_a_conference&id=<value> -->
+			<input type="hidden" name="func" value="count_inproceedings_for_a_conference">
+			<input type="text" name="id" value="conference/IEEE Conference on Computational Complexity"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+	
+	
+<!--count authors/editors for a conference (id)-->
+	<li>
+		<h3>count authors/editors for a conference (id)</h3>
+  		<form>
+  		<!-- func=count_authors_editors_for_a_conference&id=<value> -->
+			<input type="hidden" name="func" value="count_authors_editors_for_a_conference">
+			<input type="text" name="id" value="conference/IEEE Conference on Computational Complexity"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+
+	
+
 		

@@ -7,9 +7,12 @@ public enum WebFunc {
 	series_by_id(2),						//func=series_by_id#id=<id-value>
 	series_by_filter_offset(4),				//func=series_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value>
 	series_by_filter_offset_order(6),		//func=series_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction
+	
 	person_by_id(2),						//func=person_by_id#id=<id-value>
 	person_by_filter_offset(4),				//func=person_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value>
 	person_by_filter_offset_order(6),		//func=person_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction
+	delete_person_by_id(2),					//func=delete_person_by_id#id=<id-value>
+	
 	conf_by_filter_offset(4),				//func=conf_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value>
 	conf_by_filter_offset_order(6),			//func=conf_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction
 	publication_by_id(2), 					//func=publication_by_id#key=<key-value>
@@ -23,7 +26,11 @@ public enum WebFunc {
 	proceeding_by_id(2), 					//func=proceeding_by_id#key=<key-value>
 	//proceeding_by_filter(4), 				//func=proceeding_by_filter#title=<title-value>#begin-offset=<value>#begin-offset=<value>
 	find_co_authors(2),						//func=find_co_authors#name=value
-	
+	find_author_distance_path(3),			//func=find_author_distance_path#name1=value1#name2=value2
+	avg_authors_per_inproceedings(1),		//func=avg_authors_per_inproceedings
+	count_publications_per_interval(3),		//func=count_publications_per_interval&year1=<value>&year2=<value>
+	count_inproceedings_for_a_conference(2),//func=count_inproceedings_for_a_conference&id=<value>
+	count_authors_editors_for_a_conference(2), //func=count_authors_editors_for_a_conference&id=<value>
 	//
 	PAGE(2),	//func=PAGE&name=<value>
 	MAIN(1), //func

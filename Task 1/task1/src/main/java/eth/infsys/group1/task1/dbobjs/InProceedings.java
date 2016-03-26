@@ -43,6 +43,11 @@ public class InProceedings extends Publication {
 		return key;
 	}
 	
+	public Boolean removeAuthor(Person per){
+    	zooActivateWrite();
+    	return authors.remove(per);
+	}
+	
 	public List<Person> getAuthors() {
 		zooActivateRead();
 		return Collections.unmodifiableList(this.authors);

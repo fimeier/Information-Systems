@@ -32,7 +32,11 @@ public class webserver {
 	public static void main(String[] args) throws Exception {
 		//Choose DB
 		//String dbName = "Project1_ZooDB_new.zdb";
-		String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
+		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
+		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
+		String dbName = "Project1_4mil.zdb";
+
+
 
 		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
 		myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
@@ -47,7 +51,7 @@ public class webserver {
 	static class MyHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
-
+			System.out.println("user_input : "+t.getRequestURI().getQuery());
 			String user_input = java.net.URLDecoder.decode(t.getRequestURI().getQuery(), "UTF-8");
 			System.out.println("user_input after decoding: "+user_input);
 
@@ -61,7 +65,7 @@ public class webserver {
 				e.printStackTrace();
 			}
 
-			System.out.println("returned from backend...");
+			System.out.println("returned from backend...\n");
 			byte[] resp = response.getBytes();
 			t.sendResponseHeaders(200, resp.length);
 			OutputStream os = t.getResponseBody();
@@ -94,7 +98,7 @@ public class webserver {
 
 
 		Pair<String,String> name_value = parse_name_value(args[0]);
-		
+
 		//func
 		if ((name_value==null) || (!name_value.getKey().equals("func")) || (WebFunc.fromString(name_value.getValue())==null) ){
 			args_out.put("func", "ERROR");
@@ -209,6 +213,10 @@ public class webserver {
 			output += publ_by_person(args);
 			output += create_footer(wf);
 			break;
+
+			/**
+			 * Person
+			 */
 		case person_by_filter_offset_order:
 			if ( !args.containsKey("order_by") || !args.containsKey("ob_direction") ){
 				output += create_header(wf);
@@ -244,6 +252,18 @@ public class webserver {
 			output += person_by_id(args.get("id"));
 			output += create_footer(wf);
 			break;
+		case delete_person_by_id:
+			if ( !args.containsKey("id") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: id missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += delete_person_by_id(args.get("id"));
+			output += create_footer(wf);
+			break;
+
 		case publisher_by_filter_offset_order:
 			if ( !args.containsKey("order_by") || !args.containsKey("ob_direction") ){
 				output += create_header(wf);
@@ -362,6 +382,9 @@ public class webserver {
 				break;
 			}
 
+			/**
+			 * Qeries
+			 */
 		case find_co_authors:
 			if ( !args.containsKey("name")){
 				output += create_header(wf);
@@ -373,6 +396,66 @@ public class webserver {
 			output += find_co_authors(args.get("name"));
 			output += create_footer(wf);
 			break;
+
+		case find_author_distance_path:
+			if ( !args.containsKey("name1") || !args.containsKey("name2")){
+				output += create_header(wf);
+				output += get_error("wrong_args: name1 or name2 missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += find_author_distance_path(args.get("name1"),args.get("name2"));
+			output += create_footer(wf);
+			break;
+
+		case avg_authors_per_inproceedings:
+			output += create_header(wf);
+			output += avg_authors_per_inproceedings();
+			output += create_footer(wf);
+			break;
+			
+		case count_publications_per_interval:
+			if ( !args.containsKey("year1") || !args.containsKey("year2")){
+				output += create_header(wf);
+				output += get_error("wrong_args: year1 or year2 is missing...");
+				output += create_footer(wf);
+				break;
+			}
+			else {				
+				output += create_header(wf);
+				output += count_publications_per_interval(args.get("year1"),args.get("year2"));
+				output += create_footer(wf);
+				break;
+			}
+
+		case count_inproceedings_for_a_conference:
+			if ( !args.containsKey("id") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: id missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += count_inproceedings_for_a_conference(args.get("id"));
+			output += create_footer(wf);
+			break;
+			
+		case count_authors_editors_for_a_conference:
+			if ( !args.containsKey("id") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: id missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += count_authors_editors_for_a_conference(args.get("id"));
+			output += create_footer(wf);
+			break;	
+			
+			/**
+			 * Navigation		
+			 */
 		case PAGE:
 			if ( !args.containsKey("name")){
 				output += create_header(wf);
@@ -382,7 +465,7 @@ public class webserver {
 			}
 			output += get_page(args.get("name"));
 			break;
-			
+
 		case MAIN:
 			//output += create_header(WebFunc.MAIN);
 			output += get_main();
@@ -406,6 +489,60 @@ public class webserver {
 	}
 
 
+
+	private static String count_authors_editors_for_a_conference(String conf_id) {
+		String Output ="";
+		Output += myDB.count_authors_editors_for_a_conference(conf_id);
+		return Output;
+	}
+
+	private static String count_inproceedings_for_a_conference(String conf_id) {
+		String Output ="";
+		Output += myDB.IO_count_inproceedings_for_a_conference(conf_id);
+		return Output;
+	}
+
+	private static String count_publications_per_interval(String year1, String year2) {
+		String Output ="";
+		int y1, y2;
+		try {
+			y1 = Integer.valueOf(year1);
+			y2 = Integer.valueOf(year2);
+			
+			if (y2<y1){
+				Output += "<br>wrong intervall";
+				return Output;
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			y1 = 0;
+			y2 = 0;
+			
+			Output += "<br>wrong intervall";
+			return Output;
+		
+		}
+		
+		Output += myDB.IO_count_publications_per_interval(y1, y2);
+		
+		return Output;
+	}
+
+
+	private static String avg_authors_per_inproceedings() {
+		String output = "";
+		output = myDB.IO_avg_authors_per_inproceedings();
+
+		return output;
+	}
+
+	private static String find_author_distance_path(String name1, String name2) {
+		String output = "";
+		output += myDB.IO_find_author_distance_path(name1, name2);
+
+		return output;
+	}
 
 	private static String series_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
 		int boff, eoff;
@@ -478,9 +615,15 @@ public class webserver {
 	}
 
 	private static String person_by_id(String id) {
-		DivIO pers = myDB.IO_get_person_by_id(id);
+		String idtemp = id;
+		DivIO pers = myDB.IO_get_person_by_id(idtemp);
 
 		String output = pers.get_all();
+		return output;
+	}
+	private static String delete_person_by_id(String id) {
+		String output = myDB.IO_delete_get_person_by_id(id);
+
 		return output;
 	}
 
@@ -547,10 +690,14 @@ public class webserver {
 
 
 		List<PublicationIO> publs = myDB.IO_get_publ_by_person(args);
-		for (PublicationIO publ: publs){
-			Output += publ.get_all() + "<br><br>";
+		if (publs.isEmpty()){
+			Output += "no publications found..";
 		}
-		Output += "blub";
+		else {
+			for (PublicationIO publ: publs){
+				Output += publ.get_all() + "<br><br>";
+			}
+		}
 
 		return Output;
 
@@ -594,7 +741,7 @@ public class webserver {
 		}
 		return output;
 	}
-	
+
 	private static String get_page(String name) {
 		String path = "../task1/src/main/java/eth/infsys/webserver/page_"+name+".html";
 		String output = "";
@@ -617,7 +764,7 @@ public class webserver {
 		case publication_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		}
-		return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
+		return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 	}
 	private static String create_footer(WebFunc wf){
 		switch (wf) {

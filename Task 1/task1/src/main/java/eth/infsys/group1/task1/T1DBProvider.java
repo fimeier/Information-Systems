@@ -17,7 +17,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
+import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -681,7 +683,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 					//ConferenceEdition	
 					int year = proc.getConferenceEdition().getYear();
 					String confEdid = proc.getConferenceEdition().getId();
-					publication.ConferenceEdition_year_id = new Pair(year,confid);
+					publication.ConferenceEdition_year_id = new Pair(year,confEdid);
 				}
 			}
 			
@@ -746,7 +748,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						//ConferenceEdition	
 						int year = proc.getConferenceEdition().getYear();
 						String confEdid = proc.getConferenceEdition().getId();
-						publication.ConferenceEdition_year_id = new Pair(year,confid);
+						publication.ConferenceEdition_year_id = new Pair(year,confEdid);
 					}
 				}
 			}
@@ -1069,15 +1071,242 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		return return_list;
 	}
 
+	public String IO_delete_get_person_by_id(String pers_id) {
+		pm.currentTransaction().begin();
+		String Output = "<br>";
+		Person pers = get_person_by_id(pers_id);
+		if (pers==null){
+			Output += "person with id="+pers_id+" doesn't exists..";
+			return Output;
+		}
+		//remove InProceedings
+		for( Publication authored: pers.getAuthoredPublications()){
+			InProceedings inproc = (InProceedings) authored;
+			if ( inproc.removeAuthor(pers) ){
+				Output += "removed from inproceeding (id="+inproc.getId()+")<br>";
+			}
+			else {
+				Output += "ERROR: couldn't remove from inproceeding (id="+inproc.getId()+")<br>";
+			}
+		}
+		//remove Proceedings
+		for( Publication editored: pers.getEditedPublications()){
+			Proceedings proc = (Proceedings) editored;
+			if ( proc.removeEditor(pers) ){
+				Output += "removed from proceeding (id="+proc.getId()+")<br>";
+			}
+			else {
+				Output += "ERROR: couldn't remove from Inproceeding (id="+proc.getId()+")<br>";
+			}
+		}
+		
+		pers.jdoZooMarkDeleted();
+		
+		//pm.currentTransaction().rollback();
+		pm.currentTransaction().commit();;
+
+		return Output;
+	}
+
+	
+	public String IO_find_author_distance_path(String name1, String name2) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		String Output = "";
+		HashMap<Person,Pair<Person,Pair<InProceedings,Integer>>> old_authors = new HashMap<>();
+		//HashMap<Person,Pair<Person,InProceedings>> working_authors = new HashMap<>();
+		List<Person> working_authors = new ArrayList<>();
+		HashSet<Person> next_authors = new HashSet<>();
 
 
 
+		Person pers1 = get_person_by_name(name1);
+		Person pers2 = get_person_by_name(name2);
 
 
+		if ( pers1 == null || pers2 == null ){
+			Output = "<br>name1 (= "+ name1 + ") or name2(= "+ name2 + ") is not a person<br>";
+			return Output;
+		}
+		
+		if ( pers1.getAuthoredPublications()==null || pers2.getAuthoredPublications()==null){
+			Output = "<br>name1 (= "+ name1 + ") or name2(= "+ name2 + ") hasn't authored anything<br>";
+			return Output;
+		}
 
+		int distance = 1;
+		next_authors.add(pers1);
 
+//		int k = 0;
+		for (;distance <=15; distance++){
+			working_authors.clear();
+			working_authors.addAll(next_authors);
+			next_authors.clear();
+			for (Person person: working_authors){
+				//get inproceedings for person
+				for (Publication publ: person.getAuthoredPublications()){
+					InProceedings inproc = (InProceedings) publ;
+					//for each inproceeding get the list of authors
+					for (Person p: inproc.getAuthors()){
+						//check if the author was already "searched"
+						if ( old_authors.containsKey(p) ){
+							continue;
+						}
+						//creates Pair with (father-node and (common edge,distance))
+//						k++;
+						Pair<InProceedings,Integer> inproc_dist = new Pair(inproc,distance);
+						Pair<Person,Pair<InProceedings,Integer>> node_edge_dist = new Pair(person,inproc_dist);
+						old_authors.put(p, node_edge_dist);
+						next_authors.add(p);
+						
+						if ( old_authors.containsKey(pers2) ){
+							Output += "<br>Distance is "+distance+"<br>";
+							Person persA = pers2;
+							for (int i = distance; i>0; i--){
+								Pair<Person,Pair<InProceedings,Integer>> node_edge_dist2 = old_authors.get(persA);
+								
+								Person persB = node_edge_dist2.getKey();
+								InProceedings inproc1 = node_edge_dist2.getValue().getKey();
+								int dist = node_edge_dist2.getValue().getValue();
+								Output += "<a href='/test/?func=person_by_id&id="+persA.getId()+"'>"+persA.getName()+"</a> <--"+inproc1.getTitle()+"--> " + "<a href='/test/?func=person_by_id&id="+persB.getId()+"'>"+persB.getName()+"</a> ("+dist+")<br>";
+								persA = persB;
+							}
+							return Output;
+						}
+					}
+				}
+				
+			}
+		}
 
+		Output += "<br>nothing found with distance max"+(distance-1)+" <br>";
+		return Output;
+	}
 
+	public String IO_avg_authors_per_inproceedings() {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		int count_inproc = 0;
+		double avg = 0;
+        Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
+        for (InProceedings inproc: ext) {
+        	count_inproc++;
+        	avg += inproc.getAuthors().size();
+        }
+        ext.closeAll();
+        
+        double temp = avg / (double) count_inproc;
+        String Output = "<br>there are "+count_inproc+" inproceedings in total with an average of "+String.valueOf(temp)+" authors per inproceedings<br>";
+        
+		return Output;
+	}
+
+	public Object IO_count_publications_per_interval(int y1, int y2) {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		String Output = "";
+		
+		/**
+		 * performance??
+		 */
+		long start, stop;
+
+		
+		System.out.println("implementation with Extent start...");
+		start = System.nanoTime();
+		int count_publ = 0;
+        Extent<Publication> ext = pm.getExtent(Publication.class);
+        for (Publication publ: ext) {
+        	int year = publ.getYear();
+        	if( y1 <= year && year <= y2){
+        		count_publ++;
+        	}
+        }
+        ext.closeAll();
+		stop = System.nanoTime();
+		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
+
+		String temp = String.valueOf(count_publ);
+		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+temp+"<br>";
+
+		/**
+		 * is not faster
+		start = System.nanoTime();
+		Query q = pm.newQuery (Publication.class);
+		String filter = y1 +"<= year && year <= " +y2;
+		q.setFilter(filter);
+		Collection<Publication> ret = (Collection<Publication>) q.execute();
+		int tempsize = ret.size();
+		stop = System.nanoTime();
+        Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+tempsize+"<br>";
+		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
+		 */
+		
+        return Output;
+	}
+
+	public String IO_count_inproceedings_for_a_conference(String conf_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		String Output ="";
+		int count = 0;
+		Conference conf = get_conference_by_id(conf_id);
+		if (conf==null){
+			Output += "<br>not a conference<br>";
+			return Output;
+		}
+		for (ConferenceEdition confEd: conf.getEditions()){
+			try {
+				count += confEd.getProceedings().getPublications().size();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		Output += "<br>there are "+String.valueOf(count)+" inproceedings for the conference "+conf.getName() +"<br>";
+		
+		return Output;
+	}
+
+	public String count_authors_editors_for_a_conference(String conf_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		String Output ="";
+
+		Conference conf = get_conference_by_id(conf_id);
+		if (conf==null){
+			Output += "<br>not a conference<br>";
+			return Output;
+		}
+		HashSet<Person> authors = new HashSet<>();
+		HashSet<Person> editors = new HashSet<>();
+
+		for (ConferenceEdition confEd: conf.getEditions()){
+			try {
+				editors.addAll(confEd.getProceedings().getEditors());				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (confEd.getProceedings().getPublications() != null){
+				for (InProceedings inproc: confEd.getProceedings().getPublications()){
+					try {
+						authors.addAll(inproc.getAuthors());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		int count = 0;
+		count += authors.size();
+		count += editors.size();
+		
+		Output += "<br>there are "+authors.size()+" authors and "+editors.size()+" editors (total="+count+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+conf.getName()+"</a><br>";
+			
+		return Output;
+	}
 
 
 }
