@@ -17,6 +17,10 @@ public class Publisher extends DomainObject {
 	
 	public Publisher(String name) {
 		this.name = name;
+		if (this.name==null){
+    		System.out.println("create publisher/null...");
+    		this.name = "null";
+		}
 		this.setId(calculate_publisher_id(this.name));
 	}
 
@@ -27,6 +31,9 @@ public class Publisher extends DomainObject {
 
 	public String getName() {
     	zooActivateRead();
+    	if (this.name==null){
+    		System.out.println("problem... publisher getname null...");
+       	}
     	return this.name;
     }
 

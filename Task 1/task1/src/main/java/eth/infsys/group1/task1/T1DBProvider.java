@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -92,6 +93,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			 * do not delete if already exist
 			 */
 			this.pm = ZooJdoHelper.openOrCreateDB(dbName);
+		
 
 
 			//pm.currentTransaction().setRetainValues(true);
@@ -128,7 +130,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		pm.currentTransaction().commit();
 
 		pm.currentTransaction().begin();
-		ZooJdoHelper.createIndex(pm, Person.class, "name", true);
+		ZooJdoHelper.createIndex(pm, Person.class, "name", false);
+		pm.currentTransaction().commit();
+		
+		pm.currentTransaction().begin();
+		ZooJdoHelper.createIndex(pm, Publication.class, "year", false);
 		pm.currentTransaction().commit();
 	}
 
@@ -533,6 +539,20 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 		//Series
 		pm.currentTransaction().begin();
+		String series_id = Series.calculate_series_id(args.series);
+		Series serie = get_series_by_id(series_id);
+		if ( serie == null ){
+			serie = create_serie(args.series);
+			System.out.println("Series (" + args.series + ") created...");
+		}
+		else {
+			System.out.println("Series (" + args.series + ") already exists...");
+		}
+		pm.currentTransaction().commit();
+
+		/*
+		//Series
+		pm.currentTransaction().begin();
 		Series serie = null;
 		if (args.series != null){
 			String series_id = Series.calculate_series_id(args.series);
@@ -549,6 +569,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			System.out.println("No series available for proceeding("+args.id +")...");
 		}
 		pm.currentTransaction().commit();
+		 */
 
 		//Proceedings
 		pm.currentTransaction().begin();
@@ -578,7 +599,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		//return existing InProceeding
 		if ( ! (inproc == null) ){
 			pm.currentTransaction().begin();
-			//System.out.println("!!!!!!!! InProceeding already exists... id=" + inproc.getId() + " and title=" + inproc.getTitle());
+			System.out.println("!!!!!!!! InProceeding already exists... id=" + inproc.getId() + " and title=" + inproc.getTitle());
 			String ret_val = inproc.getId();
 			pm.currentTransaction().commit();
 			return ret_val;
@@ -608,7 +629,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				//System.out.println("Author (" + author_name + ") created...");
 			}
 			else {
-				//System.out.println("Author(" + author_name + ") already exists...");
+				System.out.println("Author(" + author_name + ") already exists...");
 			}
 			auth.add(author);
 			pm.currentTransaction().commit();
@@ -652,6 +673,30 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		@Override
 		public int compare(DivIO o1, DivIO o2) {
 			return o1.Person_name.compareTo(o2.Person_name);
+		}
+	};
+	
+	private Comparator<DivIO> compareDivIO_Publisher_name = new Comparator<DivIO>() {
+		@Override
+		public int compare(DivIO o1, DivIO o2) {
+			if (o1.Publisher_name==null || o2.Publisher_name==null){
+				System.out.println("ERROR: compareDivIO_Publisher_name...");
+			}
+			return o1.Publisher_name.compareTo(o2.Publisher_name);
+		}
+	};
+	
+	private Comparator<Person> compare_Person_name = new Comparator<Person>() {
+		@Override
+		public int compare(Person o1, Person o2) {
+			return o1.getName().compareTo(o2.getName());
+		}
+	};
+	
+	private Comparator<InProceedings> compare_InProceedings_title = new Comparator<InProceedings>() {
+		@Override
+		public int compare(InProceedings o1, InProceedings o2) {
+			return o1.getTitle().compareTo(o2.getTitle());
 		}
 	};
 
@@ -1137,7 +1182,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		int distance = 1;
 		next_authors.add(pers1);
 
-//		int k = 0;
+		int k = 0;
 		for (;distance <=15; distance++){
 			working_authors.clear();
 			working_authors.addAll(next_authors);
@@ -1153,7 +1198,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 							continue;
 						}
 						//creates Pair with (father-node and (common edge,distance))
-//						k++;
+						k++;
 						Pair<InProceedings,Integer> inproc_dist = new Pair(inproc,distance);
 						Pair<Person,Pair<InProceedings,Integer>> node_edge_dist = new Pair(person,inproc_dist);
 						old_authors.put(p, node_edge_dist);
@@ -1171,6 +1216,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 								Output += "<a href='/test/?func=person_by_id&id="+persA.getId()+"'>"+persA.getName()+"</a> <--"+inproc1.getTitle()+"--> " + "<a href='/test/?func=person_by_id&id="+persB.getId()+"'>"+persB.getName()+"</a> ("+dist+")<br>";
 								persA = persB;
 							}
+							Output += "<br>looked at "+k+" entries<br>";
 							return Output;
 						}
 					}
@@ -1201,7 +1247,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		return Output;
 	}
 
-	public Object IO_count_publications_per_interval(int y1, int y2) {
+	public String IO_count_publications_per_interval(int y1, int y2) {
 		pm.currentTransaction().setNontransactionalRead(true);
 
 		String Output = "";
@@ -1230,12 +1276,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+temp+"<br>";
 
 		/**
-		 * is not faster
+		 * is not faster without index
 		start = System.nanoTime();
-		Query q = pm.newQuery (Publication.class);
-		String filter = y1 +"<= year && year <= " +y2;
-		q.setFilter(filter);
-		Collection<Publication> ret = (Collection<Publication>) q.execute();
+		Query q = pm.newQuery (Publication.class, ":y1<= this.year && this.year <= :y2");
+		//String filter = "'y1'<= year && year <= 'y2'";
+		//q.setFilter(filter);
+		Collection<Publication> ret = (Collection<Publication>) q.execute(y1,y2);
 		int tempsize = ret.size();
 		stop = System.nanoTime();
         Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+tempsize+"<br>";
@@ -1245,7 +1291,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
         return Output;
 	}
 
-	public String IO_count_inproceedings_for_a_conference(String conf_id) {
+	public String IO_inproceedings_for_a_conference(String conf_id, String mode) {
 		pm.currentTransaction().setNontransactionalRead(true);
 		String Output ="";
 		int count = 0;
@@ -1254,21 +1300,40 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			Output += "<br>not a conference<br>";
 			return Output;
 		}
-		for (ConferenceEdition confEd: conf.getEditions()){
-			try {
-				count += confEd.getProceedings().getPublications().size();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+		if (mode.equals("count")){
+			for (ConferenceEdition confEd: conf.getEditions()){
+				try {
+					count += confEd.getProceedings().getPublications().size();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			Output += "<br>there are "+String.valueOf(count)+" inproceedings for the conference "+conf.getName() +"<br>";
+			return Output;
 		}
-		
-		Output += "<br>there are "+String.valueOf(count)+" inproceedings for the conference "+conf.getName() +"<br>";
-		
-		return Output;
+		else {
+			List<InProceedings> list_inproc = new ArrayList<>();
+			for (ConferenceEdition confEd: conf.getEditions()){
+				try {
+					list_inproc.addAll(confEd.getProceedings().getPublications());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			list_inproc.sort(compare_InProceedings_title);
+			Output += "<br>the inproceedings for the conference <a href='/test/?func=confEd_by_id&id="+conf.getId()+"'>"+ conf.getName()+"</a> are:<br>";
+			for (InProceedings inproc: list_inproc){
+				Output += "<a href='/test/?func=inproceeding_by_id&key="+inproc.getId()+"'>"+inproc.getTitle()+"</a><br>";
+			}
+
+			return Output;
+		}
 	}
 
-	public String count_authors_editors_for_a_conference(String conf_id) {
+	public String IO_authors_editors_for_a_conference(String conf_id, String mode) {
 		pm.currentTransaction().setNontransactionalRead(true);
 		String Output ="";
 
@@ -1298,15 +1363,238 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				}
 			}
 		}
-		
-		int count = 0;
-		count += authors.size();
-		count += editors.size();
-		
-		Output += "<br>there are "+authors.size()+" authors and "+editors.size()+" editors (total="+count+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+conf.getName()+"</a><br>";
+
+		if (mode.equals("count")){
+			int count = 0;
+			count += authors.size();
+			count += editors.size();
+
+			Output += "<br>there are "+authors.size()+" authors and "+editors.size()+" editors (total="+count+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+conf.getName()+"</a><br>";
+
+			return Output;
+		}
+		else {
+			Output+= "<br>all authors:<br>";
 			
+			List<Person> list_authors= new ArrayList<>(authors);
+			list_authors.sort(compare_Person_name);
+			for (Person pers: list_authors){
+				Output+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
+
+			}
+			
+			Output +="<br><br>all editors:<br>";
+			List<Person> list_editors= new ArrayList<>(editors);
+			list_editors.sort(compare_Person_name);
+			for (Person pers: list_editors){
+				Output+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
+
+			}
+			return Output;
+		}
+	}
+	
+	public String IO_person_is_author_and_editor() {
+		pm.currentTransaction().setNontransactionalRead(true);
+
+		String Output = "";
+		
+		HashMap<Person,List<Pair<Proceedings,InProceedings>>> authoreditor = new HashMap<>();
+
+		Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
+		for (Proceedings proc: ext) {
+			Set<Person> editors = proc.getEditors();
+			for (InProceedings inproc: proc.getPublications()){
+				for (Person p: inproc.getAuthors()){
+					if ( editors.contains(p)){
+						Pair<Proceedings,InProceedings> authedit = new Pair(proc,inproc);
+						if (authoreditor.containsKey(p)){
+							List<Pair<Proceedings,InProceedings>> old_entry = authoreditor.get(p);
+							old_entry.add(authedit);
+							authoreditor.put(p, old_entry);
+						}
+						else {
+							List<Pair<Proceedings,InProceedings>> new_entry = new ArrayList<Pair<Proceedings,InProceedings>>();
+							new_entry.add(authedit);
+							authoreditor.put(p, new_entry);
+						}
+					}
+				}
+        	}
+             	
+		}
+		ext.closeAll();
+
+		final String[] temp = new String[1];
+		temp[0] = "";
+		BiConsumer<Person, List<Pair<Proceedings, InProceedings>>> return_stuff = new BiConsumer<Person, List<Pair<Proceedings, InProceedings>>>(){
+
+			@Override
+			public void accept(Person p, List<Pair<Proceedings, InProceedings>> proc_inproc) {
+				temp[0] += p.getName()+" is author and editor in the following proceedings/inproceedings <br>";
+				for (Pair<Proceedings, InProceedings> entry: proc_inproc){
+					//System.out.println(p.getName()+" is author and editor in the proc ("+ entry.getKey().getId()+") and the inproc ("+ entry.getValue().getId()+")");
+					temp[0] += "(<a href='/test/?func=proceeding_by_id&key=" + entry.getKey().getId()+"'>"+entry.getKey().getId()+ "</a> / <a href='/test/?func=inproceeding_by_id&key=" + entry.getValue().getId()+"'>"+entry.getValue().getId()+ "</a>), ";
+				}
+				temp[0] += "<br><br>";
+			}
+		};
+		authoreditor.forEach(return_stuff);
+
+		Output += "<br><br>" + temp[0];
 		return Output;
 	}
+
+	public List<PublicationIO> IO_person_is_last_author(String pers_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
+
+		Person pers = get_person_by_id(pers_id);
+		if (pers==null){
+			//Output += "<br>inexisting person-id<br>";
+			return return_list;
+		}
+		
+		List<InProceedings> last_author = new ArrayList<>();
+		
+		Set<Publication> authoredPublications = pers.getAuthoredPublications();
+		
+		for (Publication publ: authoredPublications){
+			InProceedings inproc = (InProceedings) publ;
+			try {
+				int last = inproc.getAuthors().size() -1;
+				if ( inproc.getAuthors().get(last).getId().equals(pers_id)){
+					return_list.add(fill_PublicationIO(publ));				
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace(); 
+			}
+			
+		}
+		
+		
+		return return_list;
+	}
+
+	public String get_statistics() {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		int num_DomainObject = 0;
+		int num_Person =0;
+		int num_Conference =0;
+		int num_ConferenceEdition = 0;
+		int num_Publications = 0;
+		int num_InProceedings = 0;
+		int num_Proceedings = 0;
+		int num_Publisher = 0;
+		int num_Series = 0;
+		
+		long start, stop;
+		start = System.nanoTime();
+
+		Extent<DomainObject> ext = pm.getExtent(DomainObject.class);
+        for (DomainObject domainobj: ext) {
+        	num_DomainObject++;
+        	if ( domainobj instanceof Person ){
+        		num_Person++;
+        	}
+        	else if ( domainobj instanceof Conference ){
+        		num_Conference++;
+        	}
+        	else if ( domainobj instanceof ConferenceEdition ){
+        		num_ConferenceEdition++;
+        	}
+        	else if ( domainobj instanceof  Publication){
+        		num_Publications++;
+        		Publication publ = (Publication) domainobj;
+        		if ( publ instanceof InProceedings){
+            		num_InProceedings++;
+            	}
+        		else if ( publ instanceof Proceedings){
+            		num_Proceedings++;
+            	}
+        	}
+        	
+        	else if ( domainobj instanceof Publisher ){
+        		num_Publisher++;
+        	}
+        	else if ( domainobj instanceof  Series){
+        		num_Series++;
+        	}
+        	
+        }
+        ext.closeAll();
+		stop = System.nanoTime();
+		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
+
+	
+
+		String Output ="<br>";
+		Output += "Number of DomainObject: " +num_DomainObject+"<br>";
+		Output += "Number of Person: " +num_Person+"<br>";
+		Output += "Number of Conference: " +num_Conference+"<br>";
+		Output += "Number of ConferenceEdition: " +num_ConferenceEdition+"<br>";
+		Output += "Number of Publications: " +num_Publications+"<br>";
+		Output += "Number of InProceedings: " +num_InProceedings+"<br>";
+		Output += "Number of Proceedings: " +num_Proceedings+"<br>";
+		Output += "Number of Publisher: " +num_Publisher+"<br>";
+		Output += "Number of Series: " +num_Series+"<br>";
+
+
+		
+		return Output;
+	}
+
+	public List<DivIO> publishers_whose_authors_in_interval(int y1, int y2) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		Set<Publisher> publisher = new HashSet<Publisher>();
+		List<DivIO> return_list = new ArrayList<DivIO>();
+	
+		/**
+		 * is not faster
+		 * Query is not faster to get all inproceedings in the interval...
+		 */		
+		Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
+		for (InProceedings inproc: ext) {
+			int year = inproc.getYear();
+			if( y1 <= year && year <= y2){
+				try {
+					//add publisher to the Set
+					Publisher temp = inproc.getProceedings().getPublisher();
+					if (temp == null){
+						System.out.println("publisher is null....");
+					}
+					if (temp.getName()==null){
+						System.out.println("publisher name is null....");
+						pm.currentTransaction().begin();
+						temp.setName("null");
+						pm.currentTransaction().commit();
+
+					}
+					publisher.add(inproc.getProceedings().getPublisher());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		ext.closeAll();
+		
+		
+		for (Publisher publi: publisher){
+			
+			return_list.add(fill_DivIO(publi));
+		}
+		return_list.sort(compareDivIO_Publisher_name);
+	
+
+		return return_list;
+	}
+
+
 
 
 }

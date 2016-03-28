@@ -20,14 +20,17 @@
 		</form>
 	</li>
 
+<!--Find a publication by id-->
 	<li>
 		<h3>Find a publication by id</h3>
   		<form>
-			<input type="hidden" name="func" value="proceeding_by_id"><br>
+  			<!-- func=publication_by_id#key=<key-value> -->
+			<input type="hidden" name="func" value="publication_by_id"><br>
 			<input type="text" name="key" value='conf/isola/2004i'><br>
 			<input type="submit" value="Submit">
 		</form>
 	</li>
+	
 	<li>
 		<h3>Find a publication by filter (contains string in title)</h3>
   		<form>

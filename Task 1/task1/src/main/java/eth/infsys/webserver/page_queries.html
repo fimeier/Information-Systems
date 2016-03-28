@@ -48,9 +48,9 @@ http://localhost:8000/test/?func=find_author_distance_path&name1=A.+W.+Roscoe&na
 	</li>
 	
 	
-<!--count publications in a given interval-->
+<!--(Task 7) count publications in a given interval-->
 	<li>
-		<h3>count publications in a given interval</h3>
+		<h3>(Task 7) count publications in a given interval</h3>
   		<form>
   		<!-- func=count_publications_per_interval&year1=<value>&year2=<value> -->
 			<input type="hidden" name="func" value="count_publications_per_interval">
@@ -60,28 +60,75 @@ http://localhost:8000/test/?func=find_author_distance_path&name1=A.+W.+Roscoe&na
 		</form>
 	</li>
 	
-<!--count inproceedings for a conference (id)-->
+<!--(Task 8 & 11) inproceedings for a conference (id)-->
 	<li>
-		<h3>count inproceedings for a conference (id)</h3>
+		<h3>(Task 8 & 11) inproceedings for a conference (id)</h3>
   		<form>
-  		<!-- func=count_inproceedings_for_a_conference&id=<value> -->
-			<input type="hidden" name="func" value="count_inproceedings_for_a_conference">
+  		<!-- func=inproceedings_for_a_conference&id=<value>&mode=<value> -->
+			<input type="hidden" name="func" value="inproceedings_for_a_conference">
 			<input type="text" name="id" value="conference/IEEE Conference on Computational Complexity"><br>
+			<fieldset>
+				<input type="radio" id="cnt" name="mode" value="count" checked><label for="cnt">count</label>
+				<br>
+				<input type="radio" id="list" name="mode" value="retrieve"><label for="list">retrieve</label>
+			</fieldset>
 			<input type="submit" value="Submit">
 		</form>
 	</li>
 	
 	
-<!--count authors/editors for a conference (id)-->
+<!--(Task 9 & 10) count or retrieve all authors/editors for a conference (id)-->
 	<li>
-		<h3>count authors/editors for a conference (id)</h3>
+		<h3>(Task 9 & 10) count or retrieve all authors/editors for a conference (id)</h3>
   		<form>
-  		<!-- func=count_authors_editors_for_a_conference&id=<value> -->
-			<input type="hidden" name="func" value="count_authors_editors_for_a_conference">
+  		<!-- func=authors_editors_for_a_conference&id=<value>&mode=<value> -->
+			<input type="hidden" name="func" value="authors_editors_for_a_conference">
 			<input type="text" name="id" value="conference/IEEE Conference on Computational Complexity"><br>
+			<fieldset>
+				<input type="radio" id="cnt" name="mode" value="count" checked><label for="cnt">count</label>
+				<br>
+				<input type="radio" id="list" name="mode" value="retrieve"><label for="list">retrieve</label>
+			</fieldset>
 			<input type="submit" value="Submit">
 		</form>
 	</li>
+	
+	
+<!-- (Task 12) person is author and editor-->
+	<li>
+		<h3>(Task 12) person is author and editor</h3>
+  		<form>
+  		<!-- func=person_is_author_and_editor -->
+			<input type="hidden" name="func" value="person_is_author_and_editor">
+			<input type="submit" value="get">
+		</form>
+	</li>
+	
+<!--(Task 13) person is last author-->
+	<li>
+		<h3>(Task 13) person is last author</h3>
+  		<form>
+  		<!-- func=person_is_last_author&id=<value> -->
+			<input type="hidden" name="func" value="person_is_last_author">
+			<input type="text" name="id" value="person/Manuel Wettstein"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>
+
+
+<!--(Task 14) publishers whose authors appear in any inproceedings in a interval of years-->
+	<li>
+		<h3>(Task 14) publishers whose authors appear in any inproceedings in a interval of years</h3>
+  		<form>
+  		<!-- func=publishers_whose_authors_in_interval&year1=<value>&year2=<value> -->
+			<input type="hidden" name="func" value="publishers_whose_authors_in_interval">
+			<input type="text" name="year1" value="2005"><br>
+			<input type="text" name="year2" value="2008"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</li>	
+	
+	
 
 	
 

@@ -12,6 +12,7 @@ import eth.infsys.group1.dbspec.WebFunc;
 import eth.infsys.group1.task1.T1DBProvider;
 import eth.infsys.group1.task1.dbobjs.InProceedings;
 import eth.infsys.group1.task1.dbobjs.Proceedings;
+import eth.infsys.group1.task1.dbobjs.Publisher;
 
 public class batch_db_loader {
 
@@ -21,11 +22,13 @@ public class batch_db_loader {
 		//Choose DB
 		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
 		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
-		String dbName = "Project1_4mil.zdb";
+		//String dbName = "Project1_4mil.zdb";
+		String dbName = "Project1_test.zdb";
+
 
 
 		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
-		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
+		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
 		
 //!!!!!!!change override
 
@@ -36,7 +39,8 @@ public class batch_db_loader {
 
 		//queries(myDB);
 
-
+		//String arg = null;
+		//String publ_id = Publisher.calculate_publisher_id(arg);
 
 		myDB.closeDB();
 

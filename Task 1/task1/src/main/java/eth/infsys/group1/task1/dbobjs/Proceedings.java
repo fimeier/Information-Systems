@@ -37,20 +37,32 @@ public class Proceedings extends Publication {
 			p.addEditedPublications(this);
 		}
 
-		this.note = args.note;
+		if (note != null){
+			this.note = args.note;}
+		else {
+			this.note = "";}
+		
 		this.number = args.number;
-
+				
 		this.publisher = publ;
 		publ.addPublication(this);
 
-		this.volume = args.volume;
-		this.isbn = args.isbn;
+		if (volume != null){
+			this.volume = args.volume;}
+		else {
+			this.volume = "";}
+		
+		if (isbn != null){
+			this.isbn = args.isbn;}
+		else {
+			this.isbn = "";}
 
 		this.series = serie;
-		if (this.series != null){
-			serie.addPublication(this);
-		}
+		//if (this.series != null){
+		serie.addPublication(this);
+		//}
 
+		//Condition: never null
 		this.conferenceEdition = confEd;
 		confEd.setProceedings(this);
 

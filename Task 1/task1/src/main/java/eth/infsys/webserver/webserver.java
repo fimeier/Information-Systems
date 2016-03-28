@@ -429,19 +429,37 @@ public class webserver {
 				break;
 			}
 
-		case count_inproceedings_for_a_conference:
-			if ( !args.containsKey("id") ){
+		case inproceedings_for_a_conference:
+			if ( !args.containsKey("id")||!args.containsKey("mode") ){
 				output += create_header(wf);
-				output += get_error("wrong_args: id missing...");
+				output += get_error("wrong_args: id or mode missing...");
 				output += create_footer(wf);
 				break;
 			}
 			output += create_header(wf);
-			output += count_inproceedings_for_a_conference(args.get("id"));
+			output += inproceedings_for_a_conference(args.get("id"), args.get("mode"));
 			output += create_footer(wf);
 			break;
 			
-		case count_authors_editors_for_a_conference:
+		case authors_editors_for_a_conference:
+			if ( !args.containsKey("id")||!args.containsKey("mode") ){
+				output += create_header(wf);
+				output += get_error("wrong_args: id or mode missing...");
+				output += create_footer(wf);
+				break;
+			}
+			output += create_header(wf);
+			output += authors_editors_for_a_conference(args.get("id"), args.get("mode"));
+			output += create_footer(wf);
+			break;	
+
+		case person_is_author_and_editor:
+			output += create_header(wf);
+			output += person_is_author_and_editor();
+			output += create_footer(wf);
+			break;	
+
+		case person_is_last_author:
 			if ( !args.containsKey("id") ){
 				output += create_header(wf);
 				output += get_error("wrong_args: id missing...");
@@ -449,13 +467,35 @@ public class webserver {
 				break;
 			}
 			output += create_header(wf);
-			output += count_authors_editors_for_a_conference(args.get("id"));
+			output += person_is_last_author(args.get("id"));
 			output += create_footer(wf);
-			break;	
+			break;
 			
+		case publishers_whose_authors_in_interval:
+			if ( !args.containsKey("year1") || !args.containsKey("year2")){
+				output += create_header(wf);
+				output += get_error("wrong_args: year1 or year2 is missing...");
+				output += create_footer(wf);
+				break;
+			}
+			else {				
+				output += create_header(wf);
+				output += publishers_whose_authors_in_interval(args.get("year1"),args.get("year2"));
+				output += create_footer(wf);
+				break;
+			}
+
 			/**
-			 * Navigation		
+			 * Navigation and other stuff	
 			 */
+
+		case get_statistics:
+
+			output += create_header(wf);
+			output += get_statistics();
+			output += create_footer(wf);
+			break;
+
 		case PAGE:
 			if ( !args.containsKey("name")){
 				output += create_header(wf);
@@ -489,17 +529,85 @@ public class webserver {
 	}
 
 
-
-	private static String count_authors_editors_for_a_conference(String conf_id) {
+	private static String publishers_whose_authors_in_interval(String year1, String year2) {
 		String Output ="";
-		Output += myDB.count_authors_editors_for_a_conference(conf_id);
+		int y1, y2;
+		try {
+			y1 = Integer.valueOf(year1);
+			y2 = Integer.valueOf(year2);
+
+			if (y2<y1){
+				Output += "<br>wrong intervall";
+				return Output;
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			y1 = 0;
+			y2 = 0;
+
+			Output += "<br>wrong intervall";
+			return Output;
+
+		}
+
+		List<DivIO> publishers = myDB.publishers_whose_authors_in_interval(y1, y2);
+		for (DivIO publi: publishers){
+			Output += publi.get_all() + "<br><br>";
+		} 
 		return Output;
 	}
 
-	private static String count_inproceedings_for_a_conference(String conf_id) {
+	private static String get_statistics() {
 		String Output ="";
-		Output += myDB.IO_count_inproceedings_for_a_conference(conf_id);
+		Output = myDB.get_statistics();
 		return Output;
+	}
+
+	private static String person_is_last_author(String pers_id) {
+		String Output = "<br>Author with id="+pers_id+" is the last author in the following inproceedings:<br><br>";
+		
+		List<PublicationIO> publs = myDB.IO_person_is_last_author(pers_id);
+		if (publs.isEmpty()){
+			Output += "no publications found..";
+		}
+		else {
+			for (PublicationIO publ: publs){
+				Output += publ.get_all() + "<br><br>";
+			}
+		}
+		return Output;
+	}
+
+	private static String person_is_author_and_editor() {
+		String Output="";
+		Output += myDB.IO_person_is_author_and_editor();
+		return Output;
+	}
+
+	private static String authors_editors_for_a_conference(String conf_id, String mode) {
+		String Output ="";
+		if (mode.equals("retrieve")|| mode.equals("count")){
+			Output += myDB.IO_authors_editors_for_a_conference(conf_id, mode);
+			return Output;
+		}
+		else{
+			Output+= "<br>wrong mode...<br>";
+			return Output;
+		}
+	}
+
+	private static String inproceedings_for_a_conference(String conf_id, String mode) {
+		String Output ="";
+		if (mode.equals("retrieve")|| mode.equals("count")){
+			Output ="";
+			Output += myDB.IO_inproceedings_for_a_conference(conf_id, mode);
+			return Output;
+		}
+		else{
+			Output+= "<br>wrong mode...<br>";
+			return Output;
+		}
 	}
 
 	private static String count_publications_per_interval(String year1, String year2) {

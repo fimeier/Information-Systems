@@ -118,12 +118,24 @@ public final class XMLParser<TRProceedings> {
 					data.number = 0;
 				}
 				data.publisher = getTagContent(procElement, "publisher");
+				/*if (data.publisher==null){
+					System.out.println("data.publisher==null");
+				}*/
 				data.volume = getTagContent(procElement, "volume");
 				data.isbn = getTagContent(procElement, "isbn");
 				data.series = getTagContent(procElement, "series");
+				/*if (data.series==null){
+					System.out.println("data.series==null");
+				}*/
 
 				data.conferenceName = confEd.getKey();
-				data.conferenceEdition = confEd.getValue();	
+				data.conferenceEdition = confEd.getValue();
+				
+				//more conditions besides that the ConfEd must exist
+				if (data.id==null||data.title==null||data.year==0){
+					continue;				
+				}
+				
 				String ret_val = dbProvider.batch_createProceedings(data);
 				if (ret_val.equals(safe_key)) {
 					proceedingsTable.add(ret_val);
@@ -193,6 +205,11 @@ public final class XMLParser<TRProceedings> {
 					System.out.println("XMLParser: InProceedings (" + data.id +") not created, needs Proceedings with key="+ data.crossref);
 					continue;
 				}
+				
+				//Conditions
+				if (data.id==null||data.title==null||data.year==0){
+					continue;				
+				}
 
 				not_created--;
 
@@ -223,7 +240,7 @@ public final class XMLParser<TRProceedings> {
 				int conferenceEdition = year;
 				String conferenceName = getTagContent(inProcElement, "booktitle");
 
-				if (crossref == null){
+				if (crossref == null || year == 0 || conferenceName == null){
 					continue;
 				}
 				Pair<String,Integer> confEd = confEditions.get(crossref);

@@ -17,6 +17,10 @@ public class Series extends DomainObject {
     
     public Series(String name) {
     	this.name = name;
+    	if (this.name==null){
+    		System.out.println("create series/null...");
+    		this.name = "null";
+		}
     	this.setId(calculate_series_id(name));
     }
     

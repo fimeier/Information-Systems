@@ -29,9 +29,13 @@ public enum WebFunc {
 	find_author_distance_path(3),			//func=find_author_distance_path#name1=value1#name2=value2
 	avg_authors_per_inproceedings(1),		//func=avg_authors_per_inproceedings
 	count_publications_per_interval(3),		//func=count_publications_per_interval&year1=<value>&year2=<value>
-	count_inproceedings_for_a_conference(2),//func=count_inproceedings_for_a_conference&id=<value>
-	count_authors_editors_for_a_conference(2), //func=count_authors_editors_for_a_conference&id=<value>
+	inproceedings_for_a_conference(3),		//func=inproceedings_for_a_conference&id=<value>&mode=<value>
+	authors_editors_for_a_conference(3),	//func=authors_editors_for_a_conference&id=<value>&mode=<value>
+	person_is_author_and_editor(1),			//func=person_is_author_and_editor
+	person_is_last_author(2),				//func=person_is_last_author&id=<value>
+	publishers_whose_authors_in_interval(3),//func=publishers_whose_authors_in_interval&year1=<value>&year2=<value>
 	//
+	get_statistics(1),	//func=get_statistics
 	PAGE(2),	//func=PAGE&name=<value>
 	MAIN(1), //func
 	ERROR(1),
