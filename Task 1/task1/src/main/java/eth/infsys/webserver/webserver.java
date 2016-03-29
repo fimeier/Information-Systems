@@ -34,7 +34,16 @@ public class webserver {
 		//String dbName = "Project1_ZooDB_new.zdb";
 		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
 		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
+		
+		
 		//String dbName = "Project1_4mil.zdb";
+		
+		
+		//AssesmentTask1.xml
+		//String dbName = "Project1_empty.zdb";
+
+		
+		//big db inkl Ass.data
 		String dbName = "Project1_test.zdb";
 
 

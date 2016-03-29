@@ -96,7 +96,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		
 
 
-			//pm.currentTransaction().setRetainValues(true);
+			pm.currentTransaction().setRetainValues(true);
 
 			/*
 			pm.currentTransaction().begin();
@@ -1244,7 +1244,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
         ext.closeAll();
         
         double temp = avg / (double) count_inproc;
-        String Output = "<br>there are "+count_inproc+" inproceedings in total with an average of "+String.valueOf(temp)+" authors per inproceedings<br>";
+        String Output = "<br>there are <b>"+count_inproc+" inproceedings</b> in total with an average of <b>"+String.valueOf(temp)+" authors per inproceedings</b><br>";
         
 		return Output;
 	}
@@ -1373,12 +1373,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			count += authors.size();
 			count += editors.size();
 
-			Output += "<br>there are "+authors.size()+" authors and "+editors.size()+" editors (total="+count+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+conf.getName()+"</a><br>";
+			Output += "<br>there are <b>"+authors.size()+" authors</b> and <b>"+editors.size()+" editors</b> (total="+count+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+conf.getName()+"</a><br>";
 
 			return Output;
 		}
 		else {
-			Output+= "<br>all authors:<br>";
+			Output+= "<br><b>all authors:</b><br>";
 			
 			List<Person> list_authors= new ArrayList<>(authors);
 			list_authors.sort(compare_Person_name);
@@ -1387,7 +1387,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 			}
 			
-			Output +="<br><br>all editors:<br>";
+			Output +="<br><br><b>all editors:</b><br>";
 			List<Person> list_editors= new ArrayList<>(editors);
 			list_editors.sort(compare_Person_name);
 			for (Person pers: list_editors){
