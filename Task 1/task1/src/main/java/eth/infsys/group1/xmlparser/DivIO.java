@@ -51,9 +51,8 @@ public class DivIO {
 		
 		//Conference ok
 		else if (is_a_conference){
-			ret += "<Conference><br>";
-			ret += "id: "+id +"<br>";
-			ret += "name: "+Conference_name +"<br>";
+			ret += "Conference-id: "+id +"<br>";
+			ret += "name: <b>"+Conference_name +"</b><br>";
 
 
 			int show = -1;
@@ -70,68 +69,104 @@ public class DivIO {
 		
 		//ConferenceEdition
 		else if (is_a_conference_edition){
-			ret += "<ConferenceEdition><br>";
-			ret += "id: "+id +"<br>";
-			ret += "year: "+ConferenceEdition_year +"<br>";
-			ret += "<a href='/test/?func=conf_by_id&id=" +ConferenceEdition_conference_id+ "'>conference name: "+ConferenceEdition_conference_name+"</a><br>";
-			ret += "<a href='/test/?func=proceeding_by_id&key=" +ConferenceEditions_proceedings_id+ "'>proceeding title: "+ConferenceEditions_proceedings_title+"</a><br>";
+			ret += "ConferenceEdition-id: "+id +"<br>";
+			ret += "year: <b>"+ConferenceEdition_year +"</b><br>";
+			
+			//ret += "<a href='/test/?func=conf_by_id&id=" +ConferenceEdition_conference_id+ "'>conference name: "+ConferenceEdition_conference_name+"</a><br>";
+			ret += "conference: <a href='/test/?func=conf_by_id&id=" +ConferenceEdition_conference_id+ "'>"+ConferenceEdition_conference_name+"</a><br>";
+
+			//ret += "<a href='/test/?func=proceeding_by_id&key=" +ConferenceEditions_proceedings_id+ "'>proceeding title: "+ConferenceEditions_proceedings_title+"</a><br>";
+			ret += "Proceeding: "+ ConferenceEditions_proceedings_title + " (<a href='/test/?func=inproceeding_by_id&key=" + ConferenceEditions_proceedings_id + "'>"+ConferenceEditions_proceedings_id+"</a>)<br>";
 
 		}
 
 		//Person ok
 		else if (is_a_person){
-			ret += "<Person><br>";
-			ret += "id: "+id +"<br>";
-			ret += "name: "+ Person_name +"<br>";
+			ret += "Person-id: "+id +"<br>";
+			ret += "name: <b>"+ Person_name +"</b><br>";
 			
 			int show = -1;
-			for (Pair<String,String> inprTid: Person_authoredPublications_title_id){
-				String title = inprTid.getKey().substring(0, Math.min(200,inprTid.getKey().length()));
-				String id = inprTid.getValue();
-				ret += "<a href='/test/?func=inproceeding_by_id&key=" + id + "'>inproceeding-id: "+id+"</a> title: "+title +"<br>";
-				if (--show == 0)
-					break;
-			}
+
 			
+			ret += "Proceedings:";
+			if (Person_editedPublications_title_id.size()==0)
+				ret += " no proceedings";
+			ret += "<ol type='1'>";
 			for (Pair<String,String> prTid: Person_editedPublications_title_id){
 				String title = prTid.getKey().substring(0, Math.min(200,prTid.getKey().length()));
 				String id = prTid.getValue();
-				ret += "<a href='/test/?func=proceeding_by_id&key=" + id + "'>proceeding-id: "+id+"</a> title: "+title +"<br>";
+				//ret += "<a href='/test/?func=proceeding_by_id&key=" + id + "'>proceeding-id: "+id+"</a> title: "+title +"<br>";
+				ret += "<li>"+title + " (<a href='/test/?func=proceeding_by_id&key=" + id + "'>"+id+"</a>)</li>";
 				if (--show == 0)
 					break;
 			}
+			ret += "</ol>";
+
+			
+			ret += "InProceedings:";
+			if (Person_authoredPublications_title_id.size()==0)
+				ret += " no inproceedings";
+			ret += "<ol type='1'>";
+			for (Pair<String,String> inprTid: Person_authoredPublications_title_id){
+				String title = inprTid.getKey().substring(0, Math.min(200,inprTid.getKey().length()));
+				String id = inprTid.getValue();
+				//ret += "<a href='/test/?func=inproceeding_by_id&key=" + id + "'>inproceeding-id: "+id+"</a> title: "+title +"<br>";
+				ret += "<li>"+title + " (<a href='/test/?func=inproceeding_by_id&key=" + id + "'>"+id+"</a>)</li>";
+				if (--show == 0)
+					break;
+			}
+			ret += "</ol>";
+
 
 		}
 
 		//Publisher ok
 		else if (is_a_publisher){
-			ret += "<Publisher><br>";
-			ret += "id: "+id +"<br>";
-			ret += "name: "+ Publisher_name +"<br>";
+			ret += "Publisher-id: "+id +"<br>";
+			ret += "name: <b>"+ Publisher_name +"</b><br>";
+			
+			
+			
+			ret += "Proceedings:";
+			if (Publisher_publications_title_id.size()==0)
+				ret += " no proceedings";
+			ret += "<ol type='1'>";
+			
 			int show = -1;
 			for (Pair<String,String> publTid: Publisher_publications_title_id){
 				String title = publTid.getKey().substring(0, Math.min(200,publTid.getKey().length()));
 				String id = publTid.getValue();
-				ret += "<a href='/test/?func=publication_by_id&key=" + id + "'>(details) </a>"+title +"<br>";
+				//ret += "<a href='/test/?func=publication_by_id&key=" + id + "'>(details) </a>"+title +"<br>";
+				ret += "<li>"+title + " (<a href='/test/?func=proceeding_by_id&key=" + id + "'>"+id+"</a>)</li>";
+
 				if (--show == 0)
 					break;
 			}
+			ret += "</ol>";
+
 
 		}
 
 		//Series ok
 		else if (is_a_series){
-			ret += "<Series><br>";
-			ret += "id: "+id +"<br>";
-			ret += "name: "+ Series_name +"<br>";
+			ret += "Series-id: "+id +"<br>";
+			ret += "name: <b>"+ Series_name +"</b><br>";
+			
+			ret += "Proceedings:";
+			if (Series_publications_title_id.size()==0)
+				ret += " no proceedings";
+			ret += "<ol type='1'>";
 			int show = -1;
 			for (Pair<String,String> publTid: Series_publications_title_id){
 				String title = publTid.getKey().substring(0, Math.min(200,publTid.getKey().length()));
 				String id = publTid.getValue();
-				ret += "<a href='/test/?func=publication_by_id&key=" + id + "'>(details) </a>"+title +"<br>";
+				//ret += "<a href='/test/?func=publication_by_id&key=" + id + "'>(details) </a>"+title +"<br>";
+				ret += "<li>"+title + " (<a href='/test/?func=proceeding_by_id&key=" + id + "'>"+id+"</a>)</li>";
 				if (--show == 0)
 					break;
 			}
+			ret += "</ol>";
+
 			
 
 		}

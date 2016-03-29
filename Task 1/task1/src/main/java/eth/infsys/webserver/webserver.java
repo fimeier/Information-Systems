@@ -34,7 +34,8 @@ public class webserver {
 		//String dbName = "Project1_ZooDB_new.zdb";
 		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
 		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
-		String dbName = "Project1_4mil.zdb";
+		//String dbName = "Project1_4mil.zdb";
+		String dbName = "Project1_test.zdb";
 
 
 
@@ -210,7 +211,7 @@ public class webserver {
 				break;
 			}
 			output += create_header(wf);
-			output += publ_by_person(args);
+			output += publ_by_person_name_or_id(args);
 			output += create_footer(wf);
 			break;
 
@@ -503,11 +504,13 @@ public class webserver {
 				output += create_footer(wf);
 				break;
 			}
+			output += create_header(wf);
 			output += get_page(args.get("name"));
+			output += create_footer(wf);
 			break;
 
 		case MAIN:
-			//output += create_header(WebFunc.MAIN);
+			output += create_header(WebFunc.MAIN);
 			output += get_main();
 			output += create_footer(WebFunc.MAIN);
 			break;
@@ -519,7 +522,7 @@ public class webserver {
 
 		default:
 			output += create_header(WebFunc.MAIN);
-			//output += get_main();
+			output += get_main();
 			output += "<br>default case<br>";
 			output += create_footer(WebFunc.MAIN);
 
@@ -664,7 +667,7 @@ public class webserver {
 			eoff = 0;
 		}
 
-		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
+		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
 
 
 		List<DivIO> series = myDB.IO_get_series_by_filter_offset(filter, boff, eoff, order_by);
@@ -694,7 +697,7 @@ public class webserver {
 			eoff = 0;
 		}
 
-		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
+		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
 
 
 		List<DivIO> publishers = myDB.IO_get_publisher_by_filter_offset(filter, boff, eoff, order_by);
@@ -713,7 +716,8 @@ public class webserver {
 	}
 
 	private static String find_co_authors(String name) {
-		String output = "";
+		String output = "The co-authors (and their publications) of <b>"+name+" are:</b><br><br>";
+		
 		List<DivIO> persons = myDB.IO_find_co_authors(name);
 		for (DivIO person: persons){
 			output += person.get_all() + "<br><br>";
@@ -761,7 +765,7 @@ public class webserver {
 			eoff = 0;
 		}
 
-		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
+		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
 
 		List<DivIO> confs = myDB.IO_get_conference_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO conf: confs){
@@ -782,7 +786,7 @@ public class webserver {
 			eoff = 0;
 		}
 
-		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br>";
+		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
 
 
 		List<DivIO> persons = myDB.IO_get_person_by_filter_offset(filter, boff, eoff, order_by);
@@ -793,16 +797,27 @@ public class webserver {
 		return Output;
 	}
 
-	private static String publ_by_person(HashMap<String, String> args) {
-		String Output = "<br>filter="+args+"<br>";
+	private static String publ_by_person_name_or_id(HashMap<String, String> args) {
+		String Output = "";//"<br><b>filter</b>="+args+"<br>";
+		
+		Output = "<br><br><a href='#first_proc'>go to Proceedings</a>, <a href='#first_inproc'>go to InProceedings</a><br>";
 
-
-		List<PublicationIO> publs = myDB.IO_get_publ_by_person(args);
+		List<PublicationIO> publs = myDB.IO_publ_by_person_name_or_id(args);
+		Boolean first_proc = false;
+		Boolean first_inproc = false;
 		if (publs.isEmpty()){
 			Output += "no publications found..";
 		}
 		else {
 			for (PublicationIO publ: publs){
+				if ( (publ.is_a_proceeding == true) && (first_proc == false) ){
+					first_proc = true;
+					Output += "<h4 id='first_proc'>Proceedings</h4>";
+				}
+				if ( (publ.is_an_inproceeding == true) && (first_inproc == false) ){
+					first_inproc = true;
+					Output += "<h4 id='first_inproc'>InProceedings</h4>";
+				}
 				Output += publ.get_all() + "<br><br>";
 			}
 		}
@@ -864,25 +879,25 @@ public class webserver {
 	}
 
 	private static String create_header(WebFunc wf){
-		switch (wf) {
+		/*switch (wf) {
 		case inproceeding_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		case proceeding_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		case publication_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
-		}
-		return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
+		}*/
+		return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><a href='/test/?func=MAIN'>HOME</a><br>";
 	}
 	private static String create_footer(WebFunc wf){
-		switch (wf) {
+		/*switch (wf) {
 		case inproceeding_by_id:
 			return "</body></html>";
 		case proceeding_by_id:
 			return "</body></html>";
 		case publication_by_id:
 			return "</body></html>";
-		}
+		}*/
 		return "</body></html>";
 	}
 

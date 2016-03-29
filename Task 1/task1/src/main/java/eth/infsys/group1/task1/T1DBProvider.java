@@ -948,7 +948,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		return return_list;
 	}
 
-	public List<PublicationIO> IO_get_publ_by_person(HashMap<String, String> args) {
+	public List<PublicationIO> IO_publ_by_person_name_or_id(HashMap<String, String> args) {
 		pm.currentTransaction().setNontransactionalRead(true);
 
 		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
@@ -1058,6 +1058,8 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			InProceedings inproc = (InProceedings) publ;
 			all_authors.addAll(inproc.getAuthors());
 		}
+		
+		all_authors.remove(pers);
 
 		for (Person pers1: all_authors){
 			System.out.println(pers1.getName());
@@ -1205,7 +1207,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						next_authors.add(p);
 						
 						if ( old_authors.containsKey(pers2) ){
-							Output += "<br>Distance is "+distance+"<br>";
+							Output += "<br><b>The distance between "+pers2.getName()+ " and "+pers1.getName()+ " is "+distance+"</b><br><br>one possible path:<br>";
 							Person persA = pers2;
 							for (int i = distance; i>0; i--){
 								Pair<Person,Pair<InProceedings,Integer>> node_edge_dist2 = old_authors.get(persA);
@@ -1257,6 +1259,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		 */
 		long start, stop;
 
+		/*
 		
 		System.out.println("implementation with Extent start...");
 		start = System.nanoTime();
@@ -1274,9 +1277,10 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 		String temp = String.valueOf(count_publ);
 		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+temp+"<br>";
+		*/
 
 		/**
-		 * is not faster without index
+		 * is not faster without index*/
 		start = System.nanoTime();
 		Query q = pm.newQuery (Publication.class, ":y1<= this.year && this.year <= :y2");
 		//String filter = "'y1'<= year && year <= 'y2'";
@@ -1286,7 +1290,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		stop = System.nanoTime();
         Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+tempsize+"<br>";
 		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
-		 */
+		 
 		
         return Output;
 	}
@@ -1556,7 +1560,39 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		/**
 		 * is not faster
 		 * Query is not faster to get all inproceedings in the interval...
-		 */		
+		 */
+		
+		
+		/*
+		
+		long start,stop;
+		//start = System.nanoTime();
+		Query q = pm.newQuery (InProceedings.class, ":y1<= this.year && this.year <= :y2");
+		//String filter = "id.contains('"+args.get("name_contains").toLowerCase()+"')";
+		//q.setFilter(filter);
+		Collection<InProceedings> ret = (Collection<InProceedings>) q.execute(y1,y2);
+		List<InProceedings> ret2 = new ArrayList<>();
+		for (Publication publ: ret){
+			if(!(publ instanceof Proceedings)){
+				ret2.add((InProceedings) publ);
+			}
+		}
+		for (InProceedings inproc: ret2) {
+			try {
+				//add publisher to the Set
+				Publisher temp = inproc.getProceedings().getPublisher();
+				if (temp == null){
+					System.out.println("publisher is null....");
+				}
+				publisher.add(inproc.getProceedings().getPublisher());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		*/
+		
+		/*
 		Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
 		for (InProceedings inproc: ext) {
 			int year = inproc.getYear();
@@ -1567,20 +1603,34 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 					if (temp == null){
 						System.out.println("publisher is null....");
 					}
-					if (temp.getName()==null){
-						System.out.println("publisher name is null....");
-						pm.currentTransaction().begin();
-						temp.setName("null");
-						pm.currentTransaction().commit();
-
-					}
 					publisher.add(inproc.getProceedings().getPublisher());
+					
+					//if(publisher.add(inproc.getProceedings().getPublisher())){
+						//System.out.println("das fehlte");
+				//	}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
+		ext.closeAll();*/
+		
+		
+		//alternative
+		Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
+		for (Proceedings proc: ext) {
+			try {
+				int year  = proc.getPublications().iterator().next().getYear();
+				if( y1 <= year && year <= y2){
+					publisher.add(proc.getPublisher());
+				} 
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	
 		ext.closeAll();
 		
 		

@@ -33,7 +33,7 @@ public class batch_db_loader {
 //!!!!!!!change override
 
 
-		load_input(myDB);
+	//	load_input(myDB);
 		//same call again is not a problem...
 		//load_input(myDB);
 

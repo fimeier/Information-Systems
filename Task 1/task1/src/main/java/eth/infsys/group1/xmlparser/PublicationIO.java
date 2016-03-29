@@ -58,15 +58,16 @@ public class PublicationIO {
 			ret += "Publication is empty<br>";
 			return ret;
 		} else if (is_a_proceeding){
-			ret += "<Proceeding><br>";
+			ret += "Proceeding-";
 		} else {
-			ret += "<InProceeding><br>";
+			ret += "InProceeding-";
 		}
 
 
 		ret += "id: "+id +"<br>";
-		ret += "title: "+title+"<br>";
+		ret += "title: <b>"+title+"</b><br>";
 		ret += "year: "+year+"<br>";
+	
 		ret += "ee: <a href='"+electronicEdition+"'>"+electronicEdition+"</a><br>";
 		
 		ret += "conference: <a href='/test/?func=conf_by_id&id=" +Conference_name_id.getValue()+ "'>"+Conference_name_id.getKey()+"</a><br>";
@@ -100,16 +101,18 @@ public class PublicationIO {
 			
 			ret += "series: <a href='/test/?func=series_by_id&id=" +series_id+ "'>"+series_name+"</a><br>";
 
-			ret += "inproceedings:<br>";
+			ret += "InProceedings:<br>";
+			ret += "<ol type='1'>";
 			int show = -1;
 			for (Pair<String,String> inprTid: inproceedings_title_id){
-				String title = inprTid.getKey().substring(0, Math.min(200,inprTid.getKey().length()));
+				String title = inprTid.getKey().substring(0, Math.min(300,inprTid.getKey().length()));
 				String id = inprTid.getValue();
 				//ret += "(id="+id+") : "+title +"<br>";
-				ret += "<a href='/test/?func=inproceeding_by_id&key=" + id + "'>inproceeding-id: "+id+"</a> title: "+title +"<br>";
+				ret += "<li>"+title + " (<a href='/test/?func=inproceeding_by_id&key=" + id + "'>"+id+"</a>)</li>";
 				if (--show == 0)
 					break;
-			}		
+			}
+			ret += "</ol>";
 
 		}
 		else
@@ -127,9 +130,10 @@ public class PublicationIO {
 			ret += "note: " + note +"<br>";
 			
 			ret += "pages: " + pages +"<br>";
-			ret += "proceeding-title: " + proceeding_title +"<br>";
-			//ret += "proceeding-id: " + proceeding_id +"<br>";
-			ret += "<a href=/test/?func=proceeding_by_id&key=" + proceeding_id +">proceeding-id: " + proceeding_id + "</a><br>";
+			//ret += "proceeding-title: " + proceeding_title +"<br>";			
+			//ret += "proceeding-id: <a href=/test/?func=proceeding_by_id&key=" + proceeding_id +">" + proceeding_id + "</a><br>";
+			ret += "Proceeding: "+ proceeding_title + " (<a href='/test/?func=inproceeding_by_id&key=" + proceeding_id + "'>"+proceeding_id+"</a>)<br>";
+
 
 
 
