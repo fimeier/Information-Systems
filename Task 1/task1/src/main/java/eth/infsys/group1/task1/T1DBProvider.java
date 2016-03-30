@@ -1,22 +1,12 @@
-/**Problems
- * Interface to Gui... OO to String...
- * !!!! getid()... etc. compare toUpperCase()
- */
-
-
 package eth.infsys.group1.task1;
 
-import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -28,6 +18,10 @@ import org.zoodb.jdo.ZooJdoHelper;
 import org.zoodb.tools.ZooHelper;
 
 import eth.infsys.group1.dbspec.DBProvider;
+import eth.infsys.group1.dbspec.DivIO;
+import eth.infsys.group1.dbspec.InProceedings_simple_input;
+import eth.infsys.group1.dbspec.Proceedings_simple_input;
+import eth.infsys.group1.dbspec.PublicationIO;
 import eth.infsys.group1.task1.dbobjs.Conference;
 import eth.infsys.group1.task1.dbobjs.ConferenceEdition;
 import eth.infsys.group1.task1.dbobjs.DomainObject;
@@ -37,52 +31,35 @@ import eth.infsys.group1.task1.dbobjs.Proceedings;
 import eth.infsys.group1.task1.dbobjs.Publication;
 import eth.infsys.group1.task1.dbobjs.Publisher;
 import eth.infsys.group1.task1.dbobjs.Series;
-import eth.infsys.group1.xmlparser.DivIO;
-import eth.infsys.group1.xmlparser.InProceedings_simple_input;
-import eth.infsys.group1.xmlparser.Proceedings_simple_input;
-import eth.infsys.group1.xmlparser.PublicationIO;
 import javafx.util.Pair;
 
-public class T1DBProvider extends
-DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
+@SuppressWarnings("restriction")
+public class T1DBProvider extends DBProvider {
+//DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
 
-	public static final int OPEN_DB_APPEND = 20;
-	public static final int OPEN_DB_OVERRIDE = 21;
-
-
-	public static final int SORT_BY_NAME = 1;
-	public static final int SORT_BY_YEAR = 2;
-	public static final int SORT_BY_TITLE = 3;
-
-
-
-
-	/*
-	//HACK!!!
-	public PersistenceManager getpm() {
-		return pm;
-	}
+	
+	/**
+	 * Class and DB-Stuff
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 */
-
 	private PersistenceManager pm;
+
 
 	/**
 	 * Create DBProvider
 	 * 
-	 * @param dbName The name of the DB
-	 * @param mode APPEND or OVERRIDE
+	 * @param dbName the name of the database to be created
+	 * @param mode OPEN_DB_APPEND or OPEN_DB_OVERRIDE
 	 */
 	public T1DBProvider(String dbName, int mode) {
 		createDB(dbName, mode);		
 	}
 
-	/**
-	 * Create DB
-	 * 
-	 * @param dbName The name of the DB
-	 * @param mode APPEND or OVERRIDE
-	 */
-	private void createDB(String dbName, int mode) {
+	protected void createDB(String dbName, int mode) {
 		// create database
 		// By default, all database files will be created in %USER_HOME%/zoodb
 
@@ -93,21 +70,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			 * do not delete if already exist
 			 */
 			this.pm = ZooJdoHelper.openOrCreateDB(dbName);
-		
-
 
 			pm.currentTransaction().setRetainValues(true);
 
-			/*
-			pm.currentTransaction().begin();
-			ZooJdoHelper.schema(pm).addClass(DomainObject.class);
-			pm.currentTransaction().commit();
-
-			 */
-			//schemaManager();
-
 			break;
 
+			//OPEN_DB_OVERRIDE
 		default:
 			/**
 			 * create database and/or remove first if it exists
@@ -121,9 +89,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		}
 	}
 
-	//simple implementation
 	protected void schemaManager() {
-		//unique-Index for DomainObject.id
 
 		pm.currentTransaction().begin();
 		ZooJdoHelper.createIndex(pm, DomainObject.class, "id", true);
@@ -132,7 +98,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		pm.currentTransaction().begin();
 		ZooJdoHelper.createIndex(pm, Person.class, "name", false);
 		pm.currentTransaction().commit();
-		
+
 		pm.currentTransaction().begin();
 		ZooJdoHelper.createIndex(pm, Publication.class, "year", false);
 		pm.currentTransaction().commit();
@@ -160,14 +126,6 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		pm = ZooJdoHelper.openDB(dbName);
 
 	}
-
-	public void tr_begin() {
-		this.pm.currentTransaction().begin();
-	}
-	public void tr_commit() {
-		this.pm.currentTransaction().commit();
-	}
-
 
 
 
@@ -273,10 +231,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		//q.setRange(boff +","+eoff);
 
 		//Query q = pm.newQuery ("select from eth.infsys.group1.task1.dbobjs.Publication GROUP BY title RANGE :boff, :eoff");
+		@SuppressWarnings("unchecked")
 		Collection<Publication> publs = (Collection<Publication>)q.execute();
 
 		int collection_size = publs.size();
-		int skip = boff-eoff;
+		//		int skip = boff-eoff;
 		if (collection_size < boff){
 			return null;
 		}
@@ -310,10 +269,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		q.setFilter(filter);
 		q.setOrdering(order_by);
 
+		@SuppressWarnings("unchecked")
 		Collection<Person> persons = (Collection<Person>) q.execute();
 
 		int collection_size = persons.size();
-		int skip = boff-eoff;
+		//		int skip = boff-eoff;
 		if (collection_size < boff){
 			return null;
 		}
@@ -343,10 +303,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		q.setFilter(filter);
 		q.setOrdering(order_by);
 
+		@SuppressWarnings("unchecked")
 		Collection<Conference> confs = (Collection<Conference>) q.execute();
 
 		int collection_size = confs.size();
-		int skip = boff-eoff;
+		//		int skip = boff-eoff;
 		if (collection_size < boff){
 			return null;
 		}
@@ -375,10 +336,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		q.setFilter(filter);
 		q.setOrdering(order_by);
 
+		@SuppressWarnings("unchecked")
 		Collection<Publisher> publishers = (Collection<Publisher>) q.execute();
 
 		int collection_size = publishers.size();
-		int skip = boff-eoff;
+		//		int skip = boff-eoff;
 		if (collection_size < boff){
 			return null;
 		}
@@ -408,10 +370,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		q.setFilter(filter);
 		q.setOrdering(order_by);
 
+		@SuppressWarnings("unchecked")
 		Collection<Series> series = (Collection<Series>) q.execute();
 
 		int collection_size = series.size();
-		int skip = boff-eoff;
+		//		int skip = boff-eoff;
 		if (collection_size < boff){
 			return null;
 		}
@@ -437,6 +400,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 	}
 
 
+	@SuppressWarnings("unused")
 	private DomainObject get_domainobject_by_id(String object_id) {
 		Query q = pm.newQuery ("select unique from eth.infsys.group1.task1.dbobjs.DomainObject where id == :compare_id");
 		return (DomainObject) q.execute(object_id);
@@ -675,7 +639,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			return o1.Person_name.compareTo(o2.Person_name);
 		}
 	};
-	
+
 	private Comparator<DivIO> compareDivIO_Publisher_name = new Comparator<DivIO>() {
 		@Override
 		public int compare(DivIO o1, DivIO o2) {
@@ -685,14 +649,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			return o1.Publisher_name.compareTo(o2.Publisher_name);
 		}
 	};
-	
+
 	private Comparator<Person> compare_Person_name = new Comparator<Person>() {
 		@Override
 		public int compare(Person o1, Person o2) {
 			return o1.getName().compareTo(o2.getName());
 		}
 	};
-	
+
 	private Comparator<InProceedings> compare_InProceedings_title = new Comparator<InProceedings>() {
 		@Override
 		public int compare(InProceedings o1, InProceedings o2) {
@@ -716,31 +680,31 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			publication.title = proc.getTitle();
 			publication.year = proc.getYear();
 			publication.electronicEdition = proc.getElectronicEdition();
-			
+
 			if (proc.getConferenceEdition() != null){
 				if (proc.getConferenceEdition().getConference() != null){
-					
+
 					//Conference
 					String name = proc.getConferenceEdition().getConference().getName();
 					String confid = proc.getConferenceEdition().getConference().getId();
-					publication.Conference_name_id = new Pair(name,confid);
-					
+					publication.Conference_name_id = new Pair<String, String>(name,confid);
+
 					//ConferenceEdition	
 					int year = proc.getConferenceEdition().getYear();
 					String confEdid = proc.getConferenceEdition().getId();
-					publication.ConferenceEdition_year_id = new Pair(year,confEdid);
+					publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
 				}
 			}
-			
+
 			/*for (Person editor: proc.getEditors()){
 				publication.editors.add(editor.getName());
 			}*/
 			for (Person editor: proc.getEditors()){
 				String name = editor.getName();
 				String id = editor.getId();
-				publication.editors_name_id.add(new Pair(name, id));
+				publication.editors_name_id.add(new Pair<String, String>(name, id));
 			}
-			
+
 			publication.note = proc.getNote();
 			publication.number = proc.getNumber();
 
@@ -762,7 +726,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (InProceedings inprocs: proc.getPublications()){
 				String title = inprocs.getTitle();
 				String id = inprocs.getId();
-				publication.inproceedings_title_id.add(new Pair(title, id));
+				publication.inproceedings_title_id.add(new Pair<String, String>(title, id));
 			}
 			publication.inproceedings_title_id.sort(comparePairTitleId);
 
@@ -788,12 +752,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						//Conference
 						String name = proc.getConferenceEdition().getConference().getName();
 						String confid = proc.getConferenceEdition().getConference().getId();
-						publication.Conference_name_id = new Pair(name,confid);
+						publication.Conference_name_id = new Pair<String, String>(name,confid);
 
 						//ConferenceEdition	
 						int year = proc.getConferenceEdition().getYear();
 						String confEdid = proc.getConferenceEdition().getId();
-						publication.ConferenceEdition_year_id = new Pair(year,confEdid);
+						publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
 					}
 				}
 			}
@@ -801,7 +765,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (Person author: inproc.getAuthors()){
 				String name = author.getName();
 				String id = author.getId();
-				publication.authors_name_id.add(new Pair(name, id));
+				publication.authors_name_id.add(new Pair<String, String>(name, id));
 			}
 			publication.note = inproc.getNote();
 			publication.pages = inproc.getPages();
@@ -829,7 +793,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (ConferenceEdition confed: conf.getEditions()){
 				int year = confed.getYear();
 				String id = confed.getId();
-				divobj.Conference_editions_year_id.add(new Pair(year, id));
+				divobj.Conference_editions_year_id.add(new Pair<Integer, String>(year, id));
 			}
 			divobj.Conference_editions_year_id.sort(comparePairYearId);
 
@@ -859,14 +823,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (Publication publ: pers.getAuthoredPublications()){
 				String title = publ.getTitle();
 				String id = publ.getId();
-				divobj.Person_authoredPublications_title_id.add(new Pair(title, id));
+				divobj.Person_authoredPublications_title_id.add(new Pair<String, String>(title, id));
 			}
 			divobj.Person_authoredPublications_title_id.sort(comparePairTitleId);
 
 			for (Publication publ: pers.getEditedPublications()){
 				String title = publ.getTitle();
 				String id = publ.getId();
-				divobj.Person_editedPublications_title_id.add(new Pair(title, id));
+				divobj.Person_editedPublications_title_id.add(new Pair<String, String>(title, id));
 			}
 			divobj.Person_editedPublications_title_id.sort(comparePairTitleId);
 
@@ -883,7 +847,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (Publication publi: publisher.getPublications()){
 				String title = publi.getTitle();
 				String id = publi.getId();
-				divobj.Publisher_publications_title_id.add(new Pair(title, id));
+				divobj.Publisher_publications_title_id.add(new Pair<String, String>(title, id));
 			}
 			divobj.Publisher_publications_title_id.sort(comparePairTitleId);
 
@@ -901,7 +865,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (Publication publi: series.getPublications()){
 				String title = publi.getTitle();
 				String id = publi.getId();
-				divobj.Series_publications_title_id.add(new Pair(title, id));
+				divobj.Series_publications_title_id.add(new Pair<String, String>(title, id));
 			}
 			divobj.Series_publications_title_id.sort(comparePairTitleId);
 		}
@@ -915,7 +879,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 	 * IO-methods
 	 * @param sort_by 
 	 */
-	//Query 1
+	
 	public PublicationIO IO_get_publication_by_id(String publ_id){
 		pm.currentTransaction().setNontransactionalRead(true);
 
@@ -923,7 +887,6 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 	}
 
-	//Query 2, 3
 	public List<PublicationIO> IO_get_publ_by_filter_offset(String filter, int boff, int eoff, String order_by) {
 		pm.currentTransaction().setNontransactionalRead(true);
 
@@ -1058,7 +1021,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			InProceedings inproc = (InProceedings) publ;
 			all_authors.addAll(inproc.getAuthors());
 		}
-		
+
 		all_authors.remove(pers);
 
 		for (Person pers1: all_authors){
@@ -1146,16 +1109,16 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				Output += "ERROR: couldn't remove from Inproceeding (id="+proc.getId()+")<br>";
 			}
 		}
-		
+
 		pers.jdoZooMarkDeleted();
-		
+
 		//pm.currentTransaction().rollback();
 		pm.currentTransaction().commit();;
 
 		return Output;
 	}
 
-	
+
 	public String IO_find_author_distance_path(String name1, String name2) {
 		pm.currentTransaction().setNontransactionalRead(true);
 
@@ -1175,7 +1138,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			Output = "<br>name1 (= "+ name1 + ") or name2(= "+ name2 + ") is not a person<br>";
 			return Output;
 		}
-		
+
 		if ( pers1.getAuthoredPublications()==null || pers2.getAuthoredPublications()==null){
 			Output = "<br>name1 (= "+ name1 + ") or name2(= "+ name2 + ") hasn't authored anything<br>";
 			return Output;
@@ -1201,17 +1164,17 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						}
 						//creates Pair with (father-node and (common edge,distance))
 						k++;
-						Pair<InProceedings,Integer> inproc_dist = new Pair(inproc,distance);
-						Pair<Person,Pair<InProceedings,Integer>> node_edge_dist = new Pair(person,inproc_dist);
+						Pair<InProceedings,Integer> inproc_dist = new Pair<InProceedings, Integer>(inproc,distance);
+						Pair<Person,Pair<InProceedings,Integer>> node_edge_dist = new Pair<Person, Pair<InProceedings, Integer>>(person,inproc_dist);
 						old_authors.put(p, node_edge_dist);
 						next_authors.add(p);
-						
+
 						if ( old_authors.containsKey(pers2) ){
 							Output += "<br><b>The distance between "+pers2.getName()+ " and "+pers1.getName()+ " is "+distance+"</b><br><br>one possible path:<br>";
 							Person persA = pers2;
 							for (int i = distance; i>0; i--){
 								Pair<Person,Pair<InProceedings,Integer>> node_edge_dist2 = old_authors.get(persA);
-								
+
 								Person persB = node_edge_dist2.getKey();
 								InProceedings inproc1 = node_edge_dist2.getValue().getKey();
 								int dist = node_edge_dist2.getValue().getValue();
@@ -1223,7 +1186,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						}
 					}
 				}
-				
+
 			}
 		}
 
@@ -1233,19 +1196,19 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 	public String IO_avg_authors_per_inproceedings() {
 		pm.currentTransaction().setNontransactionalRead(true);
-		
+
 		int count_inproc = 0;
 		double avg = 0;
-        Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
-        for (InProceedings inproc: ext) {
-        	count_inproc++;
-        	avg += inproc.getAuthors().size();
-        }
-        ext.closeAll();
-        
-        double temp = avg / (double) count_inproc;
-        String Output = "<br>there are <b>"+count_inproc+" inproceedings</b> in total with an average of <b>"+String.valueOf(temp)+" authors per inproceedings</b><br>";
-        
+		Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
+		for (InProceedings inproc: ext) {
+			count_inproc++;
+			avg += inproc.getAuthors().size();
+		}
+		ext.closeAll();
+
+		double temp = avg / (double) count_inproc;
+		String Output = "<br>there are <b>"+count_inproc+" inproceedings</b> in total with an average of <b>"+String.valueOf(temp)+" authors per inproceedings</b><br>";
+
 		return Output;
 	}
 
@@ -1253,14 +1216,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		pm.currentTransaction().setNontransactionalRead(true);
 
 		String Output = "";
-		
+
 		/**
 		 * performance??
 		 */
 		long start, stop;
 
 		/*
-		
+
 		System.out.println("implementation with Extent start...");
 		start = System.nanoTime();
 		int count_publ = 0;
@@ -1277,7 +1240,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 		String temp = String.valueOf(count_publ);
 		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+temp+"<br>";
-		*/
+		 */
 
 		/**
 		 * is not faster without index*/
@@ -1285,14 +1248,15 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Query q = pm.newQuery (Publication.class, ":y1<= this.year && this.year <= :y2");
 		//String filter = "'y1'<= year && year <= 'y2'";
 		//q.setFilter(filter);
+		@SuppressWarnings("unchecked")
 		Collection<Publication> ret = (Collection<Publication>) q.execute(y1,y2);
 		int tempsize = ret.size();
 		stop = System.nanoTime();
-        Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+tempsize+"<br>";
+		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+tempsize+"<br>";
 		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
-		 
-		
-        return Output;
+
+
+		return Output;
 	}
 
 	public String IO_inproceedings_for_a_conference(String conf_id, String mode) {
@@ -1379,14 +1343,14 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		}
 		else {
 			Output+= "<br><b>all authors:</b><br>";
-			
+
 			List<Person> list_authors= new ArrayList<>(authors);
 			list_authors.sort(compare_Person_name);
 			for (Person pers: list_authors){
 				Output+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
 
 			}
-			
+
 			Output +="<br><br><b>all editors:</b><br>";
 			List<Person> list_editors= new ArrayList<>(editors);
 			list_editors.sort(compare_Person_name);
@@ -1397,12 +1361,12 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			return Output;
 		}
 	}
-	
+
 	public String IO_person_is_author_and_editor() {
 		pm.currentTransaction().setNontransactionalRead(true);
 
 		String Output = "";
-		
+
 		HashMap<Person,List<Pair<Proceedings,InProceedings>>> authoreditor = new HashMap<>();
 
 		Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
@@ -1411,7 +1375,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			for (InProceedings inproc: proc.getPublications()){
 				for (Person p: inproc.getAuthors()){
 					if ( editors.contains(p)){
-						Pair<Proceedings,InProceedings> authedit = new Pair(proc,inproc);
+						Pair<Proceedings,InProceedings> authedit = new Pair<Proceedings, InProceedings>(proc,inproc);
 						if (authoreditor.containsKey(p)){
 							List<Pair<Proceedings,InProceedings>> old_entry = authoreditor.get(p);
 							old_entry.add(authedit);
@@ -1424,8 +1388,8 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						}
 					}
 				}
-        	}
-             	
+			}
+
 		}
 		ext.closeAll();
 
@@ -1451,7 +1415,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 
 	public List<PublicationIO> IO_person_is_last_author(String pers_id) {
 		pm.currentTransaction().setNontransactionalRead(true);
-		
+
 		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
 
 		Person pers = get_person_by_id(pers_id);
@@ -1459,11 +1423,11 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			//Output += "<br>inexisting person-id<br>";
 			return return_list;
 		}
-		
-		List<InProceedings> last_author = new ArrayList<>();
-		
+
+		//		List<InProceedings> last_author = new ArrayList<>();
+
 		Set<Publication> authoredPublications = pers.getAuthoredPublications();
-		
+
 		for (Publication publ: authoredPublications){
 			InProceedings inproc = (InProceedings) publ;
 			try {
@@ -1475,16 +1439,16 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				// TODO Auto-generated catch block
 				e.printStackTrace(); 
 			}
-			
+
 		}
-		
-		
+
+
 		return return_list;
 	}
 
-	public String get_statistics() {
+	public String IO_get_statistics() {
 		pm.currentTransaction().setNontransactionalRead(true);
-		
+
 		int num_DomainObject = 0;
 		int num_Person =0;
 		int num_Conference =0;
@@ -1494,46 +1458,46 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		int num_Proceedings = 0;
 		int num_Publisher = 0;
 		int num_Series = 0;
-		
+
 		long start, stop;
 		start = System.nanoTime();
 
 		Extent<DomainObject> ext = pm.getExtent(DomainObject.class);
-        for (DomainObject domainobj: ext) {
-        	num_DomainObject++;
-        	if ( domainobj instanceof Person ){
-        		num_Person++;
-        	}
-        	else if ( domainobj instanceof Conference ){
-        		num_Conference++;
-        	}
-        	else if ( domainobj instanceof ConferenceEdition ){
-        		num_ConferenceEdition++;
-        	}
-        	else if ( domainobj instanceof  Publication){
-        		num_Publications++;
-        		Publication publ = (Publication) domainobj;
-        		if ( publ instanceof InProceedings){
-            		num_InProceedings++;
-            	}
-        		else if ( publ instanceof Proceedings){
-            		num_Proceedings++;
-            	}
-        	}
-        	
-        	else if ( domainobj instanceof Publisher ){
-        		num_Publisher++;
-        	}
-        	else if ( domainobj instanceof  Series){
-        		num_Series++;
-        	}
-        	
-        }
-        ext.closeAll();
+		for (DomainObject domainobj: ext) {
+			num_DomainObject++;
+			if ( domainobj instanceof Person ){
+				num_Person++;
+			}
+			else if ( domainobj instanceof Conference ){
+				num_Conference++;
+			}
+			else if ( domainobj instanceof ConferenceEdition ){
+				num_ConferenceEdition++;
+			}
+			else if ( domainobj instanceof  Publication){
+				num_Publications++;
+				Publication publ = (Publication) domainobj;
+				if ( publ instanceof InProceedings){
+					num_InProceedings++;
+				}
+				else if ( publ instanceof Proceedings){
+					num_Proceedings++;
+				}
+			}
+
+			else if ( domainobj instanceof Publisher ){
+				num_Publisher++;
+			}
+			else if ( domainobj instanceof  Series){
+				num_Series++;
+			}
+
+		}
+		ext.closeAll();
 		stop = System.nanoTime();
 		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
 
-	
+
 
 		String Output ="<br>";
 		Output += "Number of DomainObject: " +num_DomainObject+"<br>";
@@ -1547,24 +1511,24 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 		Output += "Number of Series: " +num_Series+"<br>";
 
 
-		
+
 		return Output;
 	}
 
-	public List<DivIO> publishers_whose_authors_in_interval(int y1, int y2) {
+	public List<DivIO> IO_publishers_whose_authors_in_interval(int y1, int y2) {
 		pm.currentTransaction().setNontransactionalRead(true);
-		
+
 		Set<Publisher> publisher = new HashSet<Publisher>();
 		List<DivIO> return_list = new ArrayList<DivIO>();
-	
+
 		/**
 		 * is not faster
 		 * Query is not faster to get all inproceedings in the interval...
 		 */
-		
-		
+
+
 		/*
-		
+
 		long start,stop;
 		//start = System.nanoTime();
 		Query q = pm.newQuery (InProceedings.class, ":y1<= this.year && this.year <= :y2");
@@ -1590,8 +1554,8 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				e.printStackTrace();
 			}
 		}
-		*/
-		
+		 */
+
 		/*
 		Extent<InProceedings> ext = pm.getExtent(InProceedings.class);
 		for (InProceedings inproc: ext) {
@@ -1604,7 +1568,7 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 						System.out.println("publisher is null....");
 					}
 					publisher.add(inproc.getProceedings().getPublisher());
-					
+
 					//if(publisher.add(inproc.getProceedings().getPublisher())){
 						//System.out.println("das fehlte");
 				//	}
@@ -1615,8 +1579,8 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 			}
 		}
 		ext.closeAll();*/
-		
-		
+
+
 		//alternative
 		Extent<Proceedings> ext = pm.getExtent(Proceedings.class);
 		for (Proceedings proc: ext) {
@@ -1630,16 +1594,16 @@ DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Pu
 				e.printStackTrace();
 			}
 		}
-	
+
 		ext.closeAll();
-		
-		
+
+
 		for (Publisher publi: publisher){
-			
+
 			return_list.add(fill_DivIO(publi));
 		}
 		return_list.sort(compareDivIO_Publisher_name);
-	
+
 
 		return return_list;
 	}

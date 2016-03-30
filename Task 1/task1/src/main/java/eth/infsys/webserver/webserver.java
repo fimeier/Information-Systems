@@ -2,14 +2,11 @@ package eth.infsys.webserver;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,38 +15,48 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import eth.infsys.group1.dbspec.*;
-
+import eth.infsys.group1.dbspec.DBProvider;
+import eth.infsys.group1.dbspec.DivIO;
+import eth.infsys.group1.dbspec.PublicationIO;
+import eth.infsys.group1.dbspec.WebFunc;
 import eth.infsys.group1.task1.T1DBProvider;
-import eth.infsys.group1.xmlparser.DivIO;
-import eth.infsys.group1.xmlparser.PublicationIO;
+import eth.infsys.group1.task2.T2DBProvider;
 import javafx.util.Pair;
 
+@SuppressWarnings("restriction")
 public class webserver {
 
-	static private T1DBProvider myDB;
+	static private DBProvider myDB;
 	static private HttpServer server;
 	public static void main(String[] args) throws Exception {
-		//Choose DB
-		//String dbName = "Project1_ZooDB_new.zdb";
-		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
-		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
+		//Choose DBProvider and DB
+		
+		/**
+		 * Task 1 - ZooDB
+		 * 
+		 *
+		 *
+		 */
+		//String dbName = "Project1_empty.zdb"; //AssesmentTask1.xml
+		String dbName = "Project1_test.zdb"; //big db inkl Ass.data
+		myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
 		
 		
-		//String dbName = "Project1_4mil.zdb";
+		/**
+		 * Task 1 - MongoDB
+		 * 
+		 *
+		 *
+		 */
+		//String dbMongoName = "mongoDBtest";
+		//myDB = new T2DBProvider(dbMongoName, DBProvider.OPEN_DB_APPEND);
+	
 		
 		
-		//AssesmentTask1.xml
-		//String dbName = "Project1_empty.zdb";
 
-		
-		//big db inkl Ass.data
-		String dbName = "Project1_test.zdb";
 
 
 
-		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
-		myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
 
 
 		server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -146,7 +153,7 @@ public class webserver {
 		String func = args.get("func");
 		String order_by = ""; //default order
 
-		String key ="";
+//		String key ="";
 
 
 		WebFunc wf = WebFunc.fromString(func);
@@ -563,7 +570,7 @@ public class webserver {
 
 		}
 
-		List<DivIO> publishers = myDB.publishers_whose_authors_in_interval(y1, y2);
+		List<DivIO> publishers = myDB.IO_publishers_whose_authors_in_interval(y1, y2);
 		for (DivIO publi: publishers){
 			Output += publi.get_all() + "<br><br>";
 		} 
@@ -572,7 +579,7 @@ public class webserver {
 
 	private static String get_statistics() {
 		String Output ="";
-		Output = myDB.get_statistics();
+		Output = myDB.IO_get_statistics();
 		return Output;
 	}
 

@@ -3,9 +3,8 @@ package eth.infsys.group1.task1.dbobjs;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import eth.infsys.group1.xmlparser.InProceedings_simple_input;
+import eth.infsys.group1.dbspec.InProceedings_simple_input;
 
 public class InProceedings extends Publication {
 	

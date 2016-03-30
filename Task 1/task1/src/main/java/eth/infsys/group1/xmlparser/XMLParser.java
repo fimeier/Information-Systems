@@ -16,8 +16,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import eth.infsys.group1.dbspec.DBProvider;
+import eth.infsys.group1.dbspec.InProceedings_simple_input;
+import eth.infsys.group1.dbspec.Proceedings_simple_input;
 import javafx.util.Pair;
 
+@SuppressWarnings("restriction")
 public final class XMLParser<TRProceedings> {
 
 	private static String[] noContents = new String[0];
@@ -44,9 +47,12 @@ public final class XMLParser<TRProceedings> {
 	private HashMap<String, Pair<String,Integer>> confEditions = new HashMap<>();
 
 
-	private DBProvider<?, ?, ?, ?, TRProceedings, ?, ?, ?> dbProvider;
+	//private DBProvider<?, ?, ?, ?, TRProceedings, ?, ?, ?> dbProvider;
+	private DBProvider dbProvider;
 
-	public XMLParser(DBProvider<?, ?, ?, ?, TRProceedings, ?, ?, ?> dbProvider) {
+
+	//public XMLParser(DBProvider<?, ?, ?, ?, TRProceedings, ?, ?, ?> dbProvider) {
+	public XMLParser(DBProvider dbProvider) {
 		this.dbProvider = dbProvider;
 	}
 

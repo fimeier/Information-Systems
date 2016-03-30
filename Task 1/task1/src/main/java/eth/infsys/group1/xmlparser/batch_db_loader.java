@@ -7,12 +7,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import eth.infsys.group1.dbspec.QueryParameter;
-import eth.infsys.group1.dbspec.WebFunc;
 import eth.infsys.group1.task1.T1DBProvider;
-import eth.infsys.group1.task1.dbobjs.InProceedings;
 import eth.infsys.group1.task1.dbobjs.Proceedings;
-import eth.infsys.group1.task1.dbobjs.Publisher;
 
 public class batch_db_loader {
 
@@ -64,48 +60,7 @@ public class batch_db_loader {
 		myParser.parseXMLFile(file);
 	}
 
-	private static void queries(T1DBProvider myDB) {
-		System.out.println("Task 1: ....");
-		
-		InProceedings inproc;
-		InProceedings inproc2;
-		long start, stop;
-		long start2, stop2;
-		
 
-		//myDB.tr_begin();
-		//myDB.tr_commit();
-
-		String id;
-		PublicationIO publ;
-		/*
-		System.out.print("-----------------------------\n");
-		id = "conf/isola/PodpecanZL10";	
-		publ = myDB.IO_get_publication_by_id(id);
-		publ.print_all();
-		
-		System.out.print("-----------------------------\n");
-		id = "conf/isola/Zimmermann04a";	
-		publ = myDB.IO_get_publication_by_id(id);
-		publ.print_all();
-		
-		String s = "SORT_BY_TITLE";
-		
-		QueryParameter qp = QueryParameter.fromString(s);
-		System.out.print(qp.db_query);
-		
-*/
-
-	}
-	
-	
-	
-	
-	/**
-	 * IO-Helper-Methods
-	 */
-	
-	
 	
 	
 	

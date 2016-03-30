@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import eth.infsys.group1.xmlparser.Proceedings_simple_input;
+import eth.infsys.group1.dbspec.Proceedings_simple_input;
 
 public class Proceedings extends Publication {
 

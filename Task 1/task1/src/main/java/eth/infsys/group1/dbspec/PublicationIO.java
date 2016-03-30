@@ -1,11 +1,11 @@
-package eth.infsys.group1.xmlparser;
+package eth.infsys.group1.dbspec;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eth.infsys.group1.task1.dbobjs.Conference;
 import javafx.util.Pair;
 
+@SuppressWarnings("restriction")
 public class PublicationIO {
 
 	//type
@@ -37,8 +37,8 @@ public class PublicationIO {
 	public List<Pair<String,String>> inproceedings_title_id = new ArrayList<>();
 	
 	//conference
-	public Pair<String,String> Conference_name_id = new Pair("","");
-	public Pair<Integer,String> ConferenceEdition_year_id = new Pair(0,"");
+	public Pair<String,String> Conference_name_id = new Pair<String, String>("","");
+	public Pair<Integer,String> ConferenceEdition_year_id = new Pair<Integer, String>(0,"");
 	
 
 	//inproceedings

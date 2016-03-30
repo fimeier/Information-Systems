@@ -1,10 +1,11 @@
-package eth.infsys.group1.xmlparser;
+package eth.infsys.group1.dbspec;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javafx.util.Pair;
 
+@SuppressWarnings("restriction")
 public class DivIO {
 	//type
 	public Boolean is_empty = false;

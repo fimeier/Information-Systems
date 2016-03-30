@@ -1,4 +1,4 @@
-package eth.infsys.group1.xmlparser;
+package eth.infsys.group1.dbspec;
 
 public class InProceedings_simple_input {
 	
