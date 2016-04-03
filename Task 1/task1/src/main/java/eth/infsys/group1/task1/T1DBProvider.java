@@ -614,41 +614,6 @@ public class T1DBProvider extends DBProvider {
 	 * IO-methods: helper
 	 */
 
-	private Comparator<Pair<String, String>> comparePairTitleId = new Comparator<Pair<String,String>>() {
-		@Override
-		public int compare(Pair<String, String> o1, Pair<String, String> o2) {
-			return o1.getKey().compareTo(o2.getKey());
-			//					int cmp = o1.getKey().compareTo(o2.getKey());
-			//					if (cmp==0) {
-			//						return o1.getValue().compareTo(o2.getValue());
-			//					}
-			//					return 0;
-		}
-	};
-
-	private Comparator<Pair<Integer, String>> comparePairYearId = new Comparator<Pair<Integer,String>>() {
-		@Override
-		public int compare(Pair<Integer, String> o1, Pair<Integer, String> o2) {
-			return o1.getKey().compareTo(o2.getKey());
-		}
-	};
-
-	private Comparator<DivIO> compareDivIO_Person_name = new Comparator<DivIO>() {
-		@Override
-		public int compare(DivIO o1, DivIO o2) {
-			return o1.Person_name.compareTo(o2.Person_name);
-		}
-	};
-
-	private Comparator<DivIO> compareDivIO_Publisher_name = new Comparator<DivIO>() {
-		@Override
-		public int compare(DivIO o1, DivIO o2) {
-			if (o1.Publisher_name==null || o2.Publisher_name==null){
-				System.out.println("ERROR: compareDivIO_Publisher_name...");
-			}
-			return o1.Publisher_name.compareTo(o2.Publisher_name);
-		}
-	};
 
 	private Comparator<Person> compare_Person_name = new Comparator<Person>() {
 		@Override
@@ -769,8 +734,7 @@ public class T1DBProvider extends DBProvider {
 			}
 			publication.note = inproc.getNote();
 			publication.pages = inproc.getPages();
-			publication.proceeding_title = inproc.getProceedings().getTitle();
-			publication.proceeding_id = inproc.getProceedings().getId();
+			
 
 		}
 		return publication;

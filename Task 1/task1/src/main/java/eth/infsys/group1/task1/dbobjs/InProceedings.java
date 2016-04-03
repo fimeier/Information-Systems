@@ -27,12 +27,12 @@ public class InProceedings extends Publication {
     		p.addAuthoredPublications(this);
     	}
     	
-    	if (note != null){
+    	if (args.note != null){
 			this.note = args.note;}
 		else {
 			this.note = "";}
     	
-    	if (pages != null){
+    	if (args.pages != null){
     		this.pages = args.pages;}
 		else {
 			this.pages = "";}

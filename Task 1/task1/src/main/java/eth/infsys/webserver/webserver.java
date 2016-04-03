@@ -38,24 +38,22 @@ public class webserver {
 		 *
 		 */
 		//String dbName = "Project1_empty.zdb"; //AssesmentTask1.xml
-		String dbName = "Project1_test.zdb"; //big db inkl Ass.data
-		myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
+		//String dbName = "Project1_test.zdb"; //big db inkl Ass.data
+		//String dbName = "Project1_empty546.zdb";
+		//myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
 		
 		
 		/**
-		 * Task 1 - MongoDB
+		 * Task 2 - MongoDB
 		 * 
 		 *
 		 *
 		 */
-		//String dbMongoName = "mongoDBtest";
-		//myDB = new T2DBProvider(dbMongoName, DBProvider.OPEN_DB_APPEND);
+		String MongodbName ="myDBLP";		
+		myDB = (T2DBProvider) new T2DBProvider(MongodbName, DBProvider.OPEN_DB_APPEND);
 	
 		
 		
-
-
-
 
 
 
@@ -743,8 +741,7 @@ public class webserver {
 	}
 
 	private static String person_by_id(String id) {
-		String idtemp = id;
-		DivIO pers = myDB.IO_get_person_by_id(idtemp);
+		DivIO pers = myDB.IO_get_person_by_id(id);
 
 		String output = pers.get_all();
 		return output;
@@ -763,8 +760,12 @@ public class webserver {
 	}
 
 	private static String confEd_by_id(String id) {
-		DivIO confEd = myDB.IO_get_confEd_by_id(id);
+		//DivIO confEd = myDB.IO_get_confEd_by_id(id);
+		int id_length = id.length();
+		String Conference_id = id.substring(0, id_length-4);
+		int year = Integer.valueOf(id.substring(id_length-4));
 
+		DivIO confEd = ((T2DBProvider) myDB).IO_get_conferenceEdition_by_year(Conference_id,year);
 		String output = confEd.get_all();
 		return output;
 	}
@@ -917,15 +918,28 @@ public class webserver {
 		return "</body></html>";
 	}
 
-	//private static String inproceeding_by_id(String id, QueryParameter sort_by) {
 	private static String inproceeding_by_id(String id) {
-		PublicationIO publ = myDB.IO_get_publication_by_id(id);
+		PublicationIO publ = null;
+		if (myDB instanceof T1DBProvider){
+			 publ = myDB.IO_get_publication_by_id(id);
+		}
+		if (myDB instanceof T2DBProvider){
+			publ = ((T2DBProvider) myDB).IO_get_inproceedings_by_id(id);
+		}
+		
 		String output = publ.get_all();
 		return output;
 	}
 
 	private static String proceeding_by_id(String id) {
-		PublicationIO publ = myDB.IO_get_publication_by_id(id);
+		PublicationIO publ = null;
+		if (myDB instanceof T1DBProvider){
+			 publ = myDB.IO_get_publication_by_id(id);
+		}
+		if (myDB instanceof T2DBProvider){
+			publ = ((T2DBProvider) myDB).IO_get_proceedings_by_id(id);
+		}
+		
 		String output = publ.get_all();
 		return output;
 	}

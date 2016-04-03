@@ -24,7 +24,12 @@
     <dependency>
     	<groupId>org.zoodb</groupId>
     	<artifactId>zoodb</artifactId>
-    	<version>0.4.7</version>
+    	<version>0.4.8</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.mongodb</groupId>
+    	<artifactId>mongodb-driver</artifactId>
+    	<version>3.2.2</version>
     </dependency>
   </dependencies>
 </project>

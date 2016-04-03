@@ -1,7 +1,10 @@
 package eth.infsys.group1.dbspec;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
+import javafx.util.Pair;
 
 public abstract class DBProvider {
 
@@ -67,6 +70,51 @@ public abstract class DBProvider {
 	
 	
 	/**
+	 * IO-Methods: helper
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+
+	protected Comparator<Pair<String, String>> comparePairTitleId = new Comparator<Pair<String,String>>() {
+		@Override
+		public int compare(Pair<String, String> o1, Pair<String, String> o2) {
+			return o1.getKey().compareTo(o2.getKey());
+			//					int cmp = o1.getKey().compareTo(o2.getKey());
+			//					if (cmp==0) {
+			//						return o1.getValue().compareTo(o2.getValue());
+			//					}
+			//					return 0;
+		}
+	};
+
+	protected Comparator<Pair<Integer, String>> comparePairYearId = new Comparator<Pair<Integer,String>>() {
+		@Override
+		public int compare(Pair<Integer, String> o1, Pair<Integer, String> o2) {
+			return o1.getKey().compareTo(o2.getKey());
+		}
+	};
+
+	protected Comparator<DivIO> compareDivIO_Person_name = new Comparator<DivIO>() {
+		@Override
+		public int compare(DivIO o1, DivIO o2) {
+			return o1.Person_name.compareTo(o2.Person_name);
+		}
+	};
+
+	protected Comparator<DivIO> compareDivIO_Publisher_name = new Comparator<DivIO>() {
+		@Override
+		public int compare(DivIO o1, DivIO o2) {
+			if (o1.Publisher_name==null || o2.Publisher_name==null){
+				System.out.println("ERROR: compareDivIO_Publisher_name...");
+			}
+			return o1.Publisher_name.compareTo(o2.Publisher_name);
+		}
+	};
+	
+	
+	/**
 	 * IO-Methods
 	 * 
 	 * 
@@ -80,7 +128,7 @@ public abstract class DBProvider {
 	 */
 	
 	/**
-	 * Statistics about the DB (#-Objects of eacht type...)
+	 * Statistics about the DB (#-Objects of each type...)
 	 * @return some html
 	 */
 	public abstract String IO_get_statistics();
@@ -114,6 +162,15 @@ public abstract class DBProvider {
 	public abstract List<PublicationIO> IO_person_is_last_author(String pers_id);
 	public abstract List<PublicationIO> IO_publ_by_person_name_or_id(HashMap<String, String> args);
 	public abstract List<DivIO> IO_publishers_whose_authors_in_interval(int y1, int y2);
+	
+	
+	/**
+	 * dummy implementation
+	 * @param id
+	 * @return
+	 */
+	//public abstract PublicationIO IO_get_inproceedings_by_id(String id)
+	
 
 
 

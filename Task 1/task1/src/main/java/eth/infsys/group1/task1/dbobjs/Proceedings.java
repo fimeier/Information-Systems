@@ -37,7 +37,7 @@ public class Proceedings extends Publication {
 			p.addEditedPublications(this);
 		}
 
-		if (note != null){
+		if (args.note != null){
 			this.note = args.note;}
 		else {
 			this.note = "";}
@@ -47,12 +47,12 @@ public class Proceedings extends Publication {
 		this.publisher = publ;
 		publ.addPublication(this);
 
-		if (volume != null){
+		if (args.volume != null){
 			this.volume = args.volume;}
 		else {
 			this.volume = "";}
 		
-		if (isbn != null){
+		if (args.isbn != null){
 			this.isbn = args.isbn;}
 		else {
 			this.isbn = "";}

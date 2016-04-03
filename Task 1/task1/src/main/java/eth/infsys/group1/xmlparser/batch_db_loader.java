@@ -22,7 +22,7 @@ public class batch_db_loader {
 		
 
 		//AssesmentTask1.xml
-		String dbName = "Project1_empty.zdb";
+		String dbName = "Project1_empty546.zdb";
 
 
 		//big db inkl Ass.data
@@ -30,8 +30,8 @@ public class batch_db_loader {
 
 
 
-		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
-		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
+		//T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_APPEND);
+		T1DBProvider myDB = new T1DBProvider(dbName, T1DBProvider.OPEN_DB_OVERRIDE);
 		
 		//!!!!!!!change override
 

@@ -13,6 +13,7 @@ public abstract class Publication extends DomainObject {
 	protected Publication() { }
 
 	public Publication(String title, int year, String electronicEdition) {
+		//title is always present
 		if (title != null){
 			this.title = title;}
 		else {

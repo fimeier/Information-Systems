@@ -3,6 +3,11 @@ package eth.infsys.group1.dbspec;
 import java.util.ArrayList;
 import java.util.List;
 
+import eth.infsys.group1.task1.dbobjs.Conference;
+import eth.infsys.group1.task1.dbobjs.ConferenceEdition;
+import eth.infsys.group1.task1.dbobjs.Person;
+import eth.infsys.group1.task1.dbobjs.Publisher;
+import eth.infsys.group1.task1.dbobjs.Series;
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
@@ -39,6 +44,13 @@ public class PublicationIO {
 	//conference
 	public Pair<String,String> Conference_name_id = new Pair<String, String>("","");
 	public Pair<Integer,String> ConferenceEdition_year_id = new Pair<Integer, String>(0,"");
+	
+	//conference new
+	public String Conference_name = "";
+	public String Conference_id = "";
+	public int ConferenceEdition_year = 0;
+	public String ConferenceEdition_id = "";
+
 	
 
 	//inproceedings
@@ -132,14 +144,120 @@ public class PublicationIO {
 			ret += "pages: " + pages +"<br>";
 			//ret += "proceeding-title: " + proceeding_title +"<br>";			
 			//ret += "proceeding-id: <a href=/test/?func=proceeding_by_id&key=" + proceeding_id +">" + proceeding_id + "</a><br>";
-			ret += "Proceeding: "+ proceeding_title + " (<a href='/test/?func=inproceeding_by_id&key=" + proceeding_id + "'>"+proceeding_id+"</a>)<br>";
-
-
-
+			ret += "Proceeding: "+ proceeding_title + " (<a href='/test/?func=proceeding_by_id&key=" + proceeding_id + "'>"+proceeding_id+"</a>)<br>";
 
 		}
 		
 		return ret;
-	}		
+	}
+	public PublicationIO(){};
+	
+	public PublicationIO(Proceedings_simple_input input){
+		//type
+		this.is_a_proceeding = true;
+		
+		//object key/id
+		this.id = input.id;
+		
+		//publication
+		this.title= input.title;
+		this.year = input.year;
+		
+		this.electronicEdition= input.electronicEdition;
+		if (input.electronicEdition != null){
+			this.electronicEdition= input.electronicEdition;}
+		else {
+			this.electronicEdition = "";}
+		
+		//Editors
+		for (String editor: input.editors){
+			String name = editor;
+			String id = Person.calculate_person_id(editor);
+			this.editors_name_id.add(new Pair<String, String>(name, id));
+		}
+
+		if (input.note != null){
+			this.note = input.note;}
+		else {
+			this.note = "";}
+		
+		this.number = input.number;
+
+		if (input.publisher != null){
+			this.publisher_name = input.publisher;
+			this.publisher_id = Publisher.calculate_publisher_id(this.publisher_name);
+		}
+		else {
+			this.publisher_name = "null";
+			this.publisher_id = Publisher.calculate_publisher_id("null");
+		}
+		
+		if (input.volume != null){
+			this.volume = input.volume;}
+		else {
+			this.volume = "";}
+		
+		if (input.isbn != null){
+			this.isbn = input.isbn;}
+		else {
+			this.isbn = "";}
+
+		if (input.series!=null){
+			this.series_name = input.series;
+			this.series_id = Series.calculate_series_id(this.series_name);
+		}
+		else {
+			this.series_name = "null";
+			this.series_id = Series.calculate_series_id("null");
+		}
+
+		
+		//inproceedings_title_id = new ArrayList<>();
+		
+		//conference
+		this.Conference_name = input.conferenceName;
+		this.Conference_id = Conference.calculate_conference_id(input.conferenceName);
+		this.ConferenceEdition_year = input.conferenceEdition;
+		this.ConferenceEdition_id = ConferenceEdition.calculate_conferenceEdition_id(input.conferenceName, input.conferenceEdition);
+
+		
+	}
+	public PublicationIO(InProceedings_simple_input input){
+		//type
+		this.is_an_inproceeding = true;
+
+		//object key/id
+		this.id = input.id;
+
+		//publication
+		this.title= input.title;
+		this.year = input.year;
+
+		this.electronicEdition= input.electronicEdition;
+		if (input.electronicEdition != null){
+			this.electronicEdition= input.electronicEdition;}
+		else {
+			this.electronicEdition = "";}
+
+		//Authors
+		for (String author: input.authors){
+			String name = author;
+			String id = Person.calculate_person_id(author);
+			this.authors_name_id.add(new Pair<String, String>(name, id));
+		}
+
+		if (input.note != null){
+			this.note = input.note;}
+		else {
+			this.note = "";}
+		
+
+		if (input.pages != null){
+			this.pages = input.pages;}
+		else {
+			this.pages = "";}
+		
+		this.proceeding_id = input.crossref;
+	}
 	
 }

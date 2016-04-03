@@ -1,0 +1,20 @@
+
+
+
+if (r.readBsonType() == BsonType.END_OF_DOCUMENT){
+	r.readEndDocument();
+}
+
+if (r.readBsonType() != BsonType.END_OF_DOCUMENT){
+					current_name = r.readName();
+}
+else {
+r.readEndDocument();
+	}
+
+
+
+
+String current_name = r.readName();
+current_name = r.readName();
+
