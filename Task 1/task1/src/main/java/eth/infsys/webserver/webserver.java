@@ -24,46 +24,38 @@ import eth.infsys.group1.task2.T2DBProvider;
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
-public class webserver {
+public class Webserver {
 
-	static private DBProvider myDB;
-	static private HttpServer server;
-	public static void main(String[] args) throws Exception {
-		//Choose DBProvider and DB
-		
-		/**
-		 * Task 1 - ZooDB
-		 * 
-		 *
-		 *
-		 */
-		//String dbName = "Project1_empty.zdb"; //AssesmentTask1.xml
-		//String dbName = "Project1_test.zdb"; //big db inkl Ass.data
-		//String dbName = "Project1_empty546.zdb";
-		//myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
-		
-		
-		/**
-		 * Task 2 - MongoDB
-		 * 
-		 *
-		 *
-		 */
-		String MongodbName ="myDBLP";		
-		myDB = (T2DBProvider) new T2DBProvider(MongodbName, DBProvider.OPEN_DB_APPEND);
-	
-		
-		
+	private Boolean zooDB_implementation = false;
+	private Boolean MongoDB_implementation = false;
+	private String DB_Implementation="";
+
+	private DBProvider myDB;
+	private HttpServer server;
 
 
+	public Webserver(int Port, String DB_Implementation, String dbName) throws IOException {
 
-		server = HttpServer.create(new InetSocketAddress(8000), 0);
+		if ("zooDB".equals(DB_Implementation)){
+			myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
+			zooDB_implementation = true;
+			this.DB_Implementation = DB_Implementation;
+
+		}
+		else if ("MongoDB".equals(DB_Implementation)){
+			myDB = (T2DBProvider) new T2DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
+			MongoDB_implementation = true;
+			this.DB_Implementation = DB_Implementation;
+		}
+
+
+		server = HttpServer.create(new InetSocketAddress(Port), 0);
 		server.createContext("/test", new MyHandler());
 		server.setExecutor(null); // creates a default executor
 		server.start();
 	}
 
-	static class MyHandler implements HttpHandler {
+	class MyHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
 			System.out.println("user_input : "+t.getRequestURI().getQuery());
@@ -78,6 +70,7 @@ public class webserver {
 			}
 			catch(Exception e) {
 				e.printStackTrace();
+				response = backend("func=MAIN");
 			}
 
 			System.out.println("returned from backend...\n");
@@ -140,7 +133,7 @@ public class webserver {
 		return args_out;
 	}
 
-	static private String backend(String user_input) {
+	private String backend(String user_input) {
 		System.out.println("bin im backend...");
 		System.out.println("call get args...");
 		HashMap<String,String> args = get_args(user_input);
@@ -151,7 +144,7 @@ public class webserver {
 		String func = args.get("func");
 		String order_by = ""; //default order
 
-//		String key ="";
+		//		String key ="";
 
 
 		WebFunc wf = WebFunc.fromString(func);
@@ -175,7 +168,13 @@ public class webserver {
 			}
 			else {				
 				output += create_header(wf);
-				String filter = "title.toLowerCase().contains('"+args.get("title").toLowerCase()+"')";
+				String filter = "";
+				if (zooDB_implementation){
+					filter = "title.toLowerCase().contains('"+args.get("title").toLowerCase()+"')";
+				}
+				if (MongoDB_implementation){
+					filter = args.get("title");
+				}
 				output += pupl_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -251,7 +250,13 @@ public class webserver {
 			}
 			else {				
 				output += create_header(wf);
-				String filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				String filter = "";
+				if (zooDB_implementation){
+					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				}
+				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
 				output += person_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -298,7 +303,13 @@ public class webserver {
 			}
 			else {				
 				output += create_header(wf);
-				String filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				String filter = "";
+				if (zooDB_implementation){
+					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				}
+				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
 				output += publisher_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -334,7 +345,13 @@ public class webserver {
 			}
 			else {				
 				output += create_header(wf);
-				String filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				String filter = "";
+				if (zooDB_implementation){
+					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				}
+				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
 				output += series_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -391,7 +408,13 @@ public class webserver {
 			}
 			else {				
 				output += create_header(wf);
-				String filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				String filter = "";
+				if (zooDB_implementation){
+					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
+				}
+				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
 				output += conference_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -429,7 +452,7 @@ public class webserver {
 			output += avg_authors_per_inproceedings();
 			output += create_footer(wf);
 			break;
-			
+
 		case count_publications_per_interval:
 			if ( !args.containsKey("year1") || !args.containsKey("year2")){
 				output += create_header(wf);
@@ -455,7 +478,7 @@ public class webserver {
 			output += inproceedings_for_a_conference(args.get("id"), args.get("mode"));
 			output += create_footer(wf);
 			break;
-			
+
 		case authors_editors_for_a_conference:
 			if ( !args.containsKey("id")||!args.containsKey("mode") ){
 				output += create_header(wf);
@@ -485,7 +508,7 @@ public class webserver {
 			output += person_is_last_author(args.get("id"));
 			output += create_footer(wf);
 			break;
-			
+
 		case publishers_whose_authors_in_interval:
 			if ( !args.containsKey("year1") || !args.containsKey("year2")){
 				output += create_header(wf);
@@ -546,7 +569,7 @@ public class webserver {
 	}
 
 
-	private static String publishers_whose_authors_in_interval(String year1, String year2) {
+	private String publishers_whose_authors_in_interval(String year1, String year2) {
 		String Output ="";
 		int y1, y2;
 		try {
@@ -575,15 +598,15 @@ public class webserver {
 		return Output;
 	}
 
-	private static String get_statistics() {
+	private String get_statistics() {
 		String Output ="";
 		Output = myDB.IO_get_statistics();
 		return Output;
 	}
 
-	private static String person_is_last_author(String pers_id) {
+	private String person_is_last_author(String pers_id) {
 		String Output = "<br>Author with id="+pers_id+" is the last author in the following inproceedings:<br><br>";
-		
+
 		List<PublicationIO> publs = myDB.IO_person_is_last_author(pers_id);
 		if (publs.isEmpty()){
 			Output += "no publications found..";
@@ -596,13 +619,13 @@ public class webserver {
 		return Output;
 	}
 
-	private static String person_is_author_and_editor() {
+	private String person_is_author_and_editor() {
 		String Output="";
 		Output += myDB.IO_person_is_author_and_editor();
 		return Output;
 	}
 
-	private static String authors_editors_for_a_conference(String conf_id, String mode) {
+	private String authors_editors_for_a_conference(String conf_id, String mode) {
 		String Output ="";
 		if (mode.equals("retrieve")|| mode.equals("count")){
 			Output += myDB.IO_authors_editors_for_a_conference(conf_id, mode);
@@ -614,7 +637,7 @@ public class webserver {
 		}
 	}
 
-	private static String inproceedings_for_a_conference(String conf_id, String mode) {
+	private String inproceedings_for_a_conference(String conf_id, String mode) {
 		String Output ="";
 		if (mode.equals("retrieve")|| mode.equals("count")){
 			Output ="";
@@ -627,13 +650,13 @@ public class webserver {
 		}
 	}
 
-	private static String count_publications_per_interval(String year1, String year2) {
+	private String count_publications_per_interval(String year1, String year2) {
 		String Output ="";
 		int y1, y2;
 		try {
 			y1 = Integer.valueOf(year1);
 			y2 = Integer.valueOf(year2);
-			
+
 			if (y2<y1){
 				Output += "<br>wrong intervall";
 				return Output;
@@ -643,33 +666,33 @@ public class webserver {
 			e.printStackTrace();
 			y1 = 0;
 			y2 = 0;
-			
+
 			Output += "<br>wrong intervall";
 			return Output;
-		
+
 		}
-		
+
 		Output += myDB.IO_count_publications_per_interval(y1, y2);
-		
+
 		return Output;
 	}
 
 
-	private static String avg_authors_per_inproceedings() {
+	private String avg_authors_per_inproceedings() {
 		String output = "";
 		output = myDB.IO_avg_authors_per_inproceedings();
 
 		return output;
 	}
 
-	private static String find_author_distance_path(String name1, String name2) {
+	private String find_author_distance_path(String name1, String name2) {
 		String output = "";
 		output += myDB.IO_find_author_distance_path(name1, name2);
 
 		return output;
 	}
 
-	private static String series_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+	private String series_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
 		int boff, eoff;
 		try {
 			boff = Integer.valueOf(beginoffset);
@@ -692,14 +715,14 @@ public class webserver {
 		return Output;
 	}
 
-	private static String series_by_id(String series_id) {
+	private String series_by_id(String series_id) {
 		DivIO series = myDB.IO_get_series_by_id(series_id);
 
 		String output = series.get_all();
 		return output;
 	}
 
-	private static String publisher_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+	private String publisher_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
 		int boff, eoff;
 		try {
 			boff = Integer.valueOf(beginoffset);
@@ -722,55 +745,68 @@ public class webserver {
 		return Output;
 	}
 
-	private static String publisher_by_id(String publ_id) {
+	private String publisher_by_id(String publ_id) {
 		DivIO publisher = myDB.IO_get_publisher_by_id(publ_id);
 
 		String output = publisher.get_all();
 		return output;
 	}
 
-	private static String find_co_authors(String name) {
-		String output = "The co-authors (and their publications) of <b>"+name+" are:</b><br><br>";
+	private String find_co_authors(String name) {
+		String output = "";
+
+		if (zooDB_implementation){
+			output += "The co-authors (and their publications) of <b>"+name+"</b> are:<br><br>";
+
+			List<DivIO> persons = myDB.IO_find_co_authors(name);
+			for (DivIO person: persons){
+				output += person.get_all() + "<br><br>";
+			} 		
+		}
+		if (MongoDB_implementation){
+			output = "The co-authors and <font color='red'>the common publications</font> with <b>"+name+"</b> are:<br><br>";
+			
+			output += myDB.IO_find_co_authors_returns_String(name);
+		}
 		
-		List<DivIO> persons = myDB.IO_find_co_authors(name);
-		for (DivIO person: persons){
-			output += person.get_all() + "<br><br>";
-		} 
+		
 
 		return output;
 	}
 
-	private static String person_by_id(String id) {
+	private  String person_by_id(String id) {
 		DivIO pers = myDB.IO_get_person_by_id(id);
 
 		String output = pers.get_all();
 		return output;
 	}
-	private static String delete_person_by_id(String id) {
+	private String delete_person_by_id(String id) {
 		String output = myDB.IO_delete_get_person_by_id(id);
 
 		return output;
 	}
 
-	private static String conf_by_id(String id) {
+	private String conf_by_id(String id) {
 		DivIO conf = myDB.IO_get_conf_by_id(id);
 
 		String output = conf.get_all();
 		return output;
 	}
 
-	private static String confEd_by_id(String id) {
+	private String confEd_by_id(String id) {
 		//DivIO confEd = myDB.IO_get_confEd_by_id(id);
-		int id_length = id.length();
-		String Conference_id = id.substring(0, id_length-4);
-		int year = Integer.valueOf(id.substring(id_length-4));
 
-		DivIO confEd = ((T2DBProvider) myDB).IO_get_conferenceEdition_by_year(Conference_id,year);
+		//int id_length = id.length();
+		//String Conference_id = id.substring(0, id_length-4);
+		//int year = Integer.valueOf(id.substring(id_length-4));
+
+		//DivIO confEd = ((T2DBProvider) myDB).IO_get_conferenceEdition_by_year(Conference_id,year);
+		DivIO confEd = myDB.IO_get_confEd_by_id(id);
 		String output = confEd.get_all();
 		return output;
 	}
 
-	private static String conference_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+	private String conference_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
 		int boff, eoff;
 		try {
 			boff = Integer.valueOf(beginoffset);
@@ -791,7 +827,7 @@ public class webserver {
 		return Output;
 	}
 
-	private static String person_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+	private String person_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
 		int boff, eoff;
 		try {
 			boff = Integer.valueOf(beginoffset);
@@ -814,9 +850,9 @@ public class webserver {
 		return Output;
 	}
 
-	private static String publ_by_person_name_or_id(HashMap<String, String> args) {
+	private String publ_by_person_name_or_id(HashMap<String, String> args) {
 		String Output = "";//"<br><b>filter</b>="+args+"<br>";
-		
+
 		Output = "<br><br><a href='#first_proc'>go to Proceedings</a>, <a href='#first_inproc'>go to InProceedings</a><br>";
 
 		List<PublicationIO> publs = myDB.IO_publ_by_person_name_or_id(args);
@@ -843,7 +879,7 @@ public class webserver {
 
 	}
 
-	private static String pupl_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
+	private String pupl_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
 		int boff, eoff;
 		try {
 			boff = Integer.valueOf(beginoffset);
@@ -858,19 +894,55 @@ public class webserver {
 		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"<br>";
 
 		List<PublicationIO> publs = myDB.IO_get_publ_by_filter_offset(filter, boff, eoff, order_by);
-		for (PublicationIO publ: publs){
-			Output += publ.get_all() + "<br><br>";
-		} 
+		
+		if (zooDB_implementation){
+			for (PublicationIO publ: publs){
+				Output += publ.get_all() + "<br><br>";
+			} 
+		}
+		if (MongoDB_implementation){
+			Boolean first_proc = false;
+			Boolean first_inproc = false;
+			int proc_count = 0;
+			int inproc_count = 0;
+			String temp_output="";
+			if (publs.isEmpty()){
+				Output += "no publications found..";
+			}
+			else {
+				for (PublicationIO publ: publs){
+					if ( publ.is_a_proceeding){
+						proc_count++;
+						if (first_proc == false){
+							first_proc = true;
+							temp_output += "<h4 id='first_proc'>Proceedings</h4>";
+						}
+					}
+					else if (publ.is_an_inproceeding){
+						inproc_count++;
+						if (first_inproc == false){
+							first_inproc = true;
+							temp_output += "<h4 id='first_inproc'>InProceedings</h4>";
+						}
+					}
+					temp_output += publ.get_all() + "<br><br>";
+				}
+			}
+			Output += "<br><br><a href='#first_proc'>go to Proceedings ("+proc_count+")</a>, <a href='#first_inproc'>go to InProceedings("+inproc_count+")</a><br>";
+			Output += temp_output;
+		}
+
 		return Output;
+
 	}
 
-	public static String get_error(String error_code) {
+	public String get_error(String error_code) {
 		String Output = "<br>" +error_code +"<br>";
 		return Output;
 	}
 
 
-	private static String get_main() {
+	private String get_main() {
 		String path = "../task1/src/main/java/eth/infsys/webserver/index.html";
 		String output = "";
 		try {
@@ -882,7 +954,7 @@ public class webserver {
 		return output;
 	}
 
-	private static String get_page(String name) {
+	private String get_page(String name) {
 		String path = "../task1/src/main/java/eth/infsys/webserver/page_"+name+".html";
 		String output = "";
 		try {
@@ -895,7 +967,7 @@ public class webserver {
 		return output;
 	}
 
-	private static String create_header(WebFunc wf){
+	private String create_header(WebFunc wf){
 		/*switch (wf) {
 		case inproceeding_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
@@ -904,9 +976,9 @@ public class webserver {
 		case publication_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		}*/
-		return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><a href='/test/?func=MAIN'>HOME</a><br>";
+		return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><h1>"+DB_Implementation+"</h1><a href='/test/?func=MAIN'>HOME</a><FORM><INPUT Type='button' VALUE='Back' onClick='history.go(-1);return true;'></FORM><br>";
 	}
-	private static String create_footer(WebFunc wf){
+	private String create_footer(WebFunc wf){
 		/*switch (wf) {
 		case inproceeding_by_id:
 			return "</body></html>";
@@ -918,33 +990,33 @@ public class webserver {
 		return "</body></html>";
 	}
 
-	private static String inproceeding_by_id(String id) {
+	private String inproceeding_by_id(String id) {
 		PublicationIO publ = null;
-		if (myDB instanceof T1DBProvider){
-			 publ = myDB.IO_get_publication_by_id(id);
+		if (zooDB_implementation){
+			publ = myDB.IO_get_publication_by_id(id);
 		}
-		if (myDB instanceof T2DBProvider){
+		if (MongoDB_implementation){
 			publ = ((T2DBProvider) myDB).IO_get_inproceedings_by_id(id);
 		}
-		
+
 		String output = publ.get_all();
 		return output;
 	}
 
-	private static String proceeding_by_id(String id) {
+	private String proceeding_by_id(String id) {
 		PublicationIO publ = null;
-		if (myDB instanceof T1DBProvider){
-			 publ = myDB.IO_get_publication_by_id(id);
+		if (zooDB_implementation){
+			publ = myDB.IO_get_publication_by_id(id);
 		}
-		if (myDB instanceof T2DBProvider){
+		if (MongoDB_implementation){
 			publ = ((T2DBProvider) myDB).IO_get_proceedings_by_id(id);
 		}
-		
+
 		String output = publ.get_all();
 		return output;
 	}
 
-	private static String publication_by_id(String id) {
+	private String publication_by_id(String id) {
 		PublicationIO publ = myDB.IO_get_publication_by_id(id);
 
 		String output = publ.get_all();
@@ -952,7 +1024,7 @@ public class webserver {
 	}
 
 
-	static String readFile(String path, Charset encoding) 
+	String readFile(String path, Charset encoding) 
 			throws IOException 
 	{
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
