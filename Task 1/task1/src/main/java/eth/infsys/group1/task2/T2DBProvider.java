@@ -1,5 +1,6 @@
 package eth.infsys.group1.task2;
 
+import com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.elemMatch;
 import static com.mongodb.client.model.Projections.exclude;
@@ -7,10 +8,17 @@ import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Updates.addToSet;
+import com.mongodb.Block;
+import com.mongodb.client.AggregateIterable;
+import static java.util.Arrays.asList;
+import com.mongodb.client.model.Sorts.*;
+import com.mongodb.client.model.TextSearchOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import org.bson.BsonReader;
 import org.bson.BsonType;
@@ -19,7 +27,9 @@ import org.bson.conversions.Bson;
 import org.bson.json.JsonReader;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 
@@ -28,8 +38,12 @@ import eth.infsys.group1.dbspec.DivIO;
 import eth.infsys.group1.dbspec.InProceedings_simple_input;
 import eth.infsys.group1.dbspec.Proceedings_simple_input;
 import eth.infsys.group1.dbspec.PublicationIO;
+import eth.infsys.group1.task1.dbobjs.InProceedings;
+import eth.infsys.group1.task1.dbobjs.Person;
+import eth.infsys.group1.task1.dbobjs.Proceedings;
 import javafx.util.Pair;
 
+@SuppressWarnings("restriction")
 public class T2DBProvider extends DBProvider {
 
 	/**
@@ -90,6 +104,108 @@ public class T2DBProvider extends DBProvider {
 
 	public void closeDB(){
 		mongoClient.close();
+	}
+
+	protected void createIndexes(String on_collection){
+		boolean all = false;
+		switch(on_collection){
+		case "all":
+			all = true;
+			//no break			
+		case "Publications":
+			//unique
+			db.getCollection("Publications").createIndex(new Document("_id",1).append("unique", true));
+			db.getCollection("Publications").createIndex(new Document("inproceedings.Inproceedings_id",1).append("unique", true));
+			db.getCollection("Publications").createIndex(new Document("_id",1).append("inproceedings.Inproceedings_id",1).append("unique", true));
+
+			//text index
+			//db.getCollection("Publications").createIndex(new Document("title","text").append("inproceedings.Inproceedings_title", "text"));
+			db.getCollection("Publications").createIndex(new Document("inproceedings.Inproceedings_title", "text"));
+
+			
+			//for performance
+			db.getCollection("Publications").createIndex(new Document("title",1));
+			db.getCollection("Publications").createIndex(new Document("inproceedings.Inproceedings_title",1));
+			
+			db.getCollection("Publications").createIndex(new Document("editors.Editor_id",1));
+			db.getCollection("Publications").createIndex(new Document("editors.Editor_name",1));
+			
+			db.getCollection("Publications").createIndex(new Document("inproceedings.authors.Author_id",1));
+			db.getCollection("Publications").createIndex(new Document("inproceedings.authors.Author_name",1));
+			
+
+
+			if (!all){
+				break;
+			}
+		case "Conferences":
+			//unique
+			db.getCollection("Conferences").createIndex(new Document("_id",1).append("unique", true));
+			db.getCollection("Conferences").createIndex(new Document("editions.ConferenceEdition_id",1).append("unique", true));
+			db.getCollection("Conferences").createIndex(new Document("_id",1).append("editions.ConferenceEdition_id",1).append("unique", true));
+
+			
+			//text
+			db.getCollection("Conferences").createIndex(new Document("name", "text"));
+
+			
+			//for performance
+			db.getCollection("Conferences").createIndex(new Document("name",1));
+			db.getCollection("Conferences").createIndex(new Document("name",-1));
+			db.getCollection("Conferences").createIndex(new Document("editions.year",1));
+			db.getCollection("Conferences").createIndex(new Document("editions.year",-1));
+
+			if (!all){
+				break;
+			}
+
+
+		case "Persons":
+			//unique
+			db.getCollection("Persons").createIndex(new Document("_id",1).append("unique", true));
+			
+			//text
+			db.getCollection("Persons").createIndex(new Document("name", "text"));
+
+			
+			//for performance
+			db.getCollection("Persons").createIndex(new Document("name",1));
+			db.getCollection("Persons").createIndex(new Document("name",-1));
+
+			if (!all){
+				break;
+			}
+		case"Publishers":
+			//unique
+			db.getCollection("Publishers").createIndex(new Document("_id",1).append("unique", true));
+			
+
+			//text
+			db.getCollection("Publishers").createIndex(new Document("name", "text"));
+
+			
+			//for performance
+			db.getCollection("Publishers").createIndex(new Document("name",1));
+			db.getCollection("Publishers").createIndex(new Document("name",-1));
+
+			if (!all){
+				break;
+			}
+		case"Series":
+			//unique
+			db.getCollection("Series").createIndex(new Document("_id",1).append("unique", true));
+			
+
+			//text
+			db.getCollection("Series").createIndex(new Document("name", "text"));
+
+			//for performance
+			db.getCollection("Series").createIndex(new Document("name",1));
+			db.getCollection("Series").createIndex(new Document("name",-1));
+
+			break;
+		}
+
 	}
 
 
@@ -167,9 +283,8 @@ public class T2DBProvider extends DBProvider {
 		}
 
 		//create ConferenceEdition and add proceedings
-		Document confEd = get_conferenceEdition_by_year(proc_input.Conference_id, proc_input.ConferenceEdition_year);
-		if (confEd == null){
-			confEd = create_conferenceEdition(proc_input);
+		if (!exists_conferenceEdition_by_id(proc_input.ConferenceEdition_id)){
+			Document confEd = create_conferenceEdition(proc_input);
 			System.out.println("ConferenceEdition(" + proc_input.ConferenceEdition_id + ") created...");
 		}
 		else {
@@ -320,7 +435,11 @@ public class T2DBProvider extends DBProvider {
 				.append("electronicEdition", (String) proc_input.electronicEdition)
 				.append("Conference_id", proc_input.Conference_id)
 				.append("Conference_name", proc_input.Conference_name)
-				.append("conferenceEdition", (int) proc_input.ConferenceEdition_year)
+				
+				.append("ConferenceEdition_id", (String) proc_input.ConferenceEdition_id)
+				.append("ConferenceEdition_year", (int) proc_input.ConferenceEdition_year)
+
+				
 				.append("editors", editors)
 				.append("note", (String) proc_input.note)
 				.append("number", (int) proc_input.number)
@@ -450,17 +569,60 @@ public class T2DBProvider extends DBProvider {
 		Document pers = db.getCollection("Persons").find(filter).first();
 		return pers;
 	}
+	private Document get_person_by_name(String Person_name) {
+		Bson filter = eq("name", Person_name);
+		Document pers = db.getCollection("Persons").find(filter).first();
+		return pers;
+	}
 
 	private Document create_conferenceEdition(PublicationIO proc_input) {
 		Bson filter = eq("_id", proc_input.Conference_id);
 
-		Document doc = new Document("year", (int) proc_input.ConferenceEdition_year)
+		Document doc = new Document("ConferenceEdition_id", (String) proc_input.ConferenceEdition_id)
+				.append("year", (int) proc_input.ConferenceEdition_year)
 				.append("proceedings_id", (String) proc_input.id)
 				.append("proceedings_title", proc_input.title);
 
 		db.getCollection("Conferences").updateOne(filter, addToSet("editions", doc));
 
 		return doc;
+	}
+
+	/**
+	 * for batch loader: does conferenceEdition exist??
+	 * @param Conference_id
+	 * @param year
+	 * @return
+	 */
+	private Boolean exists_conferenceEdition_by_id(String confEd_id) {
+		Bson filter = eq("editions.ConferenceEdition_id", confEd_id);
+		Document doc = db.getCollection("Conferences").find(filter).first();
+		return (doc != null);	
+	}
+	
+	private Boolean exists_person_by_id(String Person_id) {
+		Bson filter = eq("_id", Person_id);
+		Document doc = db.getCollection("Persons").find(filter).first();
+		return (doc != null);	
+	}
+	private Boolean exists_person_by_name(String Person_name) {
+		Bson filter = eq("name", Person_name);
+		Document doc = db.getCollection("Persons").find(filter).first();
+		return (doc != null);	
+	}
+
+
+
+
+
+
+	private Document get_conferenceEdition_by_id(String confEd_id) {
+		Bson filter = eq("editions.ConferenceEdition_id", confEd_id);
+		Bson projection = fields(include("name"),elemMatch("editions", Filters.eq("ConferenceEdition_id", confEd_id)));
+		Document confEd = db.getCollection("Conferences").find(filter).projection(projection).first();
+
+		int a = 5;
+		return confEd;
 	}
 
 	private Document get_conferenceEdition_by_year(String Conference_id, int year) {
@@ -496,6 +658,12 @@ public class T2DBProvider extends DBProvider {
 		Document proc = db.getCollection("Publications").find(filter).projection(projection).sort(Sorts.ascending("inproceedings.Inproceedings_title")).first();
 		return proc;
 	}
+	
+	private FindIterable<Document>  get_proceedings_by_Editor_id(String Editor_id) {
+		Bson filter = eq("editors.Editor_id", Editor_id);
+		Bson projection = exclude("inproceedings.year", "inproceedings.electronicEdition","inproceedings.authors","inproceedings.note","inproceedings.pages");
+		return db.getCollection("Publications").find(filter).projection(projection);
+	}
 
 	//"old" method for batch loader
 	private Document get_inproceedings_by_id(PublicationIO inproc_input) {
@@ -509,13 +677,246 @@ public class T2DBProvider extends DBProvider {
 
 	private Document get_inproceedings_by_id(String inproc_id) {
 		Bson filter = eq("inproceedings.Inproceedings_id", inproc_id);
-		Bson projection = fields(include("_id","title","Conference_id","Conference_name","conferenceEdition"),elemMatch("inproceedings", Filters.eq("Inproceedings_id", inproc_id)));
+		Bson projection = fields(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year"),elemMatch("inproceedings", Filters.eq("Inproceedings_id", inproc_id)));
 		Document proc = db.getCollection("Publications").find(filter).projection(projection).first();
 		return proc;
 	}
 
 
+	private FindIterable<Document> get_inproceedings_by_Author_id(String pers_id) {
+		Bson filter = eq("inproceedings.authors.Author_id", pers_id);
+		Bson projection = fields(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year"),elemMatch("inproceedings", Filters.eq("authors.Author_id", pers_id)));
+		return db.getCollection("Publications").find(filter).projection(projection);
+	}
 
+	private  AggregateIterable<Document> get_inproceedings_by_filter_offset(String filter_by, int skip_in, int lim, String order_by) {
+		/*
+		db.getCollection('Publications').aggregate([
+		{$match: { $text: { $search: "fOrMal" } } },
+		{$unwind: {path: "$inproceedings"}} ,
+		{$match: {"inproceedings.Inproceedings_title":{ $regex: "fORmAl", $options:"i"}}},
+		])*/
+		switch(order_by){
+
+		case "title ascending":
+			return db.getCollection("Publications").aggregate(
+					asList(
+							new Document("$match", new Document("$text", new Document("$search", filter_by))),
+							new Document("$unwind", new Document("path", "$inproceedings")),
+							new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i"))),
+							Aggregates.sort(Sorts.ascending("inproceedings.Inproceedings_title")),
+							Aggregates.skip(skip_in),
+							Aggregates.limit(lim),
+							Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))
+							)
+					);
+		case "title descending":
+			return db.getCollection("Publications").aggregate(
+					asList(
+							new Document("$match", new Document("$text", new Document("$search", filter_by))),
+							new Document("$unwind", new Document("path", "$inproceedings")),
+							new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i"))),
+							Aggregates.sort(Sorts.descending("inproceedings.Inproceedings_title")),
+							Aggregates.skip(skip_in),
+							Aggregates.limit(lim),
+							Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))
+							)
+					);
+		case "year ascending":
+			return db.getCollection("Publications").aggregate(
+					asList(
+							new Document("$match", new Document("$text", new Document("$search", filter_by))),
+							new Document("$unwind", new Document("path", "$inproceedings")),
+							new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i"))),
+							Aggregates.sort(Sorts.ascending("inproceedings.year")),
+							Aggregates.skip(skip_in),
+							Aggregates.limit(lim),
+							Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))
+							)
+					);
+		case "year descending":
+			return db.getCollection("Publications").aggregate(
+					asList(
+							new Document("$match", new Document("$text", new Document("$search", filter_by))),
+							new Document("$unwind", new Document("path", "$inproceedings")),
+							new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i"))),
+							Aggregates.sort(Sorts.descending("inproceedings.year")),
+							Aggregates.skip(skip_in),
+							Aggregates.limit(lim),
+							Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))
+							)
+					);
+		default:
+			return db.getCollection("Publications").aggregate(
+					asList(
+							new Document("$match", new Document("$text", new Document("$search", filter_by))),
+							new Document("$unwind", new Document("path", "$inproceedings")),
+							new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i"))),
+							Aggregates.skip(skip_in),
+							Aggregates.limit(lim),
+							Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))
+							)
+					); 
+		}
+	}
+
+
+	private FindIterable<Document> get_proceedings_by_filter_offset(String filter_by, int skip_in, int limit_in, String order_by) {
+		String regex =filter_by; //"seventh";//"/"+filter_by+"/i";
+		
+		Document filter = new Document("title", 
+				new Document("$regex", regex).append("$options","i"));
+
+		Bson projection = exclude("inproceedings.year", "inproceedings.electronicEdition","inproceedings.authors","inproceedings.note","inproceedings.pages");
+
+		switch(order_by){
+
+		case "title ascending":
+			return db.getCollection("Publications").find(filter).projection(projection).skip(skip_in).limit(limit_in).sort(Sorts.ascending("title"));
+		case "title descending":
+			return db.getCollection("Publications").find(filter).projection(projection).skip(skip_in).limit(limit_in).sort(Sorts.descending("title"));
+		case "year ascending":
+			return db.getCollection("Publications").find(filter).projection(projection).skip(skip_in).limit(limit_in).sort(Sorts.ascending("year"));
+		case "year descending":
+			return db.getCollection("Publications").find(filter).projection(projection).skip(skip_in).limit(limit_in).sort(Sorts.descending("year"));
+		default:
+			return db.getCollection("Publications").find(filter).projection(projection).skip(skip_in).limit(limit_in);
+		}
+	}
+	
+	private FindIterable<Document> get_persons_by_filter_offset(String filter_by, int skip_in, int limit_in, String order_by) {
+		switch(order_by){
+
+		case "name ascending":
+			return db.getCollection("Persons").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.ascending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		case "name descending":
+			return db.getCollection("Persons").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.descending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		default:
+			//return db.getCollection("Person").find(Filters.text("Maier"));
+			
+			return db.getCollection("Persons").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.skip(skip_in)
+					.limit(limit_in);							
+		}
+	}
+	
+	private FindIterable<Document> get_conferences_by_filter_offset(String filter_by, int skip_in, int limit_in, String order_by) {
+		switch(order_by){
+
+		case "name ascending":
+			return db.getCollection("Conferences").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.ascending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		case "name descending":
+			return db.getCollection("Conferences").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.descending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		default:
+			return db.getCollection("Conferences").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.skip(skip_in)
+					.limit(limit_in);							
+		}
+	}
+
+
+	private FindIterable<Document> get_publishers_by_filter_offset(String filter_by, int skip_in, int limit_in, String order_by) {
+		String filter_ext = "/"+filter_by+"/";
+
+		switch(order_by){
+		
+
+		case "name ascending":
+			return db.getCollection("Publishers").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.ascending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		case "name descending":
+			return db.getCollection("Publishers").find(
+					new Document("$text", new Document("$search", "\""+filter_by+"\"")))
+					.sort(Sorts.descending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		default:
+			return db.getCollection("Publishers").find(
+					new Document("name",filter_ext));
+					
+			//sowas ähnliches für Publisher etc.... damit auch Teilwörter gefunden werden
+			//db.getCollection('Publishers').find({'name': /he/})
+					
+					/*
+					new Document("$text", new Document("$search", filter_ext))
+				//	new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i")))
+					)
+					//.filter(Filters.text(filter_by))
+					.skip(skip_in)
+					.limit(limit_in);		*/					
+		}
+	}
+	
+
+	private FindIterable<Document> get_series_by_filter_offset(String filter_by, int skip_in, int limit_in, String order_by) {
+		//String filter_ext = "/"+filter_by+"/";
+
+		switch(order_by){
+
+
+		case "name ascending":
+			return db.getCollection("Series").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.ascending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		case "name descending":
+			return db.getCollection("Series").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.sort(Sorts.descending("name"))
+					.skip(skip_in)
+					.limit(limit_in);
+		default:
+			return db.getCollection("Series").find(
+					new Document("$text", new Document("$search", filter_by)))
+					.skip(skip_in)
+					.limit(limit_in);					
+		}
+	}
+	
+	
+	private AggregateIterable<Document> find_co_authors(String pers_name) {
+		return db.getCollection("Publications").aggregate(asList(
+				Aggregates.match(eq("inproceedings.authors.Author_name", pers_name)),
+				Aggregates.unwind("$inproceedings"),
+				Aggregates.match(eq("inproceedings.authors.Author_name", pers_name)),
+				Aggregates.project(fields(
+						include("inproceedings.Inproceedings_id","inproceedings.Inproceedings_title","inproceedings.authors.Author_id","inproceedings.authors.Author_name"),
+						exclude("_id")))
+				));
+
+	}
+
+/*
+	new Document("$unwind", new Document("path", "$inproceedings")),
+	new Document("$match", new Document("inproceedings.Inproceedings_title", new Document("$regex",filter_by).append("$options", "i"))),
+	Aggregates.sort(Sorts.ascending("inproceedings.Inproceedings_title")),
+	Aggregates.skip(skip_in),
+	Aggregates.limit(lim),
+	Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))
+	)
+	*/
 
 	/**
 	 * IO-Methods: helper
@@ -525,7 +926,257 @@ public class T2DBProvider extends DBProvider {
 	 * 
 	 * 
 	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 */
+	@SuppressWarnings("restriction")
+	private PublicationIO fast_fill_PublicationIO(Document doc, String is_a){
+		PublicationIO publication = new PublicationIO();
+		if ( doc == null ){
+			publication.is_empty = true;
+			return publication;
+		}
+
+		//Proceedings
+		else if ("is_a_proceeding".equals(is_a) ){
+			publication.is_a_proceeding = true;
+			System.out.println(doc.toJson());
+
+			BsonReader r = new JsonReader(doc.toJson());
+			r.readStartDocument();
+
+			String current_name = r.readName();
+			BsonType current_type;
+
+			//if ( "_id".equals( current_name) ){
+				publication.id = r.readString();
+				//	if ( (current_type = r.readBsonType()) != BsonType.ARRAY ){
+				//	current_name = r.readName();
+				//	}
+				//}
+				//	if ( "title".equals( current_name) ){
+				publication.title = r.readString();
+				//	if ( (current_type = r.readBsonType()) != BsonType.ARRAY ){
+				//	current_name = r.readName();
+				//	}			
+				//}
+				//if ( "year".equals( current_name) ){
+				publication.year = r.readInt32();
+				//if ( (current_type = r.readBsonType()) != BsonType.ARRAY ){
+				//current_name = r.readName();
+				//}			
+				//	}
+				//if ( "electronicEdition".equals( current_name ) ){
+				publication.electronicEdition = r.readString();
+				//	if ( (current_type = r.readBsonType()) != BsonType.ARRAY ){
+				//current_name = r.readName();
+				//}
+				//}
+
+			String conf_id ="";
+			String conf_name="";
+			//if ( "Conference_id".equals( current_name) ){
+				conf_id = r.readString();
+				current_name = r.readName();
+				//	if ( "Conference_name".equals( current_name) ){
+					conf_name = r.readString();
+					//	current_name = r.readName();
+					publication.Conference_name_id = new Pair<String, String>(conf_name,conf_id);
+					//	}
+					//	}
+					//if ( "ConferenceEdition_id".equals( current_name) ){
+				String confEdid = r.readString();
+				//	current_name = r.readName();
+				//	if ( "ConferenceEdition_year".equals( current_name) ){
+					int year = r.readInt32();
+					//	current_name = r.readName();
+					publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
+					//}
+					//}
+
+			//read [] editors
+					//if ( "editors".equals( current_name ) ){
+				r.readStartArray();
+				while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+					r.readStartDocument();
+
+					String Editor_id = r.readString();
+					String Editor_name = r.readString();
+
+					publication.editors_name_id.add(new Pair<String, String>(Editor_name, Editor_id));					
+					r.readEndDocument();
+				}
+				r.readEndArray();
+				//current_name = r.readName();
+				//}
+
+			//read the other fields up to []inproceedings
+				//if ( "note".equals( current_name) ){
+				publication.note = r.readString();
+				//current_name = r.readName();
+				//}
+				//if ( "number".equals( current_name ) ){
+				publication.number = r.readInt32();
+				//	current_name = r.readName();
+				//	}
+				//if ( "Publisher_id".equals( current_name ) ){
+				publication.publisher_id = r.readString();
+				//	current_name = r.readName();
+				//	}
+				//if ( "Publisher_name".equals( current_name ) ){
+				publication.publisher_name = r.readString();
+				//	current_name = r.readName();
+				//}
+				//if ( "volume".equals( current_name ) ){
+				publication.volume = r.readString();
+				//	current_name = r.readName();
+				//}
+				//if ( "isbn".equals( current_name ) ){
+				publication.isbn = r.readString();
+				//	current_name = r.readName();
+				//}
+				//if ( "Series_id".equals( current_name ) ){
+				publication.series_id = r.readString();
+				//	current_name = r.readName();
+				//}
+				//if ( "Series_name".equals( current_name ) ){
+				publication.series_name = r.readString();
+				//	current_name = r.readName();
+				//}
+			//read [] inproceedings
+				//if ( "inproceedings".equals( current_name ) ){
+				r.readStartArray();
+				while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+					r.readStartDocument();
+
+					String Inproceedings_id = r.readString();
+					String Inproceedings_title = r.readString();
+
+					publication.inproceedings_title_id.add(new Pair<String, String>(Inproceedings_title, Inproceedings_id));
+					r.readEndDocument();
+				}
+				r.readEndArray();
+				//}
+			publication.inproceedings_title_id.sort(comparePairTitleId);
+		}
+
+
+		//InProceedings - wahrscheinlich i.o.
+		else if ("is_an_inproceeding".equals(is_a) ){
+			publication.is_an_inproceeding = true;
+
+			//System.out.println(doc.toJson());
+
+			BsonReader r = new JsonReader(doc.toJson());
+			r.readStartDocument();
+
+			String current_name = r.readName();
+			BsonType current_type;
+
+			//if ( "_id".equals( current_name) ){
+				publication.proceeding_id = r.readString();
+				//	current_name = r.readName();
+				//}
+				//	if ( "title".equals( current_name) ){
+				publication.proceeding_title = r.readString();
+				//	current_name = r.readName();
+				//}
+
+			String conf_id ="";
+			String conf_name="";
+			//	if ( "Conference_id".equals( current_name) ){
+				conf_id = r.readString();
+				//current_name = r.readName();
+				//	if ( "Conference_name".equals( current_name) ){
+					conf_name = r.readString();
+					//	current_name = r.readName();
+					publication.Conference_name_id = new Pair<String, String>(conf_name,conf_id);
+					//}
+					//}
+					//if ( "ConferenceEdition_id".equals( current_name) ){
+				String confEdid = r.readString();
+				current_name = r.readName();
+				//	if ( "ConferenceEdition_year".equals( current_name) ){
+					int year = r.readInt32();
+						current_name = r.readName();
+					publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
+					//	}
+					//}
+
+			//read []inproceedings
+			if ("inproceedings".equals(current_name)){
+				/**
+				 * for inproceeding_by_id needed
+				 * for pupl_by_title_offset not
+				 * maybe change inproceeding_by_id so that it doesnt return an array
+				 */
+				boolean is_array = false;
+				if ( r.getCurrentBsonType() == BsonType.ARRAY ){
+					r.readStartArray();
+					is_array = true;
+				}
+				r.readStartDocument();
+				current_type = r.readBsonType();
+				//if (current_type != BsonType.END_OF_DOCUMENT){
+					publication.id = r.readString();
+					//	current_type = r.readBsonType();
+					//	if (current_type != BsonType.END_OF_DOCUMENT){
+						publication.title = r.readString();
+						//	current_type = r.readBsonType();
+						//	if (current_type != BsonType.END_OF_DOCUMENT){
+							publication.year = r.readInt32();
+							//	current_type = r.readBsonType();
+							//	if (current_type != BsonType.END_OF_DOCUMENT){
+								publication.electronicEdition = r.readString();
+								//		current_type = r.readBsonType();
+								//		}
+								//	}
+								//	}
+								//}
+
+				//read []authors
+								//	if ( current_type == BsonType.ARRAY && "authors".equals( current_name = r.readName()) ){
+					r.readStartArray();
+					while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+						r.readStartDocument();
+
+						String Author_id = r.readString();
+						String Author_name = r.readString();
+
+						publication.authors_name_id.add(new Pair<String, String>(Author_name, Author_id));
+
+						r.readEndDocument();
+					}
+					r.readEndArray();
+					//}
+
+					//	if (current_type != BsonType.END_OF_DOCUMENT){
+					publication.note = r.readString();
+					//		current_type = r.readBsonType();
+					//		if (current_type != BsonType.END_OF_DOCUMENT){
+						publication.pages = r.readString();
+						//		}
+						//	}
+				r.readEndDocument();
+				if ( is_array ){
+					r.readEndArray();				
+				}
+			}
+		}
+		return publication;
+	}
+
 
 	@SuppressWarnings("restriction")
 	private PublicationIO fill_PublicationIO(Document doc, String is_a){
@@ -582,12 +1233,14 @@ public class T2DBProvider extends DBProvider {
 					publication.Conference_name_id = new Pair<String, String>(conf_name,conf_id);
 				}
 			}
-			if ( "conferenceEdition".equals( current_name) ){
-				int year = r.readInt32();
+			if ( "ConferenceEdition_id".equals( current_name) ){
+				String confEdid = r.readString();
 				current_name = r.readName();
-				//ugly hack
-				String confEdid = conf_id+String.valueOf(year);
-				publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
+				if ( "ConferenceEdition_year".equals( current_name) ){
+					int year = r.readInt32();
+					current_name = r.readName();
+					publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
+				}
 			}
 
 			//read [] editors
@@ -654,7 +1307,6 @@ public class T2DBProvider extends DBProvider {
 				r.readEndArray();
 			}
 			publication.inproceedings_title_id.sort(comparePairTitleId);
-
 		}
 
 
@@ -662,7 +1314,7 @@ public class T2DBProvider extends DBProvider {
 		else if ("is_an_inproceeding".equals(is_a) ){
 			publication.is_an_inproceeding = true;
 
-			System.out.println(doc.toJson());
+			//System.out.println(doc.toJson());
 
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
@@ -690,18 +1342,28 @@ public class T2DBProvider extends DBProvider {
 					publication.Conference_name_id = new Pair<String, String>(conf_name,conf_id);
 				}
 			}
-			if ( "conferenceEdition".equals( current_name) ){
-				int year = r.readInt32();
+			if ( "ConferenceEdition_id".equals( current_name) ){
+				String confEdid = r.readString();
 				current_name = r.readName();
-				//ugly hack
-				String confEdid = conf_id+String.valueOf(year);
-				publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
-
+				if ( "ConferenceEdition_year".equals( current_name) ){
+					int year = r.readInt32();
+					current_name = r.readName();
+					publication.ConferenceEdition_year_id = new Pair<Integer, String>(year,confEdid);
+				}
 			}
 
 			//read []inproceedings
 			if ("inproceedings".equals(current_name)){
-				r.readStartArray();
+				/**
+				 * for inproceeding_by_id needed
+				 * for pupl_by_title_offset not
+				 * maybe change inproceeding_by_id so that it doesnt return an array
+				 */
+				boolean is_array = false;
+				if ( r.getCurrentBsonType() == BsonType.ARRAY ){
+					r.readStartArray();
+					is_array = true;
+				}
 				r.readStartDocument();
 				current_type = r.readBsonType();
 				if (current_type != BsonType.END_OF_DOCUMENT){
@@ -745,7 +1407,9 @@ public class T2DBProvider extends DBProvider {
 					}
 				}
 				r.readEndDocument();
-				r.readEndArray();
+				if ( is_array ){
+					r.readEndArray();				
+				}
 			}
 		}
 		return publication;
@@ -759,13 +1423,16 @@ public class T2DBProvider extends DBProvider {
 			divobj.is_empty = true;
 			return divobj;
 		}
+		else {
+			//System.out.println(doc.toJson());
+		}
 
-		//Conference -- current_name angepasst
+		//Conference 
 		/*
-		 * was ist mit id von ConfEd... habe momentan einfach year.....
+		 * ConferenceEdition_id angepasst
 		 * allenfalls kann man die ganzen Infos zu den Proceedings weglassen
 		 */
-		else if ( "is_a_conference".equals(is_a) ){
+		if ( "is_a_conference".equals(is_a) ){
 			divobj.is_a_conference = true;
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
@@ -789,14 +1456,14 @@ public class T2DBProvider extends DBProvider {
 				r.readStartArray();
 				while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
 					r.readStartDocument();
+
+					String ConferenceEdition_id = r.readString();
 					int year = r.readInt32();
 					String proceedings_id = r.readString();
 					String proceedings_title = r.readString();
-					r.readEndDocument();
+					divobj.Conference_editions_year_id.add(new Pair<Integer, String>(year, ConferenceEdition_id));
 
-					//ugly hack
-					String id = divobj.id+String.valueOf(year);
-					divobj.Conference_editions_year_id.add(new Pair<Integer, String>(year, id));
+					r.readEndDocument();
 				}
 				r.readEndArray();
 				if (r.readBsonType() != BsonType.END_OF_DOCUMENT){
@@ -810,17 +1477,13 @@ public class T2DBProvider extends DBProvider {
 
 			return divobj;
 		}
-		//ConferenceEdition -- current_name angepasst
-		/**
-		 * Problem mit ConferenceEdition ID
-		 */
+
+		//ConferenceEdition -- ConferenceEdition_id angepasst
 		else if ( "is_a_conference_edition".equals(is_a) ){
 			divobj.is_a_conference_edition = true;
 
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
-
-			System.out.println(doc.toJson());
 
 			String current_name = r.readName();
 			if ( "_id".equals( current_name) ){
@@ -841,6 +1504,7 @@ public class T2DBProvider extends DBProvider {
 				r.readStartArray();
 				while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
 					r.readStartDocument();
+					divobj.id = r.readString();
 					divobj.ConferenceEdition_year = r.readInt32();
 					divobj.ConferenceEditions_proceedings_id = r.readString();
 					divobj.ConferenceEditions_proceedings_title = r.readString();				
@@ -853,9 +1517,7 @@ public class T2DBProvider extends DBProvider {
 				else {
 					r.readEndDocument();
 				}
-			}
-			//dummy werte
-			divobj.id = "-";//String.valueOf(divobj.ConferenceEdition_year);			
+			}		
 			return divobj;
 		}
 
@@ -863,11 +1525,8 @@ public class T2DBProvider extends DBProvider {
 		else if ( "is_a_person".equals(is_a) ){
 			divobj.is_a_person = true;
 
-			System.out.println(doc.toJson());
-
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
-
 
 			String current_name =r.readName();
 			if ( "_id".equals( current_name ) ){
@@ -928,11 +1587,12 @@ public class T2DBProvider extends DBProvider {
 
 		//Publisher ok -- current_name angepasst
 		else if ( "is_a_publisher".equals(is_a) ){
-			divobj.is_a_publisher = true;			
+			divobj.is_a_publisher = true;	
+
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
 
-			String current_name =r.readName();
+			String current_name = r.readName();
 			if ( "_id".equals( current_name) ){
 				divobj.id = r.readString();
 				current_name =r.readName();
@@ -971,6 +1631,7 @@ public class T2DBProvider extends DBProvider {
 		//Series ok -- current_name angepasst
 		else if ( "is_a_series".equals(is_a) ){
 			divobj.is_a_series = true;
+
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
 
@@ -1060,15 +1721,141 @@ public class T2DBProvider extends DBProvider {
 
 	@Override
 	public String IO_find_author_distance_path(String name1, String name2) {
-		// TODO Auto-generated method stub
-		return null;
+		String Output="";
+		
+		String pers1 = name1;
+		String pers2 = name2;
+		if ( !exists_person_by_name(name1)){
+			Output = "<br>name1 (="+ name1 + ") or name2 (="+ name2 + ") is not a person<br>";
+			return Output;
+		}
+		if ( !exists_person_by_name(name2)){
+			Output = "<br>name1 (="+ name1 + ") or name2 (="+ name2 + ") is not a person<br>";
+			return Output;
+		}
+		
+		
+		
+		return Output;
 	}
-
+	
 	@Override
+	//do not use it
 	public List<DivIO> IO_find_co_authors(String pers_name) {
 		// TODO Auto-generated method stub
 		return null;
+	}	
+	@Override
+	public String IO_find_co_authors_returns_String(String pers_name) {
+		HashMap<Pair<String,String>,List<Pair<String,String>>> common_inprocs = new HashMap<Pair<String,String>,List<Pair<String,String>>>();
+		List<Pair<String,String>> Author_id_name_sort = new ArrayList<Pair<String,String>>();
+		String Output ="";
+		//check if person exists
+		if (!exists_person_by_name(pers_name)){
+			Output+="person not found...";
+			return Output;
+		}
+
+		String Inproceedings_id ="";
+		String Inproceedings_title ="";
+		String Author_id="";
+		String Author_name="";
+		for (Document doc: find_co_authors(pers_name)){
+			System.out.println(doc.toJson());
+
+
+			BsonReader r = new JsonReader(doc.toJson());
+			r.readStartDocument();
+
+			String current_name = r.readName();
+			BsonType current_type;
+
+			if ("inproceedings".equals(current_name)){
+				r.readStartDocument();
+				current_type = r.readBsonType();
+				if (current_type != BsonType.END_OF_DOCUMENT){
+					Inproceedings_id = r.readString();
+					current_type = r.readBsonType();
+					if (current_type != BsonType.END_OF_DOCUMENT){
+						Inproceedings_title = r.readString();
+						current_type = r.readBsonType();
+					}
+				}
+
+				Pair<String,String> Inproc_id_title = new Pair<String,String>(Inproceedings_id,Inproceedings_title);
+				//read []authors
+				if ( current_type == BsonType.ARRAY && "authors".equals( current_name = r.readName()) ){
+					r.readStartArray();
+					while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+						r.readStartDocument();
+
+						Author_id = r.readString();
+						Author_name = r.readString();
+
+						Pair<String,String> Author_id_name = new Pair<String,String>(Author_id,Author_name);
+
+						List<Pair<String,String>> existing_list = common_inprocs.get(Author_id_name);
+						if(existing_list!=null){
+							//add to list
+							existing_list.add(Inproc_id_title);
+						} else {
+							//create new Author entry
+							List<Pair<String,String>> new_list = new ArrayList<Pair<String,String>>();
+							new_list.add(Inproc_id_title);
+							common_inprocs.put(Author_id_name, new_list);
+							//for sort list
+							Author_id_name_sort.add(Author_id_name);
+							;
+						}
+
+						r.readEndDocument();
+					}
+					r.readEndArray();
+				}
+			}
+		}
+		Author_id_name_sort.sort(compare_Author_id_name);
+		Output += "<b>Jumplist:</b> ";
+		for (Pair<String,String> Author_id_name: Author_id_name_sort){
+			Output += "<a href='#"+Author_id_name.getKey()+"'>"+Author_id_name.getValue() + "</a>, ";
+		}
+		Output += "<br>";
+		
+		
+		final String[] temp = new String[1];
+		temp[0] = "";
+		
+
+		BiConsumer<Pair<String, String>,List<Pair<String, String>>> action = new BiConsumer<Pair<String, String>,List<Pair<String, String>>>(){
+
+			@Override
+			public void accept(Pair<String, String> Author_id_name, List<Pair<String, String>> Inproc_id_title) {
+				if (Author_id_name.getValue().equals(pers_name)){
+					return;
+				}
+				temp[0] += "<h4 id='"+Author_id_name.getKey()+"'><a href='/test/?func=person_by_id&id=" +Author_id_name.getKey()+ "'>"+Author_id_name.getValue()+"</a></h4>";
+				//temp[0] += Author_id_name.getValue() +" is co-author of "+pers_name+" in the following inproceedings: <br>";
+				temp[0] += "<ol type='1'>";
+				for (Pair<String,String> inprTid: Inproc_id_title){
+					String title = inprTid.getValue().substring(0, Math.min(200,inprTid.getKey().length()));
+					String id = inprTid.getKey();
+					temp[0] += "<li>"+title + " (<a href='/test/?func=inproceeding_by_id&key=" + id + "'>"+id+"</a>)</li>";
+				}
+				temp[0] += "</ol>";				
+				temp[0] += "<br><br>";
+			}
+
+		};
+		common_inprocs.forEach(action);
+		Output += temp[0];
+		/**
+		 * indices erstellen
+		 * und query plan anschauen
+		 */
+		return Output;
 	}
+
+
 
 	@Override
 	public DivIO IO_get_conf_by_id(String conf_id) {
@@ -1076,26 +1863,67 @@ public class T2DBProvider extends DBProvider {
 	}
 
 
-	@Override //do not use this function
+	@Override 
 	public DivIO IO_get_confEd_by_id(String confEd_id) {
-		// TODO Auto-generated method stub
-		return null;
+		return fill_DivIO(get_conferenceEdition_by_id(confEd_id),"is_a_conference_edition");
 	}
+
+
 	public DivIO IO_get_conferenceEdition_by_year(String Conference_id, int year) {
 		return fill_DivIO(get_conferenceEdition_by_year(Conference_id,year),"is_a_conference_edition");
 	}
 
 	@Override
 	public List<DivIO> IO_get_conference_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		int limit = 0;
+		int skip = 0;
+		if (boff==0 || eoff< boff){
+			limit = 5;
+			skip = 0;
+		}
+		else {
+			limit = eoff - boff + 1;
+			skip = boff -1;
+		}
+
+		//get conferences, if any
+		for (Document doc: get_conferences_by_filter_offset(filter, skip, limit, order_by)){
+				return_list.add(fill_DivIO(doc,"is_a_conference"));
+		}
+
+		return return_list;
 	}
+
+
 
 	@Override
 	public List<DivIO> IO_get_person_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		int limit = 0;
+		int skip = 0;
+		if (boff==0 || eoff< boff){
+			limit = 5;
+			skip = 0;
+		}
+		else {
+			limit = eoff - boff + 1;
+			skip = boff -1;
+		}
+
+		//get persons, if any
+		for (Document doc: get_persons_by_filter_offset(filter, skip, limit, order_by)){
+				return_list.add(fill_DivIO(doc,"is_a_person"));
+		}
+
+		return return_list;
 	}
+
+	
+
+
 
 	@Override
 	public DivIO IO_get_person_by_id(String pers_id) {
@@ -1104,15 +1932,55 @@ public class T2DBProvider extends DBProvider {
 	}
 
 	@Override
+	/**
+	 * !!!!!!!!!! auf fast fill gestellt
+	 */
 	public List<PublicationIO> IO_get_publ_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+
+		List<PublicationIO> return_list = new ArrayList<PublicationIO>();
+
+		int limit = 0;
+		int skip = 0;
+		if (boff==0 || eoff< boff){
+			limit = 5;
+			skip = 0;
+		}
+		else {
+			limit = eoff - boff + 1;
+			skip = boff -1;
+		}
+
+		//get proceedings, if any
+		for (Document doc: get_proceedings_by_filter_offset(filter, skip, limit, order_by)){
+				return_list.add(fill_PublicationIO(doc,"is_a_proceeding"));
+		}
+
+		//get inproceedings, if any
+		//AggregateIterable<Document> slow = get_inproceedings_by_filter_offset(filter, boff, eoff, order_by);
+		//System.out.println("have doc's from db...");
+		//for (Document doc: slow){
+		for (Document doc: get_inproceedings_by_filter_offset(filter, skip, limit, order_by)){	
+			return_list.add(fill_PublicationIO(doc,"is_an_inproceeding"));
+		}
+		return return_list;
 	}
+
+	
 
 	@Override
 	public PublicationIO IO_get_publication_by_id(String publ_id) {
 		// TODO Auto-generated method stub
-		return null;
+		Document inproc = get_inproceedings_by_id(publ_id);
+		if ( inproc != null ){
+			return fill_PublicationIO(inproc, "is_an_inproceeding");
+		}
+		else {
+			Document proc = get_proceedings_by_id(publ_id);
+			if ( proc != null ){
+				return fill_PublicationIO(proc, "is_a_proceeding");
+			}
+		}
+		return fill_PublicationIO(null,"null");
 	}
 
 	public PublicationIO IO_get_inproceedings_by_id(String id) {
@@ -1126,9 +1994,27 @@ public class T2DBProvider extends DBProvider {
 
 	@Override
 	public List<DivIO> IO_get_publisher_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		int limit = 0;
+		int skip = 0;
+		if (boff==0 || eoff< boff){
+			limit = 5;
+			skip = 0;
+		}
+		else {
+			limit = eoff - boff + 1;
+			skip = boff -1;
+		}
+
+		//get publishers, if any
+		for (Document doc: get_publishers_by_filter_offset(filter, skip, limit, order_by)){
+				return_list.add(fill_DivIO(doc,"is_a_publisher"));
+		}
+
+		return return_list;
 	}
+
 
 	@Override
 	public DivIO IO_get_publisher_by_id(String publ_id) {
@@ -1137,9 +2023,27 @@ public class T2DBProvider extends DBProvider {
 
 	@Override
 	public List<DivIO> IO_get_series_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		int limit = 0;
+		int skip = 0;
+		if (boff==0 || eoff< boff){
+			limit = 5;
+			skip = 0;
+		}
+		else {
+			limit = eoff - boff + 1;
+			skip = boff -1;
+		}
+
+		//get series, if any
+		for (Document doc: get_series_by_filter_offset(filter, skip, limit, order_by)){
+				return_list.add(fill_DivIO(doc,"is_a_series"));
+		}
+
+		return return_list;
 	}
+
 
 	@Override
 	public DivIO IO_get_series_by_id(String series_id) {
@@ -1166,9 +2070,66 @@ public class T2DBProvider extends DBProvider {
 
 	@Override
 	public List<PublicationIO> IO_publ_by_person_name_or_id(HashMap<String, String> args) {
-		// TODO Auto-generated method stub
-		return null;
+		List<PublicationIO> return_list = new ArrayList<PublicationIO>();
+	
+		//check if person exists
+		boolean pers_exists;
+		
+		String pers_id = "";
+
+		if( args.containsKey("id") ){
+			//get person by id
+			pers_exists = exists_person_by_id(args.get("id"));
+			pers_id = args.get("id");
+		}
+		else {
+			//get person by name
+			pers_exists = exists_person_by_name(args.get("name"));
+			//get person id
+			if (pers_exists){
+				pers_id = get_person_by_name(args.get("name")).get("_id").toString();
+				
+				
+				
+			}
+		}
+
+		if ( ! pers_exists ){
+			//return empty list
+			return return_list;
+		}
+				
+		String publ_mode = args.get("publ");
+		
+		//get proceedings
+		if ( publ_mode.equals("all") || publ_mode.equals("editored")){
+			for (Document doc: get_proceedings_by_Editor_id(pers_id)){
+				return_list.add(fill_PublicationIO(doc,"is_a_proceeding"));
+			}
+			
+			/*			
+			Block<Document> call_fill_PublicationIO_proc = new Block<Document>() {
+			     @Override
+			     public void apply(final Document doc) {
+						return_list.add(fill_PublicationIO(doc,"is_a_proceeding"));
+			     }
+			};
+			get_proceedings_by_Editor_id(pers_id).forEach(call_fill_PublicationIO_proc);
+			*/
+		}
+		
+		//get inproceedings
+		if ( publ_mode.equals("all") || publ_mode.equals("authored")){
+			for (Document doc: get_inproceedings_by_Author_id(pers_id)){
+				return_list.add(fill_PublicationIO(doc,"is_an_inproceeding"));
+			}
+		}
+			
+		
+		return return_list;
 	}
+
+
 
 
 
@@ -1182,6 +2143,10 @@ public class T2DBProvider extends DBProvider {
 
 
 
+
+
+
+	
 
 
 

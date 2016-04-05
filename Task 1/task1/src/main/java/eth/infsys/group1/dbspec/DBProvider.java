@@ -6,6 +6,7 @@ import java.util.List;
 
 import javafx.util.Pair;
 
+@SuppressWarnings("restriction")
 public abstract class DBProvider {
 
 /*public abstract class DBProvider<TRConference,
@@ -102,6 +103,14 @@ public abstract class DBProvider {
 			return o1.Person_name.compareTo(o2.Person_name);
 		}
 	};
+	
+	
+	protected Comparator<Pair<String, String>> compare_Author_id_name = new Comparator<Pair<String,String>>() {
+		@Override
+		public int compare(Pair<String, String> o1, Pair<String, String> o2) {
+			return o1.getValue().compareTo(o2.getValue());
+		}
+	};
 
 	protected Comparator<DivIO> compareDivIO_Publisher_name = new Comparator<DivIO>() {
 		@Override
@@ -140,6 +149,7 @@ public abstract class DBProvider {
 	public abstract String IO_delete_get_person_by_id(String pers_id);
 	public abstract String IO_find_author_distance_path(String name1, String name2);
 	public abstract List<DivIO> IO_find_co_authors(String pers_name);
+	public abstract String IO_find_co_authors_returns_String(String pers_name);
 	public abstract DivIO IO_get_conf_by_id(String conf_id);
 	public abstract DivIO IO_get_confEd_by_id(String confEd_id);
 	public abstract List<DivIO> IO_get_conference_by_filter_offset(String filter, int boff, int eoff, String order_by);

@@ -181,12 +181,7 @@ public class DivIO {
 					break;
 			}
 			ret += "</ol>";
-
-			
-
 		}
-
-
 		return ret;		
 	}
 	

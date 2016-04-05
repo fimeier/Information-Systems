@@ -2,23 +2,12 @@ package eth.infsys.group1.task2;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-import org.zoodb.internal.util.Pair;
 
-import eth.infsys.group1.dbspec.DivIO;
 import eth.infsys.group1.dbspec.InProceedings_simple_input;
 import eth.infsys.group1.dbspec.Proceedings_simple_input;
-import eth.infsys.group1.task1.dbobjs.ConferenceEdition;
-import eth.infsys.group1.task1.dbobjs.InProceedings;
-import eth.infsys.group1.task1.dbobjs.Publisher;
-import eth.infsys.group1.task1.dbobjs.Series;
 
 public class XML_to_Bson {
 

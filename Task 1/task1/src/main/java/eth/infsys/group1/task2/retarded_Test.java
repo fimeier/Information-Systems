@@ -1,29 +1,25 @@
 package eth.infsys.group1.task2;
 
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoWriteException;
-import com.mongodb.WriteError;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import static com.mongodb.client.model.Filters.*;
-
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.lte;
+import static java.util.Arrays.asList;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import javax.annotation.Generated;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
-import static java.util.Arrays.asList;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 
 public class retarded_Test {

@@ -734,7 +734,8 @@ public class T1DBProvider extends DBProvider {
 			}
 			publication.note = inproc.getNote();
 			publication.pages = inproc.getPages();
-			
+			publication.proceeding_title = inproc.getProceedings().getTitle();
+			publication.proceeding_id = inproc.getProceedings().getId();
 
 		}
 		return publication;
@@ -896,7 +897,7 @@ public class T1DBProvider extends DBProvider {
 		}
 
 		String publ_mode = args.get("publ");
-		if ( publ_mode.equals("all") || publ_mode.equals("edited")){
+		if ( publ_mode.equals("all") || publ_mode.equals("editored")){
 			//get proceedings
 			Set<Publication> editedPublications = pers.getEditedPublications();
 			for (Publication publ: editedPublications){
@@ -1570,6 +1571,12 @@ public class T1DBProvider extends DBProvider {
 
 
 		return return_list;
+	}
+
+	@Override
+	public String IO_find_co_authors_returns_String(String pers_name) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
