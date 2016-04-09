@@ -1,124 +1,145 @@
-
 <!-- Queries -->
 
-<!--(Task 4) Find the co-authors of a person-->
-	<li>
-		<h3>(Task 4) Find the co-authors of a person</h3>
-  		<form>
-  		<!-- func=find_co_authors#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="find_co_authors">
-			<input type="text" name="name" value="Moira C. Norrie"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	
-	
-<!--(Task 5) Find the author distance and path-->
-	<li>
-		<h3>(Task 5) Find the author distance and path</h3>
-  		<form>
-  		<!-- func=find_author_distance_path#name1=value1#name2=value2 -->
-			<input type="hidden" name="func" value="find_author_distance_path">
-			<input type="text" name="name1" value="A. W. Roscoe"><br>
-			<input type="text" name="name2" value="Angel J. Rico-Diaz"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
+<h2>Queries</h2>
 
+
+<!--(Task 4) Find the co-authors of a person-->
+<form>
+<!-- func=find_co_authors#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
+<div class="form-group">
+	<label for="find_co_authors">(Task 4) Find the co-authors of a person</label>
+	<input type="hidden" id="find_co_authors" name="func" value="find_co_authors">
+	<input type="text" class="form-control" name="name" value="Moira C. Norrie">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
+
+<!--(Task 5) Find the author distance and path-->
+<form>
+<!-- func=find_author_distance_path#name1=value1#name2=value2 -->
+<div class="form-group">
+	<label for="find_author_distance_path">(Task 5) Find the author distance and path</label>
+	<input type="hidden" id="find_author_distance_path" name="func" value="find_author_distance_path">
+	<input type="text" class="form-control" name="name1" value="A. W. Roscoe">
+	<input type="text" class="form-control" name="name2" value="Angel J. Rico-Diaz">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
 
 <!--(Task 6) Calculate average number of authors per inproceedings-->	
-	<li>
-		<h3>(Task 6) Calculate average number of authors per inproceedings</h3>
-  		<form>
-  		<!-- func=avg_authors_per_inproceedings -->
-			<input type="hidden" name="func" value="avg_authors_per_inproceedings">
-			<input type="submit" value="calculate">
-		</form>
-	</li>
-	
-	
+<form>
+<!-- func=avg_authors_per_inproceedings -->
+<div class="form-group">
+	<label for="avg_authors_per_inproceedings">(Task 6) Calculate average number of authors per inproceedings</label>
+	<input type="hidden" id="avg_authors_per_inproceedings" name="func" value="avg_authors_per_inproceedings"><br>
+	<button type="submit" class="btn btn-default">calculate</button>
+</div>
+</form>
+
+<hr>
+
 <!--(Task 7) count publications in a given interval-->
-	<li>
-		<h3>(Task 7) count publications in a given interval</h3>
-  		<form>
-  		<!-- func=count_publications_per_interval&year1=<value>&year2=<value> -->
-			<input type="hidden" name="func" value="count_publications_per_interval">
-			<input type="text" name="year1" value="2005"><br>
-			<input type="text" name="year2" value="2008"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	
-<!--(Task 8 & 11) inproceedings for a conference (id)-->
-	<li>
-		<h3>(Task 8 & 11) inproceedings for a conference (id)</h3>
-  		<form>
-  		<!-- func=inproceedings_for_a_conference&id=<value>&mode=<value> -->
-			<input type="hidden" name="func" value="inproceedings_for_a_conference">
-			<input type="text" name="id" value="conference/IEEE Conference on Computational Complexity"><br>
-			<fieldset>
-				<input type="radio" id="cnt" name="mode" value="count" checked><label for="cnt">count</label>
-				<br>
-				<input type="radio" id="list" name="mode" value="retrieve"><label for="list">retrieve</label>
-			</fieldset>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	
-	
-<!--(Task 9 & 10) count or retrieve all authors/editors for a conference (id)-->
-	<li>
-		<h3>(Task 9 & 10) count or retrieve all authors/editors for a conference (id)</h3>
-  		<form>
-  		<!-- func=authors_editors_for_a_conference&id=<value>&mode=<value> -->
-			<input type="hidden" name="func" value="authors_editors_for_a_conference">
-			<input type="text" name="id" value="conference/IEEE Conference on Computational Complexity"><br>
-			<fieldset>
-				<input type="radio" id="cnt" name="mode" value="count" checked><label for="cnt">count</label>
-				<br>
-				<input type="radio" id="list" name="mode" value="retrieve"><label for="list">retrieve</label>
-			</fieldset>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	
-	
+<form>
+<!-- func=count_publications_per_interval&year1=<value>&year2=<value> -->
+<div class="form-group">
+	<label for="count_publications_per_interval">(Task 7) count publications in a given interval</label>
+	<input type="hidden" id="count_publications_per_interval" name="func" value="count_publications_per_interval">
+	<input type="text" class="form-control" name="year1" value="2005">
+	<input type="text" class="form-control" name="year2" value="2008">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
+
+<!--(Task 8 & 11) count or retrieve all inproceedings for a conference (by id)-->
+<form>
+<!-- func=inproceedings_for_a_conference&id=<value>&mode=<value> -->
+<div class="form-group">
+	<label for="inproceedings_for_a_conference">(Task 8 & 11) count or retrieve all inproceedings for a conference (by id)</label>
+	<input type="hidden" id="inproceedings_for_a_conference" name="func" value="inproceedings_for_a_conference">
+	<input type="text" class="form-control" name="id" value="conference/IEEE Conference on Computational Complexity">
+	<div class="radio">
+		<fieldset>
+			<label>
+				<input type="radio" id="cnt" name="mode" value="count" checked>
+				 count
+			</label>
+			<label>
+				<input type="radio" id="list" name="mode" value="retrieve">
+				retrieve
+			</label>
+		</fieldset>
+	</div>
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
+
+<!--(Task 9 & 10) count or retrieve all authors/editors for a conference (by id)-->
+<form>
+<!-- func=authors_editors_for_a_conference&id=<value>&mode=<value> -->
+<div class="form-group">
+	<label for="authors_editors_for_a_conference">(Task 9 & 10) count or retrieve all authors/editors for a conference (by id)</label>
+	<input type="hidden" id="authors_editors_for_a_conference" name="func" value="authors_editors_for_a_conference">
+	<input type="text" class="form-control" name="id" value="conference/IEEE Conference on Computational Complexity">
+	<div class="radio">
+		<fieldset>
+			<label>
+				<input type="radio" id="cnt" name="mode" value="count" checked>
+				 count
+			</label>
+			<label>
+				<input type="radio" id="list" name="mode" value="retrieve">
+				retrieve
+			</label>
+		</fieldset>
+	</div>
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
+
 <!-- (Task 12) person is author and editor-->
-	<li>
-		<h3>(Task 12) person is author and editor</h3>
-  		<form>
-  		<!-- func=person_is_author_and_editor -->
-			<input type="hidden" name="func" value="person_is_author_and_editor">
-			<input type="submit" value="get">
-		</form>
-	</li>
-	
+<form>
+<!-- func=person_is_author_and_editor -->
+<div class="form-group">
+	<label for="person_is_author_and_editor">(Task 12) person is author and editor</label>
+	<input type="hidden" id="person_is_author_and_editor" name="func" value="person_is_author_and_editor"><br>
+	<button type="submit" class="btn btn-default">get</button>
+</div>
+</form>
+
+<hr>
+
 <!--(Task 13) person is last author-->
-	<li>
-		<h3>(Task 13) person is last author</h3>
-  		<form>
-  		<!-- func=person_is_last_author&id=<value> -->
-			<input type="hidden" name="func" value="person_is_last_author">
-			<input type="text" name="id" value="person/Manuel Wettstein"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
+<form>
+<!-- func=person_is_last_author&id=<value> -->
+<div class="form-group">
+	<label for="person_is_last_author">(Task 13) person is last author</label>
+	<input type="hidden" id="person_is_last_author" name="func" value="person_is_last_author">
+	<input type="text" class="form-control" name="id" value="person/Manuel Wettstein">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
 
 
 <!--(Task 14) publishers whose authors appear in any inproceedings in a interval of years-->
-	<li>
-		<h3>(Task 14) publishers whose authors appear in any inproceedings in a interval of years</h3>
-  		<form>
-  		<!-- func=publishers_whose_authors_in_interval&year1=<value>&year2=<value> -->
-			<input type="hidden" name="func" value="publishers_whose_authors_in_interval">
-			<input type="text" name="year1" value="2005"><br>
-			<input type="text" name="year2" value="2008"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>	
-	
-	
-
-	
-
-		
+<form>
+<!-- func=publishers_whose_authors_in_interval&year1=<value>&year2=<value> -->
+<div class="form-group">
+	<label for="publishers_whose_authors_in_interval">(Task 14) publishers whose authors appear in any inproceedings in a interval of years</label>
+	<input type="hidden" id="publishers_whose_authors_in_interval" name="func" value="publishers_whose_authors_in_interval">
+	<input type="text" class="form-control" name="year1" value="2005">
+	<input type="text" class="form-control" name="year2" value="2008">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>

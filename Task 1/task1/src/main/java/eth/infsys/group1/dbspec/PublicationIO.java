@@ -69,15 +69,14 @@ public class PublicationIO {
 		if (is_empty){
 			ret += "Publication is empty<br>";
 			return ret;
-		} else if (is_a_proceeding){
+		} /*else if (is_a_proceeding){
 			ret += "Proceeding-";
 		} else {
 			ret += "InProceeding-";
-		}
+		}*/
 
-
+		ret += "<h3>"+title+"</h3>";
 		ret += "id: "+id +"<br>";
-		ret += "title: <b>"+title+"</b><br>";
 		ret += "year: "+year+"<br>";
 	
 		ret += "ee: <a href='"+electronicEdition+"'>"+electronicEdition+"</a><br>";
@@ -124,7 +123,7 @@ public class PublicationIO {
 				if (--show == 0)
 					break;
 			}
-			ret += "</ol>";
+			ret += "</ol><hr>";
 
 		}
 		else
@@ -145,7 +144,7 @@ public class PublicationIO {
 			//ret += "proceeding-title: " + proceeding_title +"<br>";			
 			//ret += "proceeding-id: <a href=/test/?func=proceeding_by_id&key=" + proceeding_id +">" + proceeding_id + "</a><br>";
 			ret += "Proceeding: "+ proceeding_title + " (<a href='/test/?func=proceeding_by_id&key=" + proceeding_id + "'>"+proceeding_id+"</a>)<br>";
-
+			ret += "<hr>";
 		}
 		
 		return ret;

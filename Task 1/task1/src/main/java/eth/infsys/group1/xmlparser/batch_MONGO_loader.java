@@ -21,7 +21,11 @@ public class batch_MONGO_loader {
 	public static void main(String[] args) {
 		
 		
-		String MongodbName ="myDBLP";		
+		//String MongodbName ="myDBLPv3";	
+		//String MongodbName ="myDBLP";
+		String MongodbName ="fake";		
+
+
 		//T2DBProvider myDB = new T2DBProvider(MongodbName, DBProvider.OPEN_DB_OVERRIDE);
 		T2DBProvider myDB = new T2DBProvider(MongodbName, DBProvider.OPEN_DB_APPEND);
 

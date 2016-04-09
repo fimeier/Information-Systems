@@ -704,15 +704,56 @@ public class Webserver {
 			eoff = 0;
 		}
 
-		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
+		
+		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
+		String argument_next = "";
+		String argument_prev = "";
+
+		int offset = Math.abs(boff - eoff)+1;
+
+		if ( !order_by.equals("")){
+			String ob = order_by.split(" ")[0];
+			String obd = order_by.split(" ")[1];
+			argument_prev = "/test/?func=series_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset)+"&order_by="+ob+"&ob_direction="+obd;
+			argument_next = "/test/?func=series_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset)+"&order_by="+ob+"&ob_direction="+obd;
+		}
+		else{
+			argument_prev = "/test/?func=series_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset);
+			argument_next = "/test/?func=series_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset);
+		}
+		if ( DB_Implementation.equals("zooDB")){
+			argument_next = "";
+			argument_prev = "";
+		}
+
+		Output += "<div>";
+		Output += "<!-- Nav tabs -->";
+		Output += "<ul class='nav nav-tabs' role='tablist'>";
+		Output += "<li role='presentation' class='active'><a href='#Series' aria-controls='home' role='tab' data-toggle='tab'>Series</a></li>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_next+"' aria-controls='profile' role='tab'>next</a>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_prev +"' aria-controls='profile' role='tab'>previous</a>";
+		Output += "</li>";
+		Output += "</ul>";
+		Output += "<!-- Tab panes -->";
+		Output += "<div class='tab-content'>";
+		Output += "<div role='tabpanel' class='tab-pane active' id='Series'>";
+		Output += "<!-- START Series-->";
 
 		List<DivIO> series = myDB.IO_get_series_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO ser: series){
 			Output += ser.get_all() + "<br><br>";
 		} 
 
+		Output += "<!-- END Series-->";
+		Output += "</div></div></div>";
+		
 		return Output;
+		
+		
+		
+		
+		
 	}
 
 	private String series_by_id(String series_id) {
@@ -734,14 +775,50 @@ public class Webserver {
 			eoff = 0;
 		}
 
-		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
+		
+		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
+		String argument_next = "";
+		String argument_prev = "";
+
+		int offset = Math.abs(boff - eoff)+1;
+
+		if ( !order_by.equals("")){
+			String ob = order_by.split(" ")[0];
+			String obd = order_by.split(" ")[1];
+			argument_prev = "/test/?func=publisher_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset)+"&order_by="+ob+"&ob_direction="+obd;
+			argument_next = "/test/?func=publisher_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset)+"&order_by="+ob+"&ob_direction="+obd;
+		}
+		else{
+			argument_prev = "/test/?func=publisher_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset);
+			argument_next = "/test/?func=publisher_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset);
+		}
+		if ( DB_Implementation.equals("zooDB")){
+			argument_next = "";
+			argument_prev = "";
+		}
+
+		Output += "<div>";
+		Output += "<!-- Nav tabs -->";
+		Output += "<ul class='nav nav-tabs' role='tablist'>";
+		Output += "<li role='presentation' class='active'><a href='#Publishers' aria-controls='home' role='tab' data-toggle='tab'>Publishers</a></li>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_next+"' aria-controls='profile' role='tab'>next</a>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_prev +"' aria-controls='profile' role='tab'>previous</a>";
+		Output += "</li>";
+		Output += "</ul>";
+		Output += "<!-- Tab panes -->";
+		Output += "<div class='tab-content'>";
+		Output += "<div role='tabpanel' class='tab-pane active' id='Publishers'>";
+		Output += "<!-- START Publishers-->";
 
 		List<DivIO> publishers = myDB.IO_get_publisher_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO publisher: publishers){
 			Output += publisher.get_all() + "<br><br>";
 		} 
 
+		Output += "<!-- END Publishers-->";
+		Output += "</div></div></div>";
+		
 		return Output;
 	}
 
@@ -817,14 +894,51 @@ public class Webserver {
 			boff = 0;
 			eoff = 0;
 		}
+		
+		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
-		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
+		String argument_next = "";
+		String argument_prev = "";
+
+		int offset = Math.abs(boff - eoff)+1;
+
+		if ( !order_by.equals("")){
+			String ob = order_by.split(" ")[0];
+			String obd = order_by.split(" ")[1];
+			argument_prev = "/test/?func=conf_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset)+"&order_by="+ob+"&ob_direction="+obd;
+			argument_next = "/test/?func=conf_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset)+"&order_by="+ob+"&ob_direction="+obd;
+		}
+		else{
+			argument_prev = "/test/?func=conf_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset);
+			argument_next = "/test/?func=conf_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset);
+		}
+		if ( DB_Implementation.equals("zooDB")){
+			argument_next = "";
+			argument_prev = "";
+		}
+
+		Output += "<div>";
+		Output += "<!-- Nav tabs -->";
+		Output += "<ul class='nav nav-tabs' role='tablist'>";
+		Output += "<li role='presentation' class='active'><a href='#Conferences' aria-controls='home' role='tab' data-toggle='tab'>Conferences</a></li>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_next+"' aria-controls='profile' role='tab'>next</a>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_prev +"' aria-controls='profile' role='tab'>previous</a>";
+		Output += "</li>";
+		Output += "</ul>";
+		Output += "<!-- Tab panes -->";
+		Output += "<div class='tab-content'>";
+		Output += "<div role='tabpanel' class='tab-pane active' id='Conferences'>";
+		Output += "<!-- START Conferences-->";
 
 		List<DivIO> confs = myDB.IO_get_conference_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO conf: confs){
 			Output += conf.get_all() + "<br><br>";
 		} 
+		Output += "<!-- END Conferences-->";
+		Output += "</div></div></div>";
+		
 		return Output;
+
 	}
 
 	private String person_by_filter_offset(String filter, String beginoffset, String endoffset, String order_by) {
@@ -838,22 +952,57 @@ public class Webserver {
 			boff = 0;
 			eoff = 0;
 		}
+		
+		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
-		String Output = "filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"<br><br>";
+		String argument_next = "";
+		String argument_prev = "";
 
+		int offset = Math.abs(boff - eoff)+1;
+
+		if ( !order_by.equals("")){
+			String ob = order_by.split(" ")[0];
+			String obd = order_by.split(" ")[1];
+			argument_prev = "/test/?func=person_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset)+"&order_by="+ob+"&ob_direction="+obd;
+			argument_next = "/test/?func=person_by_filter_offset_order&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset)+"&order_by="+ob+"&ob_direction="+obd;
+		}
+		else{
+			argument_prev = "/test/?func=person_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset);
+			argument_next = "/test/?func=person_by_filter_offset&name_contains="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset);
+		}
+		if ( DB_Implementation.equals("zooDB")){
+			argument_next = "";
+			argument_prev = "";
+		}
+
+		Output += "<div>";
+		Output += "<!-- Nav tabs -->";
+		Output += "<ul class='nav nav-tabs' role='tablist'>";
+		Output += "<li role='presentation' class='active'><a href='#Persons' aria-controls='home' role='tab' data-toggle='tab'>Persons</a></li>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_next+"' aria-controls='profile' role='tab'>next</a>";
+		Output += "<li role='presentation' style='float:right'><a href='"+argument_prev +"' aria-controls='profile' role='tab'>previous</a>";
+		Output += "</li>";
+		Output += "</ul>";
+		Output += "<!-- Tab panes -->";
+		Output += "<div class='tab-content'>";
+		Output += "<div role='tabpanel' class='tab-pane active' id='Persons'>";
+		Output += "<!-- START Persons-->";
 
 		List<DivIO> persons = myDB.IO_get_person_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO person: persons){
-			Output += person.get_all() + "<br><br>";
+			Output += person.get_all();
 		} 
+		Output += "<!-- END Persons-->";
+		Output += "</div></div></div>";
+		
 
 		return Output;
 	}
 
 	private String publ_by_person_name_or_id(HashMap<String, String> args) {
-		String Output = "";//"<br><b>filter</b>="+args+"<br>";
+		String Output = "<p><b>filter</b>="+args+"<br></p>";
 
-		Output = "<br><br><a href='#first_proc'>go to Proceedings</a>, <a href='#first_inproc'>go to InProceedings</a><br>";
+		//Output += "<a href='#first_proc'>go to Proceedings</a>, <a href='#first_inproc'>go to InProceedings</a><br>";
 
 		List<PublicationIO> publs = myDB.IO_publ_by_person_name_or_id(args);
 		Boolean first_proc = false;
@@ -862,17 +1011,50 @@ public class Webserver {
 			Output += "no publications found..";
 		}
 		else {
+			Output += "<div>";
+			Output += "<!-- Nav tabs -->";
+			Output += "<ul class='nav nav-tabs' role='tablist'>";
+			Output += "<li role='presentation' class='active'>";
+			Output += "<a href='#Proceedings' aria-controls='home' role='tab' data-toggle='tab'>Proceedings</a></li>";
+			Output += "<li role='presentation'><a href='#inProceedings' aria-controls='profile' role='tab' data-toggle='tab'>inProceedings</a>";
+			//Output += "<li role='presentation' style='float:right'><a href='"+argument_next+"' aria-controls='profile' role='tab'>next</a>";
+			//Output += "<li role='presentation' style='float:right'><a href='"+argument_prev +"' aria-controls='profile' role='tab'>previous</a>";
+			Output += "</li>";
+			Output += "</ul>";
+			Output += "<!-- Tab panes -->";
+			Output += "<div class='tab-content'>";
+			Output += "<div role='tabpanel' class='tab-pane active' id='Proceedings'>";
+			Output += "<!-- START PROCEEDINGS-->";
 			for (PublicationIO publ: publs){
 				if ( (publ.is_a_proceeding == true) && (first_proc == false) ){
 					first_proc = true;
-					Output += "<h4 id='first_proc'>Proceedings</h4>";
+					//Output += "<h4 id='first_proc'>Proceedings</h4>";
 				}
 				if ( (publ.is_an_inproceeding == true) && (first_inproc == false) ){
 					first_inproc = true;
-					Output += "<h4 id='first_inproc'>InProceedings</h4>";
+					//Output += "<h4 id='first_inproc'>InProceedings</h4>";
+					if (!first_proc){
+						Output += "<h3> no proceedings...</h3>";
+					}
+					Output += "<!-- END PROCEEDINGS-->";
+					Output += "</div>";
+					Output += "<div role='tabpanel' class='tab-pane' id='inProceedings'>";
+					Output += "<!-- START inPROCEEDINGS-->";
 				}
-				Output += publ.get_all() + "<br><br>";
+				Output += publ.get_all();
 			}
+			//closes proceedings
+			if (args.get("publ").equals("editored")){
+				Output += "<!-- END PROCEEDINGS-->";
+				Output += "</div>";
+				Output += "<div role='tabpanel' class='tab-pane' id='inProceedings'>";
+				Output += "<!-- START inPROCEEDINGS-->";
+				Output += "<h3> no inroceedings...</h3>";
+
+			}
+			Output += "<!-- END inPROCEEDINGS--></div></div></div>";
+
+
 		}
 
 		return Output;
@@ -891,45 +1073,91 @@ public class Webserver {
 			eoff = 0;
 		}
 
-		String Output = "<br>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"<br>";
+		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"</p>";
 
 		List<PublicationIO> publs = myDB.IO_get_publ_by_filter_offset(filter, boff, eoff, order_by);
 		
 		if (zooDB_implementation){
+			Output += "<div>";
 			for (PublicationIO publ: publs){
 				Output += publ.get_all() + "<br><br>";
-			} 
+			}
+			Output += "</div>";
 		}
 		if (MongoDB_implementation){
 			Boolean first_proc = false;
 			Boolean first_inproc = false;
 			int proc_count = 0;
 			int inproc_count = 0;
-			String temp_output="";
+			//String temp_output="";
 			if (publs.isEmpty()){
 				Output += "no publications found..";
 			}
 			else {
+
+				int offset = Math.abs(boff - eoff)+1;
+
+				String argument_prev ="";
+				String argument_next ="";
+				if ( !order_by.equals("")){
+					String ob = order_by.split(" ")[0];
+					String obd = order_by.split(" ")[1];
+					argument_prev = "/test/?func=pupl_by_title_offset_order&title="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset)+"&order_by="+ob+"&ob_direction="+obd;
+					argument_next = "/test/?func=pupl_by_title_offset_order&title="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset)+"&order_by="+ob+"&ob_direction="+obd;
+				}
+				else{
+					argument_prev = "/test/?func=pupl_by_title_offset&title="+filter+"&begin-offset="+(boff-offset)+"&end-offset="+(eoff-offset);
+					argument_next = "/test/?func=pupl_by_title_offset&title="+filter+"&begin-offset="+(boff+offset)+"&end-offset="+(eoff+offset);
+				}
+
+				Output += "<div>";
+				Output += "<!-- Nav tabs -->";
+				Output += "<ul class='nav nav-tabs' role='tablist'>";
+				Output += "<li role='presentation' class='active'>";
+				Output += "<a href='#Proceedings' aria-controls='home' role='tab' data-toggle='tab'>Proceedings</a></li>";
+				Output += "<li role='presentation'><a href='#inProceedings' aria-controls='profile' role='tab' data-toggle='tab'>inProceedings</a>";
+				Output += "<li role='presentation' style='float:right'><a href='"+argument_next+"' aria-controls='profile' role='tab'>next</a>";
+				Output += "<li role='presentation' style='float:right'><a href='"+argument_prev +"' aria-controls='profile' role='tab'>previous</a>";
+				Output += "</li>";
+				Output += "</ul>";
+				Output += "<!-- Tab panes -->";
+				Output += "<div class='tab-content'>";
+				Output += "<div role='tabpanel' class='tab-pane active' id='Proceedings'>";
+				Output += "<!-- START PROCEEDINGS-->";
 				for (PublicationIO publ: publs){
 					if ( publ.is_a_proceeding){
 						proc_count++;
 						if (first_proc == false){
 							first_proc = true;
-							temp_output += "<h4 id='first_proc'>Proceedings</h4>";
+							//temp_output += "<h4 id='first_proc'>Proceedings</h4>";
 						}
 					}
 					else if (publ.is_an_inproceeding){
 						inproc_count++;
 						if (first_inproc == false){
+							if (proc_count==0){
+								Output += "<h3>no proceedings found...</h3>";
+							}
+							Output += "<!-- END PROCEEDINGS-->";
+							Output += "</div>";
+							Output += "<div role='tabpanel' class='tab-pane' id='inProceedings'>";
+							Output += "<!-- START inPROCEEDINGS-->";
 							first_inproc = true;
-							temp_output += "<h4 id='first_inproc'>InProceedings</h4>";
+							//temp_output += "<h4 id='first_inproc'>InProceedings</h4>";
 						}
 					}
-					temp_output += publ.get_all() + "<br><br>";
+					Output += publ.get_all() + "<br><br>";
 				}
+				//closes proceedings
+				if (inproc_count==0){
+					Output += "<!-- END PROCEEDINGS-->";
+					Output += "</div>";
+					Output += "<div role='tabpanel' class='tab-pane' id='inProceedings'>";
+					Output += "<!-- START inPROCEEDINGS-->";
+					Output += "<h3> no inproceedings...</h3>";
+				}
+				Output += "<!-- END inPROCEEDINGS--></div></div></div>";
 			}
-			Output += "<br><br><a href='#first_proc'>go to Proceedings ("+proc_count+")</a>, <a href='#first_inproc'>go to InProceedings("+inproc_count+")</a><br>";
-			Output += temp_output;
 		}
 
 		return Output;
@@ -953,6 +1181,7 @@ public class Webserver {
 		}
 		return output;
 	}
+	
 
 	private String get_page(String name) {
 		String path = "../task1/src/main/java/eth/infsys/webserver/page_"+name+".html";
@@ -968,6 +1197,21 @@ public class Webserver {
 	}
 
 	private String create_header(WebFunc wf){
+		String path1 = "../task1/src/main/java/eth/infsys/webserver/header_part1.html";
+		String path2 = "../task1/src/main/java/eth/infsys/webserver/header_part2.html";
+		String output = "";
+		try {
+			output = readFile(path1, Charset.defaultCharset());
+			output += DB_Implementation;
+			output += readFile(path2, Charset.defaultCharset());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return output;
+	}
+	
+	//private String create_header(WebFunc wf){
 		/*switch (wf) {
 		case inproceeding_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
@@ -976,8 +1220,8 @@ public class Webserver {
 		case publication_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		}*/
-		return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><h1>"+DB_Implementation+"</h1><a href='/test/?func=MAIN'>HOME</a><FORM><INPUT Type='button' VALUE='Back' onClick='history.go(-1);return true;'></FORM><br>";
-	}
+		//return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><h1>"+DB_Implementation+"</h1><a href='/test/?func=MAIN'>HOME</a><FORM><INPUT Type='button' VALUE='Back' onClick='history.go(-1);return true;'></FORM><br>";
+	//}
 	private String create_footer(WebFunc wf){
 		/*switch (wf) {
 		case inproceeding_by_id:
@@ -987,7 +1231,7 @@ public class Webserver {
 		case publication_by_id:
 			return "</body></html>";
 		}*/
-		return "</body></html>";
+		return "</div></body></html>";
 	}
 
 	private String inproceeding_by_id(String id) {

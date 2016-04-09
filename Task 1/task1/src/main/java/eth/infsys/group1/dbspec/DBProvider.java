@@ -111,6 +111,13 @@ public abstract class DBProvider {
 			return o1.getValue().compareTo(o2.getValue());
 		}
 	};
+	
+	protected Comparator<Pair<String, String>> compare_Pair_value = new Comparator<Pair<String,String>>() {
+		@Override
+		public int compare(Pair<String, String> o1, Pair<String, String> o2) {
+			return o1.getValue().compareTo(o2.getValue());
+		}
+	};
 
 	protected Comparator<DivIO> compareDivIO_Publisher_name = new Comparator<DivIO>() {
 		@Override

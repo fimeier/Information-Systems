@@ -66,8 +66,8 @@ public class DivIO {
 		
 		//Conference ok
 		else if (is_a_conference){
+			ret += "<h3>"+Conference_name +"</h3>";
 			ret += "Conference-id: "+id +"<br>";
-			ret += "name: <b>"+Conference_name +"</b><br>";
 
 
 			int show = -1;
@@ -79,26 +79,27 @@ public class DivIO {
 				if (--show == 0)
 					break;
 			}
-			ret += "<br>";
+			ret += "<hr>";
 		}
 		
 		//ConferenceEdition
 		else if (is_a_conference_edition){
+			ret += "<h3>"+ConferenceEdition_year +"</h3>";
 			ret += "ConferenceEdition-id: "+id +"<br>";
-			ret += "year: <b>"+ConferenceEdition_year +"</b><br>";
 			
 			//ret += "<a href='/test/?func=conf_by_id&id=" +ConferenceEdition_conference_id+ "'>conference name: "+ConferenceEdition_conference_name+"</a><br>";
 			ret += "conference: <a href='/test/?func=conf_by_id&id=" +ConferenceEdition_conference_id+ "'>"+ConferenceEdition_conference_name+"</a><br>";
 
 			//ret += "<a href='/test/?func=proceeding_by_id&key=" +ConferenceEditions_proceedings_id+ "'>proceeding title: "+ConferenceEditions_proceedings_title+"</a><br>";
 			ret += "Proceeding: "+ ConferenceEditions_proceedings_title + " (<a href='/test/?func=proceeding_by_id&key=" + ConferenceEditions_proceedings_id + "'>"+ConferenceEditions_proceedings_id+"</a>)<br>";
-
+			ret +="<hr>";
 		}
 
 		//Person ok
 		else if (is_a_person){
+			ret += "<h3>"+ Person_name +"</h3>";
+
 			ret += "Person-id: "+id +"<br>";
-			ret += "name: <b>"+ Person_name +"</b><br>";
 			
 			int show = -1;
 
@@ -130,17 +131,17 @@ public class DivIO {
 				if (--show == 0)
 					break;
 			}
-			ret += "</ol>";
+			ret += "</ol><hr>";
 
 
 		}
 
 		//Publisher ok
 		else if (is_a_publisher){
+			
+			ret += "<h3>"+ Publisher_name +"</h3>";
+
 			ret += "Publisher-id: "+id +"<br>";
-			ret += "name: <b>"+ Publisher_name +"</b><br>";
-			
-			
 			
 			ret += "Proceedings:";
 			if (Publisher_publications_title_id.size()==0)
@@ -157,15 +158,16 @@ public class DivIO {
 				if (--show == 0)
 					break;
 			}
-			ret += "</ol>";
+			ret += "</ol><hr>";
 
 
 		}
 
 		//Series ok
 		else if (is_a_series){
+			
+			ret += "<h3>"+ Series_name +"</h3>";
 			ret += "Series-id: "+id +"<br>";
-			ret += "name: <b>"+ Series_name +"</b><br>";
 			
 			ret += "Proceedings:";
 			if (Series_publications_title_id.size()==0)

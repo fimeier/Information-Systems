@@ -1,43 +1,57 @@
 
 <!-- Series -->
 	
-	<li>
-		<h3>Find a series by id</h3>
-  		<form>
-  		<!-- func=series_by_id#id=<id-value> -->
-			<input type="hidden" name="func" value="series_by_id">
-			<input type="text" name="id" value="series/Lecture Notes in Computer Science"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-		<li>
-		<h3>Find a series by filter (contains string in name)</h3>
-  		<form>
-  		<!-- func=series_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="series_by_filter_offset">
-			<input type="text" name="name_contains" value="Lecture Notes in Computer Science"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	<li>
-		<h3>Find a series by filter (contains string in name) ordered by</h3>
-  		<form>
-  		<!-- func=series_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
-			<input type="hidden" name="func" value="series_by_filter_offset_order">
-			<input type="text" name="name_contains" value="Lecture Notes in Computer Science"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="hidden" name="order_by" value="name">
-			<fieldset>
-				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
-				<br>
-				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
-			</fieldset>
-			<input type="submit" value="Submit">
-		</form>
-	</li>
-	
-	
-	
+
+<h2>Series</h2>
+
+<form>
+<!-- func=series_by_id#id=<id-value> -->
+<div class="form-group">
+	<label for="series_by_id">Find a series by id</label>
+	<input type="hidden" id="series_by_id" name="func" value="series_by_id">
+	<input type="text" class="form-control" name="id" value="series/Studia Informatica Universalis">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
+
+<form>
+<!-- func=series_by_filter_offset#name_contains=<value>#begin-offset=<value>#end-offset=<value> -->
+<div class="form-group">
+	<label for="series_by_filter_offset">Find a series by filter (contains string in name)</label>
+	<input type="hidden" id="series_by_filter_offset" name="func" value="series_by_filter_offset">
+	<input type="text" class="form-control" name="name_contains" value="Computer">
+	<input type="text" class="form-control" name="begin-offset" value="1">
+	<input type="text" class="form-control" name="end-offset" value="2">
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+
+<hr>
+
+<form>
+<!-- func=series_by_filter_offset_order#name_contains=<value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
+<div class="form-group">
+	<label for="series_by_filter_offset_order">Find a series by filter (contains string in name) ordered by</label>
+	<input type="hidden" id="series_by_filter_offset_order" name="func" value="series_by_filter_offset_order">
+	<input type="text" class="form-control" name="name_contains" value="Computer">
+	<input type="text" class="form-control" name="begin-offset" value="1">
+	<input type="text" class="form-control" name="end-offset" value="2">
+	<input type="hidden" name="order_by" value="name">
+	<div class="radio">
+		<fieldset>
+			<label>
+				<input type="radio" id="oba" name="ob_direction" value="ascending" checked>
+				 ascending
+			</label>
+			<label>
+				<input type="radio" id="obd" name="ob_direction" value="descending">
+				descending
+			</label>
+		</fieldset>
+	</div>
+	<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+

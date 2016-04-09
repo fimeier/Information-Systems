@@ -1243,7 +1243,8 @@ public class T1DBProvider extends DBProvider {
 					e.printStackTrace();
 				}
 			}
-			Output += "<br>there are "+String.valueOf(count)+" inproceedings for the conference "+conf.getName() +"<br>";
+			Output += "<br>there are <b>"+count+" inproceedings</b> for the conference <a href='/test/?func=conf_by_id&id="+conf.getId()+"'>"+ conf.getName()+"</a><br>";
+			//Output += "<br>there are "+count+" inproceedings for the conference "+conf.getName() +"<br>";
 			return Output;
 		}
 		else {
@@ -1257,7 +1258,7 @@ public class T1DBProvider extends DBProvider {
 				}
 			}
 			list_inproc.sort(compare_InProceedings_title);
-			Output += "<br>the inproceedings for the conference <a href='/test/?func=confEd_by_id&id="+conf.getId()+"'>"+ conf.getName()+"</a> are:<br>";
+			Output += "<br>the inproceedings for the conference <a href='/test/?func=conf_by_id&id="+conf.getId()+"'>"+ conf.getName()+"</a> are:<br>";
 			for (InProceedings inproc: list_inproc){
 				Output += "<a href='/test/?func=inproceeding_by_id&key="+inproc.getId()+"'>"+inproc.getTitle()+"</a><br>";
 			}

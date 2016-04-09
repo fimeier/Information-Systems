@@ -1,80 +1,129 @@
 
 <!-- Find publications of a person by name -->
-	<li>
-		<h3>Find publications of a person by name</h3>
+	
+		<h2>Publications</h2>
   		<form>
   		<!-- func=publ_by_person_name_or_id#name=value	 -->
+			<div class="form-group">
+			<label for="publ_by_person_name_or_id15">Find publications of a person by name</label>
 			<input type="hidden" name="func" value="publ_by_person_name_or_id">
-			<input type="text" name="name" value="Andrea Bondavalli"><br>
-			<input type="submit" value="Submit">
-			<fieldset>
-				<input type="radio" id="all" name="publ" value="all" checked><label for="all">all</label>
-				<br>
-				<input type="radio" id="auth" name="publ" value="authored"><label for="auth">authored</label>
-				<br>
-				<input type="radio" id="edit" name="publ" value="editored"><label for="edit">editored</label>	
-			</fieldset>
+			<input type="text" class="form-control" id="publ_by_person_name_or_id15" name="name" value="Andrea Bondavalli">
+				<fieldset>
+				<div class="radio">
+					<label>
+						<input type="radio" class="radio" id="all" name="publ" value="all" checked>
+						 all
+					</label>
+					<label>
+						<input type="radio" class="radio" id="auth" name="publ" value="authored">
+						authored
+					</label>
+					<label>
+						<input type="radio" class="radio" id="edit" name="publ" value="editored">
+						editored
+					</label>
+				</div>
+				</fieldset>
+			<button type="submit" class="btn btn-default">Submit</button>
+			</div>
 		</form>
-	</li>
+
+		<hr>
+
 <!-- Find publications of a person by name (same as above but with id field -->
-	<li>
-		<h3>Find publications of a person by id</h3>
   		<form>
-  		<!-- func=publ_by_person_name_or_id#name=value	 -->
+  		<!-- func=publ_by_person_name_or_id#name=value -->
+		<div class="form-group">
+			<label for="publ_by_person_name_or_id16">Find publications of a person by id</label>
 			<input type="hidden" name="func" value="publ_by_person_name_or_id">
-			<input type="text" name="id" value="person/Andrea Bondavalli"><br>
-			<input type="submit" value="Submit">
-			<fieldset>
-				<input type="radio" id="all" name="publ" value="all" checked><label for="all">all</label>
-				<br>
-				<input type="radio" id="auth" name="publ" value="authored"><label for="auth">authored</label>
-				<br>
-				<input type="radio" id="edit" name="publ" value="editored"><label for="edit">editored</label>	
-			</fieldset>
+			<input type="text" class="form-control" id="publ_by_person_name_or_id16" name="id" value="person/Andrea Bondavalli">
+				<fieldset>
+				<div class="radio">
+					<label>
+						<input type="radio" class="radio" id="all" name="publ" value="all" checked>
+						 all
+					</label>
+					<label>
+						<input type="radio" class="radio" id="auth" name="publ" value="authored">
+						authored
+					</label>
+					<label>
+						<input type="radio" class="radio" id="edit" name="publ" value="editored">
+						editored
+					</label>
+				</div>
+				</fieldset>
+			<button type="submit" class="btn btn-default">Submit</button>
+			</div>
 		</form>
-	</li>
+
+		<hr>
+
 
 <!--Find a publication by id-->
-	<li>
-		<h3>Find a publication by id</h3>
+
   		<form>
+			<div class="form-group">
   			<!-- func=publication_by_id#key=<key-value> -->
-			<input type="hidden" name="func" value="publication_by_id"><br>
-			<input type="text" name="key" value='conf/gbrpr/2005'><br>
-			<input type="submit" value="Submit">
+			<label for="publication_by_id">Find a publication by id</label>
+			<input type="hidden" name="func" value="publication_by_id">
+			<input type="text" class="form-control" id="publication_by_id" name="key" value='conf/gbrpr/2005'>
+			<button type="submit" class="btn btn-default">Submit</button>
+		</div>
 		</form>
-	</li>
-	
-	<li>
-		<h3>Find a publication by filter (contains string in title)</h3>
+
+		<hr>
+
+
   		<form>
+		<div class="form-group">
   		<!-- func=pupl_by_title_offset#title=<title-value>#begin-offset=<value>#end-offset=<value> -->
-			<input type="hidden" name="func" value="pupl_by_title_offset">
-			<input type="text" name="title" value="title"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
-			<input type="submit" value="Submit">
+		<label for="pupl_by_title_offset">Find a publication by filter (contains string in title)</label>
+			<input type="hidden" id="pupl_by_title_offset" name="func" value="pupl_by_title_offset">
+			<input type="text" class="form-control" name="title" value="Algorithm">
+			<input type="text" class="form-control" name="begin-offset" value="1">
+			<input type="text" class="form-control" name="end-offset" value="5">
+			<button type="submit" class="btn btn-default">Submit</button>
+		</div>
 		</form>
-	</li>
-	<li>
-		<h3>Find a publication by filter (contains string in title) ordered by</h3>
+
+		<hr>
+
+		
   		<form>
+		<div class="form-group">
   		<!-- func=publication_by_filter#title=<title-value>#begin-offset=<value>#end-offset=<value>#order_by=<value>#ob_direction -->
-			<input type="hidden" name="func" value="pupl_by_title_offset_order">
-			<input type="text" name="title" value="title"><br>
-			<input type="text" name="begin-offset" value="0"><br>
-			<input type="text" name="end-offset" value="0"><br>
+			<label for="pupl_by_title_offset_order">Find a publication by filter (contains string in title) ordered by</label>
+			<input type="hidden" id="pupl_by_title_offset_order"name="func" value="pupl_by_title_offset_order">
+			<input type="text" class="form-control" name="title" value="intel">
+			<input type="text" class="form-control" name="begin-offset" value="1">
+			<input type="text" class="form-control" name="end-offset" value="5">
+			
 			<fieldset>
-				<input type="radio" id="obt" name="order_by" value="title" checked><label for="obt">title</label>
-				<br>
-				<input type="radio" id="oby" name="order_by" value="year"><label for="oby">year</label>
+				<div class="radio">
+					<label>
+						<input type="radio" class="radio" id="obt" name="order_by" value="title" checked>
+						title
+					</label>
+					<label>
+						<input type="radio" class="radio" id="oby" name="order_by" value="year">
+						year
+					</label>
+				</div>
 			</fieldset>
+			
 			<fieldset>
-				<input type="radio" id="oba" name="ob_direction" value="ascending" checked><label for="oba">ascending</label>
-				<br>
-				<input type="radio" id="obd" name="ob_direction" value="descending"><label for="obd">descending</label>
+				<div class="radio">
+					<label>
+						<input type="radio" class="radio" id="oba" name="ob_direction" value="ascending" checked>
+						ascending
+					</label>
+					<label>
+						<input type="radio" class="radio" id="obd" name="ob_direction" value="descending">
+						descending
+					</label>
+				</div>
 			</fieldset>
-			<input type="submit" value="Submit">
+			<button type="submit" class="btn btn-default">Submit</button>
+		</div>
 		</form>
-	</li>
-	
