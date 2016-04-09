@@ -71,7 +71,7 @@ public class T1DBProvider extends DBProvider {
 			 */
 			this.pm = ZooJdoHelper.openOrCreateDB(dbName);
 
-			pm.currentTransaction().setRetainValues(true);
+			//pm.currentTransaction().setRetainValues(true);
 
 			break;
 
@@ -1267,14 +1267,16 @@ public class T1DBProvider extends DBProvider {
 		}
 	}
 
-	public String IO_authors_editors_for_a_conference(String conf_id, String mode) {
+	public String[] IO_authors_editors_for_a_conference(String conf_id, String mode) {
 		pm.currentTransaction().setNontransactionalRead(true);
+		String out[]= new String[2]; out[0]=""; out[1]="";
 		String Output ="";
 
 		Conference conf = get_conference_by_id(conf_id);
 		if (conf==null){
 			Output += "<br>not a conference<br>";
-			return Output;
+			out[0]=Output;
+			return out;
 		}
 		HashSet<Person> authors = new HashSet<>();
 		HashSet<Person> editors = new HashSet<>();
@@ -1305,26 +1307,26 @@ public class T1DBProvider extends DBProvider {
 
 			Output += "<br>there are <b>"+authors.size()+" authors</b> and <b>"+editors.size()+" editors</b> (total="+count+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+conf.getName()+"</a><br>";
 
-			return Output;
+			out[0]=Output;
+			return out;
 		}
 		else {
-			Output+= "<br><b>all authors:</b><br>";
+			//Output+= "<br><b>all authors:</b><br>";
 
 			List<Person> list_authors= new ArrayList<>(authors);
 			list_authors.sort(compare_Person_name);
 			for (Person pers: list_authors){
-				Output+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
+				out[1]+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
 
 			}
 
-			Output +="<br><br><b>all editors:</b><br>";
+			//Output +="<br><br><b>all editors:</b><br>";
 			List<Person> list_editors= new ArrayList<>(editors);
 			list_editors.sort(compare_Person_name);
 			for (Person pers: list_editors){
-				Output+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
-
+				out[0]+= "<a href='/test?func=person_by_id&id="+pers.getId()+"'>"+pers.getName()+"</a> ";
 			}
-			return Output;
+			return out;
 		}
 	}
 

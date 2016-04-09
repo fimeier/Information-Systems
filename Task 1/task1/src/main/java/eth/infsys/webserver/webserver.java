@@ -593,7 +593,7 @@ public class Webserver {
 
 		List<DivIO> publishers = myDB.IO_publishers_whose_authors_in_interval(y1, y2);
 		for (DivIO publi: publishers){
-			Output += publi.get_all() + "<br><br>";
+			Output += publi.get_all();
 		} 
 		return Output;
 	}
@@ -613,7 +613,7 @@ public class Webserver {
 		}
 		else {
 			for (PublicationIO publ: publs){
-				Output += publ.get_all() + "<br><br>";
+				Output += publ.get_all();
 			}
 		}
 		return Output;
@@ -627,8 +627,49 @@ public class Webserver {
 
 	private String authors_editors_for_a_conference(String conf_id, String mode) {
 		String Output ="";
-		if (mode.equals("retrieve")|| mode.equals("count")){
-			Output += myDB.IO_authors_editors_for_a_conference(conf_id, mode);
+
+		if (mode.equals("count")){
+			String[] count = myDB.IO_authors_editors_for_a_conference(conf_id, mode);
+			//Output += myDB.IO_authors_editors_for_a_conference(conf_id, mode);
+			Output += count[0];
+			return Output;
+		}
+		if (mode.equals("retrieve")){
+			
+			String[] editors_authors = myDB.IO_authors_editors_for_a_conference(conf_id, mode);
+			Output += "<p></p>";
+			Output += "<div>";
+			Output += "<!-- Nav tabs -->";
+			Output += "<ul class='nav nav-tabs' role='tablist'>";
+			Output += "<li role='presentation' class='active'>";
+			Output += "<a href='#Editors' aria-controls='home' role='tab' data-toggle='tab'>Editors</a></li>";
+			Output += "<li role='presentation'><a href='#Authors' aria-controls='profile' role='tab' data-toggle='tab'>Authors</a>";
+			Output += "</li>";
+			Output += "</ul>";
+			Output += "<!-- Tab panes -->";
+			Output += "<div class='tab-content'>";
+			
+			Output += "<div role='tabpanel' class='tab-pane active' id='Editors'>";
+			Output += "<!-- START Editors-->";
+			Output += editors_authors[0];
+			
+			if ("".equals(editors_authors[0])){
+				Output += "<h3>no editors...</h3>";
+			}
+			Output += "<!-- END Editors-->";
+			Output += "</div>";
+			
+			Output += "<div role='tabpanel' class='tab-pane' id='Authors'>";
+			Output += "<!-- START Authors-->";
+			Output += editors_authors[1];
+			if ("".equals(editors_authors[1])){
+				Output += "<h3>no authors...</h3>";
+			}
+			Output += "<!-- END Authors-->";
+			Output += "</div>";
+		
+			Output += "<!-- END inPROCEEDINGS--></div></div></div>";
+						
 			return Output;
 		}
 		else{
@@ -705,8 +746,7 @@ public class Webserver {
 		}
 
 		
-		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
-
+		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 		String argument_next = "";
 		String argument_prev = "";
 
@@ -742,7 +782,7 @@ public class Webserver {
 
 		List<DivIO> series = myDB.IO_get_series_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO ser: series){
-			Output += ser.get_all() + "<br><br>";
+			Output += ser.get_all();
 		} 
 
 		Output += "<!-- END Series-->";
@@ -776,7 +816,7 @@ public class Webserver {
 		}
 
 		
-		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
+		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
 		String argument_next = "";
 		String argument_prev = "";
@@ -813,7 +853,7 @@ public class Webserver {
 
 		List<DivIO> publishers = myDB.IO_get_publisher_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO publisher: publishers){
-			Output += publisher.get_all() + "<br><br>";
+			Output += publisher.get_all();
 		} 
 
 		Output += "<!-- END Publishers-->";
@@ -833,15 +873,15 @@ public class Webserver {
 		String output = "";
 
 		if (zooDB_implementation){
-			output += "The co-authors (and their publications) of <b>"+name+"</b> are:<br><br>";
+			output += "<p>The co-authors (and their publications) of <b>"+name+"</b> are:</p>";
 
 			List<DivIO> persons = myDB.IO_find_co_authors(name);
 			for (DivIO person: persons){
-				output += person.get_all() + "<br><br>";
+				output += person.get_all();
 			} 		
 		}
 		if (MongoDB_implementation){
-			output = "The co-authors and <font color='red'>the common publications</font> with <b>"+name+"</b> are:<br><br>";
+			output = "<p>The co-authors and <font color='red'>the common publications</font> with <b>"+name+"</b> are:</p>";
 			
 			output += myDB.IO_find_co_authors_returns_String(name);
 		}
@@ -895,7 +935,7 @@ public class Webserver {
 			eoff = 0;
 		}
 		
-		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
+		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
 		String argument_next = "";
 		String argument_prev = "";
@@ -932,7 +972,7 @@ public class Webserver {
 
 		List<DivIO> confs = myDB.IO_get_conference_by_filter_offset(filter, boff, eoff, order_by);
 		for (DivIO conf: confs){
-			Output += conf.get_all() + "<br><br>";
+			Output += conf.get_all();
 		} 
 		Output += "<!-- END Conferences-->";
 		Output += "</div></div></div>";
@@ -953,7 +993,7 @@ public class Webserver {
 			eoff = 0;
 		}
 		
-		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
+		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
 		String argument_next = "";
 		String argument_prev = "";
@@ -1000,7 +1040,7 @@ public class Webserver {
 	}
 
 	private String publ_by_person_name_or_id(HashMap<String, String> args) {
-		String Output = "<p><b>filter</b>="+args+"<br></p>";
+		String Output = "<p></p>";//<p><b>filter</b>="+args+"<br></p>";
 
 		//Output += "<a href='#first_proc'>go to Proceedings</a>, <a href='#first_inproc'>go to InProceedings</a><br>";
 
@@ -1073,14 +1113,14 @@ public class Webserver {
 			eoff = 0;
 		}
 
-		String Output = "<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"</p>";
+		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"</p>";
 
 		List<PublicationIO> publs = myDB.IO_get_publ_by_filter_offset(filter, boff, eoff, order_by);
 		
 		if (zooDB_implementation){
 			Output += "<div>";
 			for (PublicationIO publ: publs){
-				Output += publ.get_all() + "<br><br>";
+				Output += publ.get_all();
 			}
 			Output += "</div>";
 		}
@@ -1146,7 +1186,7 @@ public class Webserver {
 							//temp_output += "<h4 id='first_inproc'>InProceedings</h4>";
 						}
 					}
-					Output += publ.get_all() + "<br><br>";
+					Output += publ.get_all();
 				}
 				//closes proceedings
 				if (inproc_count==0){

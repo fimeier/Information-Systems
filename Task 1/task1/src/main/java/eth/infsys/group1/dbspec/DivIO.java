@@ -182,7 +182,8 @@ public class DivIO {
 				if (--show == 0)
 					break;
 			}
-			ret += "</ol>";
+			ret += "</ol><hr>";
+
 		}
 		return ret;		
 	}

@@ -150,7 +150,7 @@ public abstract class DBProvider {
 	public abstract String IO_get_statistics();
 	
 
-	public abstract String IO_authors_editors_for_a_conference(String conf_id, String mode);
+	public abstract String[] IO_authors_editors_for_a_conference(String conf_id, String mode);
 	public abstract String IO_avg_authors_per_inproceedings();
 	public abstract String IO_count_publications_per_interval(int y1, int y2);
 	public abstract String IO_delete_get_person_by_id(String pers_id);
