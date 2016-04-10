@@ -129,6 +129,17 @@ public abstract class DBProvider {
 		}
 	};
 	
+	protected Comparator<String> compare_Name = new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			if (o1==null || o2==null){
+				System.out.println("ERROR: compareDivIO_Publisher_name...");
+			}
+			return o1.compareTo(o2);
+		}
+	};
+	
+	
 	
 	/**
 	 * IO-Methods

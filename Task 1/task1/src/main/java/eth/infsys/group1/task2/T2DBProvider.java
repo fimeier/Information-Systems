@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 
@@ -52,6 +53,8 @@ import eth.infsys.group1.task1.dbobjs.ConferenceEdition;
 import eth.infsys.group1.task1.dbobjs.InProceedings;
 import eth.infsys.group1.task1.dbobjs.Person;
 import eth.infsys.group1.task1.dbobjs.Proceedings;
+import eth.infsys.group1.task1.dbobjs.Publication;
+import eth.infsys.group1.task1.dbobjs.Publisher;
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
@@ -155,13 +158,23 @@ public class T2DBProvider extends DBProvider {
 
 			//for performance
 			db.getCollection("Publications").createIndex(new Document("title",1));
+			db.getCollection("Publications").createIndex(new Document("title",-1));
+
+			
 			db.getCollection("Publications").createIndex(new Document("inproceedings.Inproceedings_title",1));
+			db.getCollection("Publications").createIndex(new Document("inproceedings.Inproceedings_title",-1));
 
 			db.getCollection("Publications").createIndex(new Document("editors.Editor_id",1));
-			db.getCollection("Publications").createIndex(new Document("editors.Editor_name",1));
+			db.getCollection("Publications").createIndex(new Document("editors.Editor_name",-1));
 
 			db.getCollection("Publications").createIndex(new Document("inproceedings.authors.Author_id",1));
-			db.getCollection("Publications").createIndex(new Document("inproceedings.authors.Author_name",1));
+			db.getCollection("Publications").createIndex(new Document("inproceedings.authors.Author_name",-1));
+			
+			db.getCollection("Publications").createIndex(new Document("ConferenceEdition_year",1));
+			db.getCollection("Publications").createIndex(new Document("ConferenceEdition_year",-1));
+			
+			
+			
 
 
 
@@ -568,6 +581,35 @@ public class T2DBProvider extends DBProvider {
 		Document publisher = db.getCollection("Publishers").find(filter).first();
 		return publisher;
 	}
+	
+	private Document get_publisher_by_name(String publ_name) {
+		Bson filter = eq("name", publ_name);
+		Document publisher = db.getCollection("Publishers").find(filter).first();
+		return publisher;
+	}
+	
+	private Document get_publishers_names_whose_authors_in_interval(int y1, int y2){
+		/*db.getCollection('Publications').aggregate(
+				[
+				    {$match:
+				        {$and:[
+				            {"ConferenceEdition_year": {$gte:1977}},
+				            {"ConferenceEdition_year": {$lte:1978}}
+				        ]
+				        }  
+				    },
+				    {$group: { _id: "null", "all_publishers_for_interval":{$addToSet: "$Publisher_name"}}},
+				    {$project: { "_id":0, "all_publishers_for_interval":1}}
+				]	)*/
+		
+		return db.getCollection("Publications").aggregate(asList(
+				Aggregates.match(Filters.and(
+						Filters.gte("ConferenceEdition_year", y1),
+						Filters.lte("ConferenceEdition_year", y2))),
+				new Document("$group",new Document("_id",null).append("all_publishers_for_interval",new Document("$addToSet","$Publisher_name"))),
+				Aggregates.project(fields(include("all_publishers_for_interval"),exclude("_id")))
+				)).first();
+	}
 
 
 	private void person_add_inproceedings(String pers_id, String Inproceedings_title, String Inproceedings_id) {
@@ -743,6 +785,42 @@ public class T2DBProvider extends DBProvider {
 		return proc;
 	}
 
+	
+	private AggregateIterable<Document> get_inproceedings_by_Author_id_author_is_last_author(String pers_id) {
+		/*db.getCollection('Publications').aggregate(
+				[
+				    {$match:{"inproceedings.authors.Author_id": "person/Moira C. Norrie"}},
+				    {$unwind:"$inproceedings"},
+				    {$project: {
+				            "_id":1, "title":1,"Conference_id":1,"Conference_name":1,"ConferenceEdition_id":1,"ConferenceEdition_year":1,"inproceedings":1,
+				            last:{$arrayElemAt: ["$inproceedings.authors",-1]}
+				            }
+				            },
+				    {$match: {"last.Author_id":"person/Moira C. Norrie"}},
+				    {$sort: { "inproceedings.Inproceedings_title":1}},
+				    {$project: { "_id":1, "title":1,"Conference_id":1,"Conference_name":1,"ConferenceEdition_id":1,"ConferenceEdition_year":1,"inproceedings":1}}
+				])*/
+
+		return db.getCollection("Publications").aggregate(
+				asList(
+						Aggregates.match(eq("inproceedings.authors.Author_id",pers_id)),
+						Aggregates.unwind("$inproceedings"),
+
+						new Document("$project",
+								new Document("_id",1)
+								.append("title", 1)
+								.append("Conference_id", 1)
+								.append("Conference_name", 1)
+								.append("ConferenceEdition_id", 1)
+								.append("ConferenceEdition_year", 1)
+								.append("inproceedings", 1)					
+								.append("last", new Document("$arrayElemAt",asList("$inproceedings.authors",-1)))),
+
+						Aggregates.match(eq("last.Author_id",pers_id)),
+						Aggregates.sort(Sorts.ascending("inproceedings.Inproceedings_title")),
+						Aggregates.project(include("_id","title","Conference_id","Conference_name","ConferenceEdition_id","ConferenceEdition_year","inproceedings"))					
+						));
+	}
 
 	private AggregateIterable<Document> get_inproceedings_by_Author_id(String pers_id) {
 		/*Bson filter = eq("inproceedings.authors.Author_id", pers_id);
@@ -1363,7 +1441,55 @@ public class T2DBProvider extends DBProvider {
 						Aggregates.project(fields(include("retrieve_all_authors"), exclude("_id")))
 						)).first();
 	}
-	
+
+
+
+	private AggregateIterable<Document> person_is_author_and_editor_Query12V2() {
+		/*db.getCollection('Publications').aggregate(
+				[
+				    {$unwind:"$editors"},
+				    {$unwind:"$inproceedings"},
+				    {$unwind:"$inproceedings.authors"},
+				    {$project:{ "title":1,"editors.Editor_id":1,"editors.Editor_name":1,"inproceedings.Inproceedings_id":1,"inproceedings.Inproceedings_title":1, compare:{ $cmp:["$inproceedings.authors.Author_id", "$editors.Editor_id"]}}},
+				    {$match:{"compare":0}},
+
+				    {$project:{ "_id":0, "editors.Editor_id":1,"editors.Editor_name":1,Publications:["$_id","$title","$inproceedings.Inproceedings_id","$inproceedings.Inproceedings_title"]}},
+
+				    {$group: { _id: {"Editor_id":"$editors.Editor_id","Editor_name":"$editors.Editor_name"}, "all_editors_inproceedings":{$addToSet: "$Publications"}}},
+				    {$sort: {"_id.Editor_name":1}}
+				])*/
+
+		return db.getCollection("Publications").aggregate(
+				Arrays.asList(
+						Aggregates.unwind("$editors"),						
+						Aggregates.unwind("$inproceedings"),						
+						Aggregates.unwind("$inproceedings.authors"),
+						new Document("$project",
+								new Document("title",1)
+								.append("editors.Editor_id", 1)
+								.append("editors.Editor_name",1)
+								.append("inproceedings.Inproceedings_id",1)
+								.append("inproceedings.Inproceedings_title",1)
+								.append("compare", new Document("$cmp", asList("$inproceedings.authors.Author_id","$editors.Editor_id")))),						
+						Aggregates.match(eq("compare",0)),
+
+						new Document("$project",
+								new Document("_id",0)
+								.append("editors.Editor_id", 1)
+								.append("editors.Editor_name",1)
+								.append("Publications",asList("$_id","$title","$inproceedings.Inproceedings_id","$inproceedings.Inproceedings_title"))),
+
+						new Document("$group",
+								new Document("_id",new Document("Editor_id","$editors.Editor_id")
+										.append("Editor_name","$editors.Editor_name"))
+								.append("all_editors_inproceedings",new Document("$addToSet","$Publications"))
+								),
+						Aggregates.sort(Sorts.ascending("_id.Editor_name"))						
+						));						
+	}
+
+
+
 	private AggregateIterable<Document> person_is_author_and_editor_Query12() {
 		/*db.getCollection('Publications').aggregate(
 				[
@@ -1374,9 +1500,9 @@ public class T2DBProvider extends DBProvider {
 				    {$match:{"compare":0}}
 				]
 				)*/
-		List<String> compare_this = new ArrayList<>();
-		compare_this.add("$inproceedings.authors.Author_id");
-		compare_this.add("$editors.Editor_id");
+		//List<String> compare_this = new ArrayList<>();
+		//compare_this.add("$inproceedings.authors.Author_id");
+		//compare_this.add("$editors.Editor_id");
 
 		return db.getCollection("Publications").aggregate(
 				Arrays.asList(
@@ -2412,6 +2538,9 @@ public class T2DBProvider extends DBProvider {
 
 
 		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+(count_proceedings+count_inproceedings)+"<br>";
+		Output += "count_proceedings: "+count_proceedings+"<br>";
+		Output += "count_inproceedings: "+count_inproceedings+"<br>";
+
 		return Output;
 	}
 
@@ -3035,12 +3164,76 @@ public class T2DBProvider extends DBProvider {
 		return Output;
 	}
 
-
-
-
-
 	@Override
 	public String IO_person_is_author_and_editor() {
+		String Output = "";
+		StringBuilder temp = new StringBuilder();
+		StringBuilder Jumplist = new StringBuilder();
+
+		Jumplist.append("<b>Jumplist: </b>");
+
+		int k = 0;
+
+		for (Document doc: person_is_author_and_editor_Query12V2()){
+			String Proceeding_id ="";
+			String Proceeding_title ="";
+			String Inproceeding_id="";
+			String Inproceeding_title="";
+			String Person_id="";
+			String Person_name="";
+
+			BsonReader r = new JsonReader(doc.toJson());
+			r.readStartDocument();
+			//_id
+			if ("_id".equals(r.readName())){
+				r.readStartDocument();
+				if ("Editor_id".equals(r.readName())){
+					Person_id = r.readString();
+					if ("Editor_name".equals(r.readName())){
+						Person_name = r.readString();
+						r.readEndDocument();
+
+						//add person to jumplist
+						Jumplist.append("<a href='#"+Person_id+"'>"+Person_name + "</a>, ");
+
+						temp.append("<h4 id='"+Person_id+"'><a href='/test/?func=person_by_id&id=" +Person_id+ "'>"+Person_name+"</a></h4>");
+						temp.append("<ol type='1'>");
+
+						//all_editors_inproceedings
+						if ("all_editors_inproceedings".equals(r.readName())){
+							r.readStartArray();
+							while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+								r.readStartArray();
+								while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+									Proceeding_id = r.readString();
+									Proceeding_title = r.readString();
+									Inproceeding_id = r.readString();
+									Inproceeding_title = r.readString();
+
+									temp.append("<li><a href='/test/?func=proceeding_by_id&key=" + Proceeding_id+"'>"+Proceeding_title+ "</a> / <a href='/test/?func=inproceeding_by_id&key=" + Inproceeding_id+"'>"+Inproceeding_title+ "</a></li>");
+									k++;
+								}
+								r.readEndArray();
+							}
+							r.readEndArray();
+
+							temp.append("</ol><hr>");
+						}
+					}
+				}
+			}
+		}
+		Output += "Statistic: inner loop... "+k+"<br>"+Jumplist + "<br>" + temp;
+		return Output;
+	}
+
+
+
+
+	public String IO_person_is_author_and_editor_alt() {
+		//String testeeeen = IO_person_is_author_and_editorV2();
+		
+		
 		String Output="";
 		HashMap<Pair<String,String>, List<Pair<Pair<String,String>,Pair<String,String>>>> author_editor = new HashMap<>();
 		List<Pair<String,String>> person_id_to_name = new ArrayList<>();
@@ -3145,9 +3338,22 @@ public class T2DBProvider extends DBProvider {
 
 	@Override
 	public List<PublicationIO> IO_person_is_last_author(String pers_id) {
-		// TODO Auto-generated method stub
-		return null;
+		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
+
+		if ( !exists_person_by_id(pers_id)){
+			System.out.println("\n!!!!!!there is no person with id ="+ pers_id + " in the system....!!!!\n");
+			return return_list;
+		}
+
+		for (Document doc: get_inproceedings_by_Author_id_author_is_last_author(pers_id)){
+			return_list.add(fill_PublicationIO(doc,"is_an_inproceeding"));
+		}		
+		return return_list;
 	}
+
+
+
+
 
 	@Override
 	public List<PublicationIO> IO_publ_by_person_name_or_id(HashMap<String, String> args) {
@@ -3213,8 +3419,34 @@ public class T2DBProvider extends DBProvider {
 
 	@Override
 	public List<DivIO> IO_publishers_whose_authors_in_interval(int y1, int y2) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<>();
+		
+		//1. get set of publishers
+		Document doc = get_publishers_names_whose_authors_in_interval(y1,y2);
+		
+		//2. sort set
+		List<String> publishers = new ArrayList<>();
+		BsonReader r = new JsonReader(doc.toJson());
+		r.readStartDocument();
+		if ("all_publishers_for_interval".equals(r.readName())){
+			r.readStartArray();
+			while (r.readBsonType() != BsonType.END_OF_DOCUMENT) {
+				publishers.add(r.readString());
+			}
+			r.readEndArray();
+		}
+		r.readEndDocument();
+		publishers.sort(compare_Name);
+		
+		//3. get publishers from list
+		for (String publi: publishers){
+			return_list.add( fill_DivIO( get_publisher_by_name(publi), "is_a_publisher"));
+		}
+		
+
+
+		return return_list;
+		
 	}
 
 

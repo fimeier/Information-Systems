@@ -605,7 +605,9 @@ public class Webserver {
 	}
 
 	private String person_is_last_author(String pers_id) {
-		String Output = "<br>Author with id="+pers_id+" is the last author in the following inproceedings:<br><br>";
+		String Output = "<h3>(Task 13) person is last author</h3>";
+
+		Output += "<p>Author with <b>id="+pers_id+"</b> is the last author in the following inproceedings:<p>";
 
 		List<PublicationIO> publs = myDB.IO_person_is_last_author(pers_id);
 		if (publs.isEmpty()){
@@ -620,9 +622,7 @@ public class Webserver {
 	}
 
 	private String person_is_author_and_editor() {
-		String Output="";
-		Output += myDB.IO_person_is_author_and_editor();
-		return Output;
+		return myDB.IO_person_is_author_and_editor();
 	}
 
 	private String authors_editors_for_a_conference(String conf_id, String mode) {
