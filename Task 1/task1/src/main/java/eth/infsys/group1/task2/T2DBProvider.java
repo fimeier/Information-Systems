@@ -1,8 +1,5 @@
 package eth.infsys.group1.task2;
 
-import com.mongodb.client.model.Aggregates.*;
-import com.mongodb.client.model.CountOptions;
-
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.elemMatch;
 import static com.mongodb.client.model.Projections.exclude;
@@ -10,25 +7,14 @@ import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Updates.addToSet;
-import com.mongodb.Block;
-import com.mongodb.client.AggregateIterable;
 import static java.util.Arrays.asList;
-
-import java.lang.reflect.Array;
-
-import com.mongodb.client.model.Sorts.*;
-import com.mongodb.client.model.TextSearchOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-
-import javax.jdo.Extent;
 
 import org.bson.BsonReader;
 import org.bson.BsonType;
@@ -37,6 +23,7 @@ import org.bson.conversions.Bson;
 import org.bson.json.JsonReader;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Aggregates;
@@ -48,13 +35,6 @@ import eth.infsys.group1.dbspec.DivIO;
 import eth.infsys.group1.dbspec.InProceedings_simple_input;
 import eth.infsys.group1.dbspec.Proceedings_simple_input;
 import eth.infsys.group1.dbspec.PublicationIO;
-import eth.infsys.group1.task1.dbobjs.Conference;
-import eth.infsys.group1.task1.dbobjs.ConferenceEdition;
-import eth.infsys.group1.task1.dbobjs.InProceedings;
-import eth.infsys.group1.task1.dbobjs.Person;
-import eth.infsys.group1.task1.dbobjs.Proceedings;
-import eth.infsys.group1.task1.dbobjs.Publication;
-import eth.infsys.group1.task1.dbobjs.Publisher;
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")

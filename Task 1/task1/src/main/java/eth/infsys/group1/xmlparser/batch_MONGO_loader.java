@@ -25,16 +25,17 @@ public class batch_MONGO_loader {
 		//String MongodbName ="myDBLP";
 		String MongodbName ="fake";		
 		//String MongodbName ="test";
+		//String MongodbName ="myDBLP_manipulate";
 
 
-		//T2DBProvider myDB = new T2DBProvider(MongodbName, DBProvider.OPEN_DB_OVERRIDE);
+		//((T2DBProvider myDB = new T2DBProvider(MongodbName, DBProvider.OPEN_DB_OVERRIDE);
 		T2DBProvider myDB = new T2DBProvider(MongodbName, DBProvider.OPEN_DB_APPEND);
 
 
 		XMLParser<Proceedings> myParser = new XMLParser<>(myDB);
 
-		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
-		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/dblp_part_neu.xml";
+		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
+		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/dblp_part_neu.xml";
 		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
 
 		File file = new File(dblp_data);
