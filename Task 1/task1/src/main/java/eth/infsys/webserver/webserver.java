@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.xquery.XQException;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -21,6 +23,8 @@ import eth.infsys.group1.dbspec.PublicationIO;
 import eth.infsys.group1.dbspec.WebFunc;
 import eth.infsys.group1.task1.T1DBProvider;
 import eth.infsys.group1.task2.T2DBProvider;
+import eth.infsys.group1.task3.T3DBProvider;
+
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
@@ -28,6 +32,7 @@ public class Webserver {
 
 	private Boolean zooDB_implementation = false;
 	private Boolean MongoDB_implementation = false;
+	private Boolean BaseXDB_implementation = false;
 	private String DB_Implementation="";
 
 	private DBProvider myDB;
@@ -47,7 +52,20 @@ public class Webserver {
 			MongoDB_implementation = true;
 			this.DB_Implementation = DB_Implementation;
 		}
+		
+		server = HttpServer.create(new InetSocketAddress(Port), 0);
+		server.createContext("/test", new MyHandler());
+		server.setExecutor(null); // creates a default executor
+		server.start();
+	}
+		
+	public Webserver(int Port, String DB_Implementation, String dbName, String User, String PW) throws IOException, XQException {
 
+		if ("BaseXDB".equals(DB_Implementation)){
+			myDB = (T3DBProvider) new T3DBProvider(dbName, User, PW);
+			BaseXDB_implementation = true;
+			this.DB_Implementation = DB_Implementation;
+		}
 
 		server = HttpServer.create(new InetSocketAddress(Port), 0);
 		server.createContext("/test", new MyHandler());
@@ -1282,6 +1300,9 @@ public class Webserver {
 		if (MongoDB_implementation){
 			publ = ((T2DBProvider) myDB).IO_get_inproceedings_by_id(id);
 		}
+		if (BaseXDB_implementation){
+			publ = myDB.IO_get_publication_by_id(id);
+		}
 
 		String output = publ.get_all();
 		return output;
@@ -1294,6 +1315,9 @@ public class Webserver {
 		}
 		if (MongoDB_implementation){
 			publ = ((T2DBProvider) myDB).IO_get_proceedings_by_id(id);
+		}
+		if (BaseXDB_implementation){
+			publ = myDB.IO_get_publication_by_id(id);
 		}
 
 		String output = publ.get_all();

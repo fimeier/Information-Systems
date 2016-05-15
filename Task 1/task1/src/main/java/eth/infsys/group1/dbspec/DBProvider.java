@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.xml.xquery.XQException;
+
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")

@@ -45,7 +45,7 @@ public class PublicationIO {
 	public Pair<String,String> Conference_name_id = new Pair<String, String>("","");
 	public Pair<Integer,String> ConferenceEdition_year_id = new Pair<Integer, String>(0,"");
 	
-	//conference new
+	//conference new - Batchloader
 	public String Conference_name = "";
 	public String Conference_id = "";
 	public int ConferenceEdition_year = 0;
