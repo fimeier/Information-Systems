@@ -193,6 +193,9 @@ public class Webserver {
 				if (MongoDB_implementation){
 					filter = args.get("title");
 				}
+				if (BaseXDB_implementation){
+					filter = args.get("title");
+				}
 				output += pupl_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -273,6 +276,9 @@ public class Webserver {
 					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
 				}
 				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
+				if (BaseXDB_implementation){
 					filter = args.get("name_contains");
 				}
 				output += person_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
@@ -1142,7 +1148,7 @@ public class Webserver {
 			}
 			Output += "</div>";
 		}
-		if (MongoDB_implementation){
+		if (MongoDB_implementation || BaseXDB_implementation){
 			Boolean first_proc = false;
 			Boolean first_inproc = false;
 			int proc_count = 0;
