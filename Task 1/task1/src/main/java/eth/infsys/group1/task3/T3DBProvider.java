@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.jdo.Extent;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
@@ -25,6 +26,7 @@ import eth.infsys.group1.dbspec.InProceedings_simple_input;
 import eth.infsys.group1.dbspec.Proceedings_simple_input;
 import eth.infsys.group1.dbspec.PublicationIO;
 import eth.infsys.group1.dbspec.WebFunc;
+import eth.infsys.group1.task1.dbobjs.InProceedings;
 import javafx.util.Pair;
 import net.xqj.basex.BaseXXQDataSource;
 
@@ -182,7 +184,7 @@ public class T3DBProvider extends DBProvider {
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
-	
+
 	private XQResultSequence get_inproceedings_by_filter_offset(String filter, int boff, int eoff, String order_by) throws XQException {
 		String xqueryString = "";
 		switch(order_by){
@@ -207,7 +209,7 @@ public class T3DBProvider extends DBProvider {
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
-	
+
 	private XQResultSequence get_inproceedings_by_Author_name(String pers_name) throws XQException {
 		String xqueryString = "for $inproc in doc('"+dbName+"')//inproceedings where $inproc/author = '"+pers_name+"' order by $inproc/title let $proc_id := $inproc/crossref let $proc_name := doc('"+dbName+"')//proceedings[@key = $proc_id]/title return<inproceedings proc_name='{ $proc_name}'> {$inproc/(@*, *)} </inproceedings>";
 		XQExpression xqe = conn.createExpression();
@@ -220,19 +222,87 @@ public class T3DBProvider extends DBProvider {
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
-	
+
 	private XQResultSequence get_person_by_name(String pers_name) throws XQException {
 		String xqueryString = "let $procs := doc('"+dbName+"')//proceedings[editor = '"+pers_name+"'] let $inprocs := doc('"+dbName+"')//inproceedings[author = '"+pers_name+"']let $name := '"+pers_name+"' return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
 
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
-	
+
 
 	private XQResultSequence get_persons_by_filter_offset(String filter, int boff, int eoff, String obd) throws XQException {
 		//String xqueryString = "let $procs := doc('"+dbName+"')//proceedings[editor = '"+filter+"'] let $inprocs := doc('"+dbName+"')//inproceedings[author = '"+filter+"']let $name := '"+filter+"' return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
 		//String xqueryString = "for $person in distinct-values(doc('"+dbName+"')//inproceedings/author | doc('"+dbName+"')//proceedings/editor ) where contains($person,'"+filter+"') order by $person let $procs := doc('"+dbName+"')//proceedings[editor = $person] let $inprocs := doc('"+dbName+"')//inproceedings[author = $person] let $name := $person return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
 		String xqueryString =" let $all_person := for $person in distinct-values(doc('"+dbName+"')//inproceedings/author | doc('"+dbName+"')//proceedings/editor ) where contains(upper-case($person),upper-case('"+filter+"')) order by $person "+obd+" return $person for $i in ("+boff+" to "+eoff+") let $person := $all_person[$i] where $person != '' let $procs := doc('"+dbName+"')//proceedings[editor = $person] let $inprocs := doc('"+dbName+"')//inproceedings[author = $person] let $name := $person return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	private XQResultSequence get_confEd_by_name(String conf_name, String confEd_name) throws XQException {
+		//String xqueryString = "let $procs := doc('"+dbName+"')//proceedings[editor = '"+confEd_name+"'] let $inprocs := doc('"+dbName+"')//inproceedings[author = '"+confEd_name+"']let $name := '"+confEd_name+"' return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
+		String xqueryString = "for $proc in doc('"+dbName+"')//proceedings where $proc/booktitle = '"+conf_name+"' let $proc_id := $proc/@key where doc('"+dbName+"')//inproceedings[crossref =  $proc_id]/year = '"+confEd_name+"' return <confEd_key_title key='conferenceedition/"+conf_name+"/"+confEd_name+"' title='"+confEd_name+"'> {$proc/booktitle} <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title></confEd_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	private XQResultSequence get_conf_by_name(String conf_name) throws XQException {
+		String xqueryString = "let $conf := '"+conf_name+"' let $all_proc_id := for $proc in doc('"+dbName+"')//proceedings where $proc/booktitle = $conf return $proc/@key let $all_confEd := for $proc_id in  $all_proc_id let $inproc := doc('"+dbName+"')//inproceedings[crossref =  $proc_id] return $inproc[1]/year return <conf_key_title key='conference/{$conf}' title='{$conf}'>{for $confEd in $all_confEd order by $confEd return <confEd_key_title key='conferenceedition/{$conf}/{$confEd}' title='{$confEd}'></confEd_key_title>}</conf_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+
+	private XQResultSequence get_conference_by_filter_offset(String filter, int boff, int eoff, String obd) throws XQException {
+		String xqueryString = "let $filter := '"+filter+"' let $all_conferences :=  for $conf in distinct-values(doc('"+dbName+"')//proceedings/booktitle) where contains(upper-case($conf),upper-case($filter)) order by $conf "+obd+" return $conf for $i in ("+boff+" to "+eoff+") let $conf := $all_conferences[$i] where  $conf !='' let $all_proc_id := for $proc in doc('"+dbName+"')//proceedings where $proc/booktitle = $conf return $proc/@key let $all_confEd := for $proc_id in  $all_proc_id let $inproc := doc('"+dbName+"')//inproceedings[crossref =  $proc_id] return $inproc[1]/year return <conf_key_title key='conference/{$conf}' title='{$conf}'> {for $confEd in $all_confEd order by $confEd return <confEd_key_title key='conferenceedition/{$conf}/{$confEd}' title='{$confEd}'></confEd_key_title>}</conf_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	private XQResultSequence get_publisher_by_name(String publ_name) throws XQException {
+		String xqueryString = "let $publ_name := '"+publ_name+"' return <publisher_key_title key='publisher/{$publ_name}' title='{$publ_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/publisher = $publ_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>}</publisher_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	private XQResultSequence get_publisher_by_filter_offset(String filter, int boff, int eoff, String obd) throws XQException {
+		String xqueryString = "let $filter := '"+filter+"' let $all_publishers :=  for $publ in distinct-values(doc('"+dbName+"')//proceedings/publisher) where contains(upper-case($publ),upper-case($filter)) order by $publ "+obd+" return $publ for $i in ("+boff+" to "+eoff+") let $publ_name := $all_publishers[$i] where $publ_name !='' return <publisher_key_title key='publisher/{$publ_name}' title='{$publ_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/publisher = $publ_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>}</publisher_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+
+	private XQResultSequence get_series_by_name(String series_name) throws XQException {
+		String xqueryString = "let $series_name := '"+series_name+"' return <series_key_title key='series/{$series_name}' title='{$series_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/series = $series_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>}</series_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	private XQResultSequence get_series_by_filter_offset(String filter, int boff, int eoff, String obd) throws XQException {
+		//String xqueryString = "let $series_name := '"+series_name+"' return <series_key_title key='series/{$series_name}' title='{$series_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/series = $series_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>}</series_key_title>";
+		String xqueryString = "let $filter := '"+filter+"' let $all_series :=  for $series in distinct-values(doc('"+dbName+"')//proceedings/series) where contains(upper-case($series),upper-case($filter)) order by $series "+obd+" return $series for $i in ("+boff+" to "+eoff+") let $series_name := $all_series[$i] where $series_name !='' return <series_key_title key='series/{$series_name}' title='{$series_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/series = $series_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>} </series_key_title>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	/**
+	 * Special-Queries
+	 * @throws XQException 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+
+	private XQResultSequence executeQuery_myquery(String xqueryString) throws XQException {
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
+
+	private XQResultSequence find_co_authors(String pers_name) throws XQException {
+		//let $filter := '"+filter+"' let $all_series :=  for $series in distinct-values(doc('"+dbName+"')//proceedings/series) where contains(upper-case($series),upper-case($filter)) order by $series "+obd+" return $series for $i in ("+boff+" to "+eoff+") let $series_name := $all_series[$i] where $series_name !='' return <series_key_title key='series/{$series_name}' title='{$series_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/series = $series_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>} </series_key_title>";
+		String xqueryString = "let $author := '"+pers_name+"' let $all_inprocs := for $inproc in doc('"+dbName+"')//inproceedings where $inproc/author = $author return $inproc for $coauthor in distinct-values($all_inprocs/author) order by $coauthor where  $coauthor != $author let $procs := doc('"+dbName+"')//proceedings[editor = $coauthor] let $inprocs := doc('"+dbName+"')//inproceedings[author = $coauthor] let $name := $coauthor  return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
@@ -258,6 +328,131 @@ public class T3DBProvider extends DBProvider {
 			return divobj;
 		}
 
+		else if ( "is_a_series".equals(is_a) ){
+			divobj.is_a_series = true;
+
+			try {
+				Element series = (Element) doc.getObject();
+				divobj.id = series.getAttribute("key");
+				divobj.Series_name = series.getAttribute("title");
+				NodeList childs = series.getChildNodes();
+				for (int i=0; i<= childs.getLength()-1; i++){
+					String node_name = childs.item(i).getNodeName();
+
+					switch (node_name) {
+					case "proc_key_title":					
+						Element proc = (Element) childs.item(i);
+
+						String proceedings_id = proc.getAttribute("key");
+						String proceedings_title = proc.getAttribute("title");
+						divobj.Series_publications_title_id.add(new Pair<String, String>(proceedings_title, proceedings_id));
+						break;
+					default:
+						continue;
+					}
+				}
+			} catch (XQException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return divobj;
+		}
+		else if ( "is_a_publisher".equals(is_a) ){
+			divobj.is_a_publisher = true;
+			try {
+				Element publ = (Element) doc.getObject();
+				divobj.id = publ.getAttribute("key");
+				divobj.Publisher_name = publ.getAttribute("title");
+				NodeList childs = publ.getChildNodes();
+				for (int i=0; i<= childs.getLength()-1; i++){
+					String node_name = childs.item(i).getNodeName();
+
+					switch (node_name) {
+					case "proc_key_title":					
+						Element proc = (Element) childs.item(i);
+
+						String proceedings_id = proc.getAttribute("key");
+						String proceedings_title = proc.getAttribute("title");
+						divobj.Publisher_publications_title_id.add(new Pair<String, String>(proceedings_title, proceedings_id));
+						break;
+					default:
+						continue;
+					}
+				}
+			} catch (XQException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return divobj;
+		}
+
+		else if ( "is_a_conference".equals(is_a) ){
+			divobj.is_a_conference = true;
+			try {
+				Element conf = (Element) doc.getObject();
+				divobj.id = conf.getAttribute("key");
+				divobj.Conference_name = conf.getAttribute("title");
+				NodeList childs = conf.getChildNodes();
+				for (int i=0; i<= childs.getLength()-1; i++){
+					String node_name = childs.item(i).getNodeName();
+
+					switch (node_name) {
+					case "confEd_key_title":					
+						Element confEd = (Element) childs.item(i);
+						try {
+							String ConferenceEdition_id = confEd.getAttribute("key");
+							int year = Integer.parseInt(confEd.getAttribute("title"));
+							divobj.Conference_editions_year_id.add(new Pair<Integer, String>(year, confEd.getAttribute("key")));
+						}
+						catch (NumberFormatException e) {
+							//ignore-entry
+						}
+						break;
+					default:
+						continue;
+					}
+				}
+			} catch (XQException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return divobj;
+		}
+
+		//ConferenceEdition
+		else if ( "is_a_conference_edition".equals(is_a) ){
+			divobj.is_a_conference_edition = true;
+			try {
+				Element confEd = (Element) doc.getObject();
+				divobj.id = confEd.getAttribute("key");
+				divobj.ConferenceEdition_year = Integer.parseInt(confEd.getAttribute("title"));
+				NodeList childs = confEd.getChildNodes();
+				for (int i=0; i<= childs.getLength()-1; i++){
+					String node_name = childs.item(i).getNodeName();
+
+					switch (node_name) {
+					case "booktitle":
+						divobj.ConferenceEdition_conference_name = childs.item(i).getTextContent();
+						divobj.ConferenceEdition_conference_id = calculate_conference_id(divobj.ConferenceEdition_conference_name);
+						break;
+					case "proc_key_title":					
+						Element proc = (Element) childs.item(i);
+						divobj.ConferenceEditions_proceedings_id = proc.getAttribute("key");
+						divobj.ConferenceEditions_proceedings_title = proc.getAttribute("title");
+						break;
+
+					default:
+						continue;
+					}
+				}
+			} catch (XQException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return divobj;
+		}
+
+
 		//Person
 		else if ( "is_a_person".equals(is_a) ){
 			divobj.is_a_person = true;
@@ -265,16 +460,13 @@ public class T3DBProvider extends DBProvider {
 				Element pers = (Element) doc.getObject();
 				divobj.Person_name = pers.getAttribute("name");
 				divobj.id = calculate_person_id(divobj.Person_name);
-				
+
 				NodeList childs = pers.getChildNodes();
 
 				for (int i=0; i<= childs.getLength()-1; i++){
 					String node_name = childs.item(i).getNodeName();
 
 					switch (node_name) {
-					case "title":
-						//childs.title = node_text;
-						break;
 					case "proc_key_title":					
 						//editedPublications		
 						Element proc = (Element) childs.item(i);
@@ -292,32 +484,22 @@ public class T3DBProvider extends DBProvider {
 						divobj.Person_authoredPublications_title_id.add(new Pair<String, String>(Inproceedings_title, Inproceedings_id));
 						//not needed
 						//divobj.Person_authoredPublications_title_id.sort(comparePairTitleId);
-						break;	
-
+						break;
 					default:
 						continue;
 					}
-				
 				}
-
-				
 			} catch (XQException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-
-			
-
-			
-
 			return divobj;
 		}
 		return divobj;
 	}
 
-	
-	
+
+
 	private PublicationIO fill_PublicationIO(XQResultSequence doc, String is_a){
 		PublicationIO publication = new PublicationIO();
 		if ( doc == null ){
@@ -388,7 +570,7 @@ public class T3DBProvider extends DBProvider {
 						Element inproc = (Element) proc_childs.item(i);
 						publication.inproceedings_title_id.add(new Pair(inproc.getAttribute("title"),inproc.getAttribute("key")));
 						break;	
-					
+
 					default:
 						continue;
 					}
@@ -398,8 +580,8 @@ public class T3DBProvider extends DBProvider {
 					Element inproc = (Element) doc.getObject();
 					publication.inproceedings_title_id.add(new Pair(inproc.getAttribute("title"),inproc.getAttribute("key")));
 				}*/
-				
-				
+
+
 			} catch (XQException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -469,8 +651,8 @@ public class T3DBProvider extends DBProvider {
 		return publication;
 
 	}
-	
-	
+
+
 
 
 
@@ -500,9 +682,31 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public String IO_avg_authors_per_inproceedings() {
-		// TODO Auto-generated method stub
-		return null;
+		int count_inprocs = 0;
+		int count_authors = 0;
+		double avg = 0;
+		//get count_inprocs and count_authors
+		try {
+			String xqueryString = "let $all_inprocs :=  doc('"+dbName+"')//inproceedings let $count_inproc := count($all_inprocs) let $count_authors := count($all_inprocs/author) return <result count_inprocs='{$count_inproc}' count_authors='{$count_authors}'></result>";
+			XQResultSequence doc = executeQuery_myquery(xqueryString);
+			//Node shit = doc.getNode();
+			if (doc.next()){
+				Element result = (Element) doc.getObject();
+
+				count_inprocs = Integer.parseInt(result.getAttribute("count_inprocs"));
+				count_authors = Integer.parseInt(result.getAttribute("count_authors"));
+
+				avg = (double) count_authors / (double) count_inprocs;
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String Output = "<br>there are <b>"+count_inprocs+" inproceedings</b> in total with an average of <b>"+String.valueOf(avg)+" authors per inproceedings</b><br>";
+		return Output;
 	}
+
+
 
 	@Override
 	public String IO_count_publications_per_interval(int y1, int y2) {
@@ -524,9 +728,22 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public List<DivIO> IO_find_co_authors(String pers_name) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		//get persons, if any
+		try {
+			XQResultSequence doc = find_co_authors(pers_name);
+			while (doc.next()){
+				return_list.add(fill_DivIO(doc,"is_a_person"));
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return return_list;
 	}
+
+
 
 	@Override
 	public String IO_find_co_authors_returns_String(String pers_name) {
@@ -536,21 +753,66 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public DivIO IO_get_conf_by_id(String conf_id) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			String conf_name = conf_id.split("/")[1];
+			XQResultSequence doc = get_conf_by_name(conf_name);
+			if (doc.next()){
+				return fill_DivIO(doc,"is_a_conference");
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return fill_DivIO(null,"null");
 	}
+
+
 
 	@Override
 	public DivIO IO_get_confEd_by_id(String confEd_id) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			String conf_name = confEd_id.split("/")[1];
+			String confEd_name = confEd_id.split("/")[2];
+
+			XQResultSequence doc = get_confEd_by_name(conf_name, confEd_name);
+			if (doc.next()){
+				return fill_DivIO(doc,"is_a_conference_edition");
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return fill_DivIO(null,"null");
 	}
+
+
 
 	@Override
 	public List<DivIO> IO_get_conference_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		String obd = "ascending";
+		if ( !order_by.equals("")){
+			obd = order_by.split(" ")[1];
+		}
+		if (boff<=0 || eoff< boff){
+			boff = 1;
+			eoff = 5;
+		}
+
+		//get conference, if any
+		try {
+			XQResultSequence doc = get_conference_by_filter_offset(filter, boff, eoff, obd);
+			while (doc.next()){
+				return_list.add(fill_DivIO(doc,"is_a_conference"));
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return return_list;
 	}
+
 
 	@Override
 	public List<DivIO> IO_get_person_by_filter_offset(String filter, int boff, int eoff, String order_by) {
@@ -560,8 +822,6 @@ public class T3DBProvider extends DBProvider {
 		if ( !order_by.equals("")){
 			obd = order_by.split(" ")[1];
 		}
-
-
 		if (boff<=0 || eoff< boff){
 			boff = 1;
 			eoff = 5;
@@ -577,7 +837,6 @@ public class T3DBProvider extends DBProvider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return return_list;
 	}
 
@@ -628,7 +887,7 @@ public class T3DBProvider extends DBProvider {
 		return return_list;
 	}
 
-	
+
 
 	@Override
 	public PublicationIO IO_get_publication_by_id(String publ_id){
@@ -671,27 +930,90 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public List<DivIO> IO_get_publisher_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		String obd = "ascending";
+		if ( !order_by.equals("")){
+			obd = order_by.split(" ")[1];
+		}
+		if (boff<=0 || eoff< boff){
+			boff = 1;
+			eoff = 5;
+		}
+
+		//get conference, if any
+		try {
+			XQResultSequence doc = get_publisher_by_filter_offset(filter, boff, eoff, obd);
+			while (doc.next()){
+				return_list.add(fill_DivIO(doc,"is_a_publisher"));
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return return_list;
 	}
+
 
 	@Override
 	public DivIO IO_get_publisher_by_id(String publ_id) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			String publ_name = publ_id.split("/")[1];
+			XQResultSequence doc = get_publisher_by_name(publ_name);
+			if (doc.next()){
+				return fill_DivIO(doc,"is_a_publisher");
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return fill_DivIO(null,"null");
 	}
+
 
 	@Override
 	public List<DivIO> IO_get_series_by_filter_offset(String filter, int boff, int eoff, String order_by) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<DivIO>();
+
+		String obd = "ascending";
+		if ( !order_by.equals("")){
+			obd = order_by.split(" ")[1];
+		}
+		if (boff<=0 || eoff< boff){
+			boff = 1;
+			eoff = 5;
+		}
+
+		//get conference, if any
+		try {
+			XQResultSequence doc = get_series_by_filter_offset(filter, boff, eoff, obd);
+			while (doc.next()){
+				return_list.add(fill_DivIO(doc,"is_a_series"));
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return return_list;
 	}
+
+
 
 	@Override
 	public DivIO IO_get_series_by_id(String series_id) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			String series_name = series_id.split("/")[1];
+			XQResultSequence doc = get_series_by_name(series_name);
+			if (doc.next()){
+				return fill_DivIO(doc,"is_a_series");
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return fill_DivIO(null,"null");
 	}
+
 
 	@Override
 	public String IO_inproceedings_for_a_conference(String conf_id, String mode) {

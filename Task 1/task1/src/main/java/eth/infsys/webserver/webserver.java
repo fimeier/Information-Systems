@@ -334,6 +334,9 @@ public class Webserver {
 				if (MongoDB_implementation){
 					filter = args.get("name_contains");
 				}
+				if (BaseXDB_implementation){
+					filter = args.get("name_contains");
+				}
 				output += publisher_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
 				output += create_footer(wf);
 				break;
@@ -374,6 +377,9 @@ public class Webserver {
 					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
 				}
 				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
+				if (BaseXDB_implementation){
 					filter = args.get("name_contains");
 				}
 				output += series_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
@@ -437,6 +443,9 @@ public class Webserver {
 					filter = "name.toLowerCase().contains('"+args.get("name_contains").toLowerCase()+"')";
 				}
 				if (MongoDB_implementation){
+					filter = args.get("name_contains");
+				}
+				if (BaseXDB_implementation){
 					filter = args.get("name_contains");
 				}
 				output += conference_by_filter_offset(filter,args.get("begin-offset"),args.get("end-offset"),order_by);
@@ -908,6 +917,15 @@ public class Webserver {
 			output = "<p>The co-authors and <font color='red'>the common publications</font> with <b>"+name+"</b> are:</p>";
 			
 			output += myDB.IO_find_co_authors_returns_String(name);
+		}
+		
+		if (BaseXDB_implementation){
+			output += "<p>The co-authors (and their publications) of <b>"+name+"</b> are:</p>";
+
+			List<DivIO> persons = myDB.IO_find_co_authors(name);
+			for (DivIO person: persons){
+				output += person.get_all();
+			} 		
 		}
 		
 		
