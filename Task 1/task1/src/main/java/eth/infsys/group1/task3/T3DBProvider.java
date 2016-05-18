@@ -1,5 +1,6 @@
 package eth.infsys.group1.task3;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ public class T3DBProvider extends DBProvider {
 	private String dbName;
 
 
+
 	/**
 	 * Create DBProvider
 	 * 
@@ -59,7 +61,7 @@ public class T3DBProvider extends DBProvider {
 		this.xqs = new BaseXXQDataSource();
 		xqs.setProperty("serverName", "localhost");
 		xqs.setProperty("port", "1984");
-		this.conn = xqs.getConnection(User, PW);		
+		this.conn = xqs.getConnection(User, PW);
 	}
 
 	public void testx() throws XQException{
@@ -232,9 +234,8 @@ public class T3DBProvider extends DBProvider {
 
 
 	private XQResultSequence get_persons_by_filter_offset(String filter, int boff, int eoff, String obd) throws XQException {
-		//String xqueryString = "let $procs := doc('"+dbName+"')//proceedings[editor = '"+filter+"'] let $inprocs := doc('"+dbName+"')//inproceedings[author = '"+filter+"']let $name := '"+filter+"' return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
-		//String xqueryString = "for $person in distinct-values(doc('"+dbName+"')//inproceedings/author | doc('"+dbName+"')//proceedings/editor ) where contains($person,'"+filter+"') order by $person let $procs := doc('"+dbName+"')//proceedings[editor = $person] let $inprocs := doc('"+dbName+"')//inproceedings[author = $person] let $name := $person return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
 		String xqueryString =" let $all_person := for $person in distinct-values(doc('"+dbName+"')//inproceedings/author | doc('"+dbName+"')//proceedings/editor ) where contains(upper-case($person),upper-case('"+filter+"')) order by $person "+obd+" return $person for $i in ("+boff+" to "+eoff+") let $person := $all_person[$i] where $person != '' let $procs := doc('"+dbName+"')//proceedings[editor = $person] let $inprocs := doc('"+dbName+"')//inproceedings[author = $person] let $name := $person return (<person name= '{$name}'> {for $x in $procs order by $x/title return <proc_key_title key='{$x/@key}' title='{$x/title}'></proc_key_title>} {for $x in $inprocs order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </person>)";
+
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
@@ -676,9 +677,71 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public String[] IO_authors_editors_for_a_conference(String conf_id, String mode) {
-		// TODO Auto-generated method stub
-		return null;
+		String out[]= new String[2]; out[0]=""; out[1]="";
+		String Output ="";
+		String Conference_id = conf_id.split("/")[1];
+		String Conference_name = Conference_id;
+		int count_editors = 0;
+		int count_authors = 0;
+		int total = 0;
+
+		if (mode.equals("count")){
+			try {
+				String xqueryString = "let $conf := '"+Conference_id+"' let $count_editors := count(distinct-values(doc('"+dbName+"')//proceedings[booktitle = $conf]/editor)) let $count_authors := count(distinct-values(doc('"+dbName+"')//inproceedings[booktitle = $conf]/author)) return <result count_editors='{$count_editors}' count_authors='{$count_authors}' ></result>";
+				XQResultSequence doc = executeQuery_myquery(xqueryString);
+				if (doc.next()){
+					Element result = (Element) doc.getObject();
+					count_editors = Integer.parseInt(result.getAttribute("count_editors"));
+					count_authors = Integer.parseInt(result.getAttribute("count_authors"));
+					total = count_authors + count_editors;
+					Output += "<br>there are <b>"+count_authors+" authors</b> and <b>"+count_editors+" editors</b> (total="+total+") for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+Conference_name+"</a><br>";
+					out[0]=Output;
+					return out;
+				}
+			} catch (XQException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		else {
+			//get editors
+			try {
+				String xqueryString = "let $conf := '"+Conference_id+"' for $editor in distinct-values(doc('"+dbName+"')//proceedings[booktitle = $conf]/editor) order by $editor return <editor key='person/{$editor}' name='{$editor}'></editor>";
+				XQResultSequence doc = executeQuery_myquery(xqueryString);
+				while (doc.next()){
+					Element result = (Element) doc.getObject();
+					String Editor_id = result.getAttribute("key");
+					String Editor_name = result.getAttribute("name");
+					out[0]+= "<a href='/test?func=person_by_id&id="+Editor_id+"'>"+Editor_name+"</a> ";
+				}
+			} catch (XQException e) {
+				e.printStackTrace();
+			}
+
+
+
+			//get authors
+			try {
+				String xqueryString = "let $conf := '"+Conference_id+"' for $author in distinct-values(doc('"+dbName+"')//inproceedings[booktitle = $conf]/author) order by $author return <author key='person/{$author}' name='{$author}'></author>";
+				XQResultSequence doc = executeQuery_myquery(xqueryString);
+				while (doc.next()){
+					Element result = (Element) doc.getObject();
+					String Author_id = result.getAttribute("key");
+					String Author_name = result.getAttribute("name");
+					out[1]+= "<a href='/test?func=person_by_id&id="+Author_id+"'>"+Author_name+"</a> ";
+				}
+			} catch (XQException e) {
+				e.printStackTrace();
+			}
+			return out;
+		}
+		
+		//Error...
+		Output += "<br>Error...<br>";
+		out[0]=Output;
+		return out;
 	}
+
 
 	@Override
 	public String IO_avg_authors_per_inproceedings() {
@@ -710,8 +773,32 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public String IO_count_publications_per_interval(int y1, int y2) {
-		// TODO Auto-generated method stub
-		return null;
+		String Output = "";
+
+
+		int count_proceedings = 0;
+		int count_inproceedings = 0;
+		int total = 0;
+
+		try {
+			String xqueryString = "let $year1 := '"+y1+"' let $year2 := '"+y2+"' let $count_inprocs := count(doc('"+dbName+"')//inproceedings[$year1 <= *:year][*:year <= $year2]) let $count_procs := count(doc('"+dbName+"')//proceedings[$year1 <= *:year][*:year <= $year2]) return <result count_procs='{$count_procs}' count_inprocs='{$count_inprocs}' ></result>";
+			XQResultSequence doc = executeQuery_myquery(xqueryString);
+			if (doc.next()){
+				Element result = (Element) doc.getObject();
+				count_proceedings = Integer.parseInt(result.getAttribute("count_procs"));
+				count_inproceedings = Integer.parseInt(result.getAttribute("count_inprocs"));
+				total = count_proceedings + count_inproceedings;
+			}
+		} catch (XQException e) {
+			e.printStackTrace();
+		}
+
+
+		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+total+"<br>";
+		Output += "count_proceedings: "+count_proceedings+"<br>";
+		Output += "count_inproceedings: "+count_inproceedings+"<br>";
+
+		return Output;
 	}
 
 	@Override
@@ -1017,8 +1104,46 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public String IO_inproceedings_for_a_conference(String conf_id, String mode) {
-		// TODO Auto-generated method stub
-		return null;
+		String Output ="";
+		String Conference_id = conf_id.split("/")[1];
+		String Conference_name = Conference_id;
+		int count_inprocs = 0;
+
+		if (mode.equals("count")){
+			try {
+				String xqueryString = "let $conf := '"+Conference_id+"' return <result count_inprocs='{count(for $inproc in doc('"+dbName+"')//inproceedings where $inproc/booktitle = $conf return $inproc)}'></result>";
+				XQResultSequence doc = executeQuery_myquery(xqueryString);
+				if (doc.next()){
+					Element result = (Element) doc.getObject();
+					count_inprocs = Integer.parseInt(result.getAttribute("count_inprocs"));
+				}
+			} catch (XQException e) {
+				e.printStackTrace();
+			}
+			Output += "<br>there are <b>"+count_inprocs+" inproceedings</b> for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+ Conference_name+"</a><br>";
+			return Output;
+		}
+		else if (mode.equals("retrieve")) {
+			try {
+				Output += "<br>the inproceedings for the conference <a href='/test/?func=conf_by_id&id="+conf_id+"'>"+ Conference_name+"</a> are:<br><br>";
+
+				String xqueryString = "let $conf := '"+Conference_id+"' for $inproc in doc('"+dbName+"')//inproceedings where $inproc/booktitle = $conf order by $inproc/title return (<inproc_key_title key='{$inproc/@key}' title='{$inproc/title}'></inproc_key_title>)";
+				XQResultSequence doc = executeQuery_myquery(xqueryString);
+
+				while (doc.next()){
+					Element result = (Element) doc.getObject();
+
+					String Inproceedings_id = result.getAttribute("key");
+					String Inproceedings_title = result.getAttribute("title");
+
+					Output += "<a href='/test/?func=inproceeding_by_id&key="+Inproceedings_id+"'>"+Inproceedings_title+"</a><br>";
+				}
+				return Output;
+			} catch (XQException e) {
+				e.printStackTrace();
+			}
+		}
+		return "<br>Error...<br>";
 	}
 
 	@Override
