@@ -1,23 +1,15 @@
 package eth.infsys.group1.task3;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.jdo.Extent;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
 
-import org.bson.BsonReader;
-import org.bson.BsonType;
-import org.bson.Document;
-import org.bson.json.JsonReader;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -26,11 +18,10 @@ import eth.infsys.group1.dbspec.DivIO;
 import eth.infsys.group1.dbspec.InProceedings_simple_input;
 import eth.infsys.group1.dbspec.Proceedings_simple_input;
 import eth.infsys.group1.dbspec.PublicationIO;
-import eth.infsys.group1.dbspec.WebFunc;
-import eth.infsys.group1.task1.dbobjs.InProceedings;
 import javafx.util.Pair;
 import net.xqj.basex.BaseXXQDataSource;
 
+@SuppressWarnings("restriction")
 public class T3DBProvider extends DBProvider {
 
 
@@ -56,12 +47,17 @@ public class T3DBProvider extends DBProvider {
 	 * @param mode OPEN_DB_APPEND or OPEN_DB_OVERRIDE
 	 * @throws XQException 
 	 */
-	public T3DBProvider(String dbName, String User, String PW) throws XQException {
-		this.dbName = dbName;
-		this.xqs = new BaseXXQDataSource();
-		xqs.setProperty("serverName", "localhost");
-		xqs.setProperty("port", "1984");
-		this.conn = xqs.getConnection(User, PW);
+	public T3DBProvider(String dbName, String User, String PW){
+		try {
+			this.dbName = dbName;
+			this.xqs = new BaseXXQDataSource();
+			xqs.setProperty("serverName", "localhost");
+			xqs.setProperty("port", "1984");
+			this.conn = xqs.getConnection(User, PW);
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void testx() throws XQException{
@@ -545,10 +541,10 @@ public class T3DBProvider extends DBProvider {
 							//e.printStackTrace();
 							System.out.println("Error: NumberFormatException...");
 						}
-						publication.ConferenceEdition_year_id = new Pair(temp,calculate_conferenceEdition_id(publication.Conference_name_id.getKey(), temp));
+						publication.ConferenceEdition_year_id = new Pair<Integer, String>(temp,calculate_conferenceEdition_id(publication.Conference_name_id.getKey(), temp));
 						break;
 					case "editor":
-						publication.editors_name_id.add(new Pair(node_text,calculate_person_id(node_text)));
+						publication.editors_name_id.add(new Pair<String, String>(node_text,calculate_person_id(node_text)));
 						break;
 					case "note":
 						publication.note = node_text;
@@ -702,7 +698,7 @@ public class T3DBProvider extends DBProvider {
 				e.printStackTrace();
 			}
 		}
-		
+
 		else {
 			//get editors
 			try {
@@ -735,7 +731,7 @@ public class T3DBProvider extends DBProvider {
 			}
 			return out;
 		}
-		
+
 		//Error...
 		Output += "<br>Error...<br>";
 		out[0]=Output;
@@ -1148,14 +1144,95 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public String IO_person_is_author_and_editor() {
-		// TODO Auto-generated method stub
-		return null;
+		String Output = "";
+		StringBuilder temp = new StringBuilder();
+		StringBuilder Jumplist = new StringBuilder();
+
+		Jumplist.append("<b>Jumplist: </b>");
+
+		int k = 0;
+
+		try {
+			String xqueryString = "let $result := for $proc in doc('"+dbName+"')//proceedings for $editor in $proc/editor let $inprocs_per_editor := doc('"+dbName+"')//inproceedings[author = $editor][crossref = $proc/@key] for $inproc in $inprocs_per_editor return <editor_author id='{$editor}' name='{$editor}' proc_key='{$proc/@key}' proc_title='{$proc/title}' inproc_key='{$inproc/@key}' inproc_title='{$inproc/title}'></editor_author> for $res in $result order by $res/@name return $res";
+			XQResultSequence doc = executeQuery_myquery(xqueryString);
+
+			String Person_id= "";
+			String Person_name="";
+
+			Boolean is_first_person = true;
+			String last_Person_id = "no last person";
+
+			String Proceeding_id ="";
+			String Proceeding_title ="";
+
+			String Inproceeding_id="";
+			String Inproceeding_title="";
+
+			while (doc.next()){
+				k++;
+				Element result = (Element) doc.getObject();
+
+				Person_id=result.getAttribute("id");
+				Person_name=result.getAttribute("name");
+
+				Proceeding_id =result.getAttribute("proc_key");
+				Proceeding_title =result.getAttribute("proc_title");
+
+				Inproceeding_id=result.getAttribute("inproc_key");
+				Inproceeding_title=result.getAttribute("inproc_title");
+
+				//new Person
+				if ( ! last_Person_id.equals(Person_id) ){
+					//close the list for last person: not for the first person
+					if (!is_first_person){
+						//last entry for person
+						temp.append("</ol><hr>");
+					} else {
+						is_first_person = false;
+					}
+
+					//start new List for the new Person
+
+					//add person to jumplist - first time
+					Jumplist.append("<a href='#"+Person_id+"'>"+Person_name + "</a>, ");
+
+					//first time header
+					temp.append("<h4 id='"+Person_id+"'><a href='/test/?func=person_by_id&id=" +Person_id+ "'>"+Person_name+"</a></h4>");
+					temp.append("<ol type='1'>");
+				}
+				//add entry for person
+				temp.append("<li><a href='/test/?func=proceeding_by_id&key=" + Proceeding_id+"'>"+Proceeding_title+ "</a> / <a href='/test/?func=inproceeding_by_id&key=" + Inproceeding_id+"'>"+Inproceeding_title+ "</a></li>");
+
+				last_Person_id = Person_id;
+			}
+		} catch (XQException e) {
+			e.printStackTrace();
+		}
+
+		Output += "Statistic: inner loop... "+k+"<br>"+Jumplist + "<br>" + temp;
+		return Output;
 	}
 
 	@Override
 	public List<PublicationIO> IO_person_is_last_author(String pers_id) {
-		// TODO Auto-generated method stub
-		return null;
+		List<PublicationIO> return_list = new ArrayList<PublicationIO>();	
+
+		try {
+			String pers_name = pers_id.split("/")[1];
+
+			String xqueryString = "let $author := '"+pers_name+"' for $inproc in doc('"+dbName+"')//inproceedings where ($inproc/author)[last()] =  $author order by $inproc/title return $inproc";
+			XQResultSequence doc = executeQuery_myquery(xqueryString);
+
+			while (doc.next()){
+				return_list.add(fill_PublicationIO(doc,"is_an_inproceeding"));
+			}
+
+			return return_list;
+
+		} catch (XQException e) {
+			e.printStackTrace();
+		}
+		return return_list;
 	}
 
 	@Override
@@ -1211,12 +1288,27 @@ public class T3DBProvider extends DBProvider {
 	}
 
 
-
-
 	@Override
 	public List<DivIO> IO_publishers_whose_authors_in_interval(int y1, int y2) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DivIO> return_list = new ArrayList<>();
+
+		try {
+			String xqueryString = "let $year1 := '"+y1+"' let $year2 := '"+y2+"' let $all_crossrefs := distinct-values(doc('"+dbName+"')//inproceedings[$year1 <= *:year][*:year <= $year2]/crossref) let $all_publishers := distinct-values(for $crossref in $all_crossrefs return doc('"+dbName+"')//proceedings[@key=$crossref]/publisher) for $publ_name in $all_publishers order by $publ_name return <publisher_key_title key='publisher/{$publ_name}' title='{$publ_name}'> {for $proc in doc('"+dbName+"')//proceedings where $proc/publisher = $publ_name order by $proc/title let $proc_id := $proc/@key return <proc_key_title key='{$proc_id}' title='{$proc/title}'></proc_key_title>} </publisher_key_title>";
+			XQResultSequence doc = executeQuery_myquery(xqueryString);
+
+			while (doc.next()){
+				return_list.add(fill_DivIO(doc,"is_a_publisher"));
+			}
+			
+			return return_list;
+			
+		} catch (XQException e) {
+			e.printStackTrace();
+		}
+
+		return return_list;
 	}
+
+	
 
 }

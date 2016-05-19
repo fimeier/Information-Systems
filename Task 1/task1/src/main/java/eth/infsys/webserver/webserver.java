@@ -24,7 +24,7 @@ import eth.infsys.group1.dbspec.WebFunc;
 import eth.infsys.group1.task1.T1DBProvider;
 import eth.infsys.group1.task2.T2DBProvider;
 import eth.infsys.group1.task3.T3DBProvider;
-
+import eth.infsys.group1.task4.My_timer;
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
@@ -34,10 +34,42 @@ public class Webserver {
 	private Boolean MongoDB_implementation = false;
 	private Boolean BaseXDB_implementation = false;
 	private String DB_Implementation="";
+	
+	private Boolean Benchmark_mode = false;
 
 	private DBProvider myDB;
 	private HttpServer server;
 
+	//Benchmark Mode
+	public Webserver(String DB_Implementation, String dbName, String User, String PW, Boolean Benchmark_mode) throws XQException{
+		if ("zooDB".equals(DB_Implementation)){
+			myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
+			zooDB_implementation = true;
+			this.DB_Implementation = DB_Implementation;
+		}
+		else if ("MongoDB".equals(DB_Implementation)){
+			myDB = (T2DBProvider) new T2DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
+			MongoDB_implementation = true;
+			this.DB_Implementation = DB_Implementation;
+		}
+		else if ("BaseXDB".equals(DB_Implementation)){
+			myDB = (T3DBProvider) new T3DBProvider(dbName, User, PW);
+			BaseXDB_implementation = true;
+			this.DB_Implementation = DB_Implementation;
+		}
+		
+		this.Benchmark_mode = true;	
+	}
+	
+	public int benchmark(My_timer timer, String user_input){
+		
+		timer.new_run();
+		timer.start();
+		String response = backend(user_input);
+		timer.stop();
+		
+		return response.length();
+	}
 
 	public Webserver(int Port, String DB_Implementation, String dbName) throws IOException {
 
@@ -45,7 +77,6 @@ public class Webserver {
 			myDB = new T1DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
 			zooDB_implementation = true;
 			this.DB_Implementation = DB_Implementation;
-
 		}
 		else if ("MongoDB".equals(DB_Implementation)){
 			myDB = (T2DBProvider) new T2DBProvider(dbName, DBProvider.OPEN_DB_APPEND);
@@ -59,7 +90,7 @@ public class Webserver {
 		server.start();
 	}
 		
-	public Webserver(int Port, String DB_Implementation, String dbName, String User, String PW) throws IOException, XQException {
+	public Webserver(int Port, String DB_Implementation, String dbName, String User, String PW) throws IOException {
 
 		if ("BaseXDB".equals(DB_Implementation)){
 			myDB = (T3DBProvider) new T3DBProvider(dbName, User, PW);
@@ -76,11 +107,11 @@ public class Webserver {
 	class MyHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
-			System.out.println("user_input : "+t.getRequestURI().getQuery());
+			System.out.println("\nuser_input : "+t.getRequestURI().getQuery());
 			String user_input = java.net.URLDecoder.decode(t.getRequestURI().getQuery(), "UTF-8");
 			System.out.println("user_input after decoding: "+user_input);
 
-			System.out.println("call backend...");
+			//System.out.println("call backend...");
 			String response = "";
 			try {
 				response = backend(user_input);
@@ -91,7 +122,7 @@ public class Webserver {
 				response = backend("func=MAIN");
 			}
 
-			System.out.println("returned from backend...\n");
+			//System.out.println("returned from backend...\n");
 			byte[] resp = response.getBytes();
 			t.sendResponseHeaders(200, resp.length);
 			OutputStream os = t.getResponseBody();
@@ -152,10 +183,10 @@ public class Webserver {
 	}
 
 	private String backend(String user_input) {
-		System.out.println("bin im backend...");
-		System.out.println("call get args...");
+		//System.out.println("bin im backend...");
+		//System.out.println("call get args...");
 		HashMap<String,String> args = get_args(user_input);
-		System.out.println("zurück von get args");
+		//System.out.println("zurück von get args");
 
 
 		String output = "";

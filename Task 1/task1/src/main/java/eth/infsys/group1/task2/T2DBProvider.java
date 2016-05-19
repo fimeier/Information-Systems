@@ -1182,10 +1182,10 @@ public class T2DBProvider extends DBProvider {
 
 	private long count_conferenceeditions() {
 
-		System.out.println(db.getCollection("Conferences").aggregate(asList(
+		/*System.out.println(db.getCollection("Conferences").aggregate(asList(
 				Aggregates.unwind("$editions"),
 				new Document("$group", new Document("_id", null).append("count", new Document("$sum", 1)))
-				)).first().toJson());
+				)).first().toJson());*/
 
 		BsonReader r = new JsonReader(db.getCollection("Conferences").aggregate(asList(
 				Aggregates.unwind("$editions"),
@@ -1256,7 +1256,7 @@ public class T2DBProvider extends DBProvider {
 		if (doc==null){
 			return 0;
 		}
-		System.out.println(doc.toJson());
+		//System.out.println(doc.toJson());
 
 		BsonReader r = new JsonReader(doc.toJson());
 		r.readStartDocument();
@@ -1287,7 +1287,7 @@ public class T2DBProvider extends DBProvider {
 		if (doc==null){
 			return 0;
 		}
-		System.out.println(doc.toJson());
+		//System.out.println(doc.toJson());
 
 		BsonReader r = new JsonReader(doc.toJson());
 		r.readStartDocument();
@@ -1339,7 +1339,7 @@ public class T2DBProvider extends DBProvider {
 		if (doc==null){
 			return 0;
 		}
-		System.out.println(doc.toJson());
+		//System.out.println(doc.toJson());
 
 		BsonReader r = new JsonReader(doc.toJson());
 		r.readStartDocument();
@@ -1391,7 +1391,7 @@ public class T2DBProvider extends DBProvider {
 		if (doc==null){
 			return 0;
 		}
-		System.out.println(doc.toJson());
+		//System.out.println(doc.toJson());
 
 		BsonReader r = new JsonReader(doc.toJson());
 		r.readStartDocument();
@@ -1589,7 +1589,7 @@ public class T2DBProvider extends DBProvider {
 		//Proceedings
 		else if ("is_a_proceeding".equals(is_a) ){
 			publication.is_a_proceeding = true;
-			System.out.println(doc.toJson());
+			//System.out.println(doc.toJson());
 
 			BsonReader r = new JsonReader(doc.toJson());
 			r.readStartDocument();
@@ -2385,7 +2385,7 @@ public class T2DBProvider extends DBProvider {
 			return out;
 		}
 
-		System.out.println(conf.toJson());
+		//System.out.println(conf.toJson());
 
 		BsonReader r = new JsonReader(conf.toJson());
 		r.readStartDocument();
@@ -2410,7 +2410,7 @@ public class T2DBProvider extends DBProvider {
 			List<Pair<String,String>> list_editors = new ArrayList<Pair<String,String>>();
 			if (doc!=null){
 
-				System.out.println(doc.toJson());
+				//System.out.println(doc.toJson());
 
 				r = new JsonReader(doc.toJson());
 
@@ -2443,7 +2443,7 @@ public class T2DBProvider extends DBProvider {
 			List<Pair<String,String>> list_authors = new ArrayList<Pair<String,String>>();
 			if (doc!=null){
 
-				System.out.println(doc.toJson());
+				//System.out.println(doc.toJson());
 
 				r = new JsonReader(doc.toJson());
 
@@ -2594,7 +2594,7 @@ public class T2DBProvider extends DBProvider {
 			//String timing = "dbquery "+dbquery+" took "+(end_q-start_q)/1000000+"ms <=> ";
 			String timing = "dbquery (v2) "+dbquery+" took "+(end_q2-start_q2)/1000000+"ms";
 
-			System.out.println(timing);
+			//System.out.println(timing);
 			Output += timing+"<br>";
 
 
@@ -2793,7 +2793,7 @@ public class T2DBProvider extends DBProvider {
 		String Author_id="";
 		String Author_name="";
 		for (Document doc: find_co_authors(pers_name)){
-			System.out.println(doc.toJson());
+			//System.out.println(doc.toJson());
 
 
 			BsonReader r = new JsonReader(doc.toJson());
@@ -3095,7 +3095,7 @@ public class T2DBProvider extends DBProvider {
 			return Output;
 		}
 
-		System.out.println(conf.toJson());
+		//System.out.println(conf.toJson());
 
 		BsonReader r = new JsonReader(conf.toJson());
 		r.readStartDocument();

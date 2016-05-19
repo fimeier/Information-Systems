@@ -990,7 +990,7 @@ public class T1DBProvider extends DBProvider {
 		all_authors.remove(pers);
 
 		for (Person pers1: all_authors){
-			System.out.println(pers1.getName());
+			//System.out.println(pers1.getName());
 			return_list.add(fill_DivIO(pers1));
 		}
 
@@ -1186,7 +1186,7 @@ public class T1DBProvider extends DBProvider {
 		 * performance??
 		 */
 		long start, stop;
-
+		
 		/*
 
 		System.out.println("implementation with Extent start...");
@@ -1218,7 +1218,7 @@ public class T1DBProvider extends DBProvider {
 		int tempsize = ret.size();
 		stop = System.nanoTime();
 		Output += "<br>the number of publications in the interval ["+y1+","+y2+"] is: "+tempsize+"<br>";
-		System.out.println("implementation with Extent took="+(stop-start)/1.e9);
+		//System.out.println("implementation with Extent took="+(stop-start)/1.e9);
 
 
 		return Output;
