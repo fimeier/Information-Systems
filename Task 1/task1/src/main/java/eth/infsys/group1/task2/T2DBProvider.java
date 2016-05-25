@@ -1097,6 +1097,7 @@ public class T2DBProvider extends DBProvider {
 	}
 
 
+	@SuppressWarnings("resource")
 	private Document find_co_authors_names_of_a_group_not_working(List<String> pers_names) {
 
 		Document all_inprocs = db.getCollection("Persons").aggregate(
