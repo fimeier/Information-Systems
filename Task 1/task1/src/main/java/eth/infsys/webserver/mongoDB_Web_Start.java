@@ -1,6 +1,6 @@
 package eth.infsys.webserver;
 
-public class mongoWeb_start {
+public class mongoDB_Web_Start {
 
 	public static void main(String[] args) throws Exception {
 

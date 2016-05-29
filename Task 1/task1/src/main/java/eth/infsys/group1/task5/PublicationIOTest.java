@@ -9,7 +9,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,8 +20,10 @@ public class PublicationIOTest {
 
 	private static Validator validator;
 	
-	private static int currentYear; 
-	
+	/**
+	 * 
+	 * @return a proceedings with no errors; !!!You have to set the fields mode and myDB!!!
+	 */
 	private static Proceedings_simple_input create_proc(){
 		Proceedings_simple_input proc_static = new Proceedings_simple_input();
 
@@ -50,6 +51,11 @@ public class PublicationIOTest {
 		return proc_static;
 	}
 	
+	/**
+	 * 
+	 * @return an inproceedings with no errors; !!!You have to set the fields mode and myDB!!!
+	 * 
+	 */
 	private static InProceedings_simple_input create_inproc(){
 		InProceedings_simple_input inproc_static = new InProceedings_simple_input();
 		
@@ -79,7 +85,8 @@ public class PublicationIOTest {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 		
-		currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		
+		
 	}
 
 	/**
@@ -110,7 +117,7 @@ public class PublicationIOTest {
 	public void procYearIsInRange() {
 		Proceedings_simple_input proc = create_proc();
 		
-		proc.year = currentYear + 9;
+		proc.year = 1492;
 		
 		Set<ConstraintViolation<Proceedings_simple_input>> constraintViolations = validator.validate( proc);
 		assertEquals( 1, constraintViolations.size() );
@@ -121,7 +128,7 @@ public class PublicationIOTest {
 	public void procIsbnUpdate() {
 		Proceedings_simple_input proc = create_proc();
 		
-		proc.year = currentYear + 9;
+		proc.year = 1492;
 		
 		Set<ConstraintViolation<Proceedings_simple_input>> constraintViolations = validator.validate( proc);
 		assertEquals( 1, constraintViolations.size() );

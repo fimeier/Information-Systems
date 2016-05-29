@@ -35,9 +35,9 @@ import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
 public class T1DBProvider extends DBProvider {
-//DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
+	//DBProvider<Conference, ConferenceEdition, InProceedings, Person, Proceedings, Publication, Publisher, Series> {
 
-	
+
 	/**
 	 * Class and DB-Stuff
 	 * 
@@ -845,7 +845,7 @@ public class T1DBProvider extends DBProvider {
 	 * IO-methods
 	 * @param sort_by 
 	 */
-	
+
 	public PublicationIO IO_get_publication_by_id(String publ_id){
 		pm.currentTransaction().setNontransactionalRead(true);
 
@@ -1187,7 +1187,7 @@ public class T1DBProvider extends DBProvider {
 		 * performance??
 		 */
 		long start, stop;
-		
+
 		/*
 
 		System.out.println("implementation with Extent start...");
@@ -1587,9 +1587,46 @@ public class T1DBProvider extends DBProvider {
 
 
 	@Override
-	public boolean IO_exists_inproceedings_id(String id) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean IO_exists_inproceedings_id(String inproc_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		InProceedings inproc = get_inproceeding_by_id(inproc_id);
+
+		if ( ! (inproc == null) ){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean IO_exists_proceedings_id(String proc_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		Proceedings proc = get_proceeding_by_id(proc_id);
+
+		if ( ! (proc == null) ){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	@Override
+	public String IO_get_isbn_by_proc_id(String proc_id) {
+		pm.currentTransaction().setNontransactionalRead(true);
+		
+		Proceedings proc = get_proceeding_by_id(proc_id);
+
+		if ( ! (proc == null) ){
+			String currentIsbn = proc.getIsbn();
+			return currentIsbn;
+		}
+		else {
+			return "Error getting old isbn...";
+		}
 	}
 
 

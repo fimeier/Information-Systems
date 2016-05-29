@@ -3,8 +3,6 @@ package eth.infsys.webserver;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import eth.infsys.group1.dbspec.InProceedings_simple_input;
-import eth.infsys.group1.dbspec.MyCustomConstraints.CaseMode;
 import eth.infsys.group1.dbspec.Proceedings_simple_input;
 
 public class ValidProceedingsIdValidator

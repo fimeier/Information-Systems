@@ -17,12 +17,12 @@ public class batch_db_loader {
 
 		//Choose DB
 		//String dbName = "Project1_ZooDB_updated_confEd_keys.zdb";
-		//String dbName = "Project1_ZooDB_updated_assesmenttask1.zdb";
-		//String dbName = "Project1_4mil.zdb";
+		//String dbName = "Project1_ZooDB_small.zdb";
+		String dbName = "ZooDB_big.zdb";
 		
 
 		//AssesmentTask1.xml
-		String dbName = "Project1_empty546.zdb";
+		//String dbName = "Project1_empty546.zdb";
 
 
 		//big db inkl Ass.data
@@ -52,8 +52,8 @@ public class batch_db_loader {
 	private static void load_input(T1DBProvider myDB) throws ParserConfigurationException, SAXException, IOException {
 		XMLParser<Proceedings> myParser = new XMLParser<>(myDB);
 		
-		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
-		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
+		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
+		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
 
 
 		File file = new File(dblp_data);

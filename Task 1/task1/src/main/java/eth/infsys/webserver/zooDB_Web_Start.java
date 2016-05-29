@@ -1,6 +1,6 @@
 package eth.infsys.webserver;
 
-public class start_webserver_zooDB {
+public class zooDB_Web_Start {
 
 	public static void main(String[] args) throws Exception {
 
@@ -11,8 +11,8 @@ public class start_webserver_zooDB {
 		 *
 		 */
 		//String dbName = "Project1_empty.zdb"; //AssesmentTask1.xml
-		String dbName = "Project1_test.zdb"; //big db inkl Ass.data
-		//String dbName = "Project1_empty546.zdb";
+		//String dbName = "Project1_test.zdb"; //big db inkl Ass.data
+		String dbName = "ZooDB_big.zdb";
 		
 		int Port = 8000;
 		String DB_Implementation = "zooDB";

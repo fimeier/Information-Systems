@@ -693,9 +693,18 @@ public class T2DBProvider extends DBProvider {
 		Document doc = db.getCollection("Persons").find(filter).first();
 		return (doc != null);	
 	}
-
-
-
+	
+	private Boolean exists_proceedings_by_id(String proc_id) {
+		Bson filter = eq("_id", proc_id);
+		Document doc = db.getCollection("Publications").find(filter).first();
+		return (doc != null);	
+	}
+	
+	private Boolean exists_inproceedings_by_id(String inproc_id) {
+		Bson filter = eq("_id", inproc_id);
+		Document doc = db.getCollection("Inproceedings").find(filter).first();
+		return (doc != null);	
+	}
 
 
 
@@ -2999,13 +3008,6 @@ public class T2DBProvider extends DBProvider {
 	}
 
 
-	@Override
-	public boolean IO_exists_inproceedings_id(String id) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
 
 	@Override
 	public PublicationIO IO_get_publication_by_id(String publ_id) {
@@ -3436,19 +3438,28 @@ public class T2DBProvider extends DBProvider {
 		return return_list;
 		
 	}
+	
+	
+	
+
+	@Override
+	public boolean IO_exists_inproceedings_id(String inproc_id) {
+		return exists_inproceedings_by_id(inproc_id);
+
+	}
 
 
+	@Override
+	public boolean IO_exists_proceedings_id(String proc_id) {
+		return exists_proceedings_by_id(proc_id);
+	}
 
 
-
-
-
-
-
-
-
-
-
+	@Override
+	public String IO_get_isbn_by_proc_id(String id) {
+		PublicationIO proc = fill_PublicationIO(get_proceedings_by_id(id),"is_a_proceeding");
+		return proc.isbn;
+	}
 
 
 
