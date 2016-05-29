@@ -2999,6 +2999,13 @@ public class T2DBProvider extends DBProvider {
 	}
 
 
+	@Override
+	public boolean IO_exists_inproceedings_id(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 
 	@Override
 	public PublicationIO IO_get_publication_by_id(String publ_id) {
@@ -3429,6 +3436,8 @@ public class T2DBProvider extends DBProvider {
 		return return_list;
 		
 	}
+
+
 
 
 

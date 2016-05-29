@@ -39,6 +39,17 @@ public enum WebFunc {
 	PAGE(2),	//func=PAGE&name=<value>
 	MAIN(1), //func
 	ERROR(1),
+	
+	
+	add_inproc(10),
+	update_inproc(10),
+	
+	add_proc(14),
+	update_proc(14),
+
+	
+
+
 	;
 
 	public final int arg_count;

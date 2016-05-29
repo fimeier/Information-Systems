@@ -175,6 +175,13 @@ public class T3DBProvider extends DBProvider {
 		XQExpression xqe = conn.createExpression();
 		return xqe.executeQuery(xqueryString);
 	}
+	
+
+	private XQResultSequence exists_proceedings_by_id(String id) throws XQException {
+		String xqueryString = "let $proc_id := '"+id+"' let $proc_exists :=for $proc in doc('"+dbName+"')//proceedings[@key = $proc_id ] return count($proc) return <proceedings key='{$proc_id}' exists='{$proc_exists}'></proceedings>";
+		XQExpression xqe = conn.createExpression();
+		return xqe.executeQuery(xqueryString);
+	}
 
 	private XQResultSequence get_proceedings_by_id(String id) throws XQException {
 		String xqueryString = "let $proc := doc('"+dbName+"')//proceedings[@key = '"+id+"' ] let $proc_id := $proc/@key let $inproc := doc('"+dbName+"')//inproceedings[crossref =  $proc_id] return (<proceedings confEd='{$inproc[1]/year}'> {$proc/(@*, *)} {for $x in $inproc order by $x/title return <inproc_key_title key='{$x/@key}' title='{$x/title}'></inproc_key_title>} </proceedings>)";
@@ -527,6 +534,9 @@ public class T3DBProvider extends DBProvider {
 						catch (NumberFormatException e) {
 							publication.year = 0;
 						}
+						break;
+					case "isbn":
+						publication.isbn = node_text;
 						break;
 					case "ee":
 						publication.electronicEdition = node_text;
@@ -969,6 +979,55 @@ public class T3DBProvider extends DBProvider {
 		}
 		return return_list;
 	}
+
+	@Override
+	public boolean IO_exists_inproceedings_id(String id){
+		System.out.println("T3DBProvider: IO_exists_inproceedings_id...");
+		XQResultSequence publ;
+		try {
+			publ = get_inproceedings_by_id(id);
+			//check for empty sequence			
+			if(!publ.next()){
+				return false;
+			}
+			else {
+				return true;
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			publ = null;
+		}
+		return false;
+	}
+	
+
+	@Override
+	public boolean IO_exists_proceedings_id(String id) {
+		System.out.println("T3DBProvider: IO_exists_proceedings_id...");
+		XQResultSequence publ;
+		try {
+			publ = exists_proceedings_by_id(id);
+			//check for empty sequence			
+			if(publ.next()){
+				Element proc = (Element) publ.getObject();
+				if ( proc.getAttribute("exists").equals("1")){
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 
 
 

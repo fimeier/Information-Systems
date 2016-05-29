@@ -1,8 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter01;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 public class Car {
 

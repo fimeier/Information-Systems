@@ -1,5 +1,9 @@
 package eth.infsys.group1.dbspec;
 
+
+import javax.validation.constraints.*;
+
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,7 +108,8 @@ public class PublicationIO {
 			ret += "number: " + number+"<br>";
 			
 			ret += "publisher: <a href='/test/?func=publisher_by_id&id=" +publisher_id+ "'>"+publisher_name+"</a><br>";
-			
+			ret += "isbn: "+isbn+"<br>";
+
 			ret += "volume: " + volume+"<br>";
 			
 			//ret += "series-name: " + series_name+"<br>";
@@ -219,6 +224,9 @@ public class PublicationIO {
 		this.ConferenceEdition_year = input.conferenceEdition;
 		this.ConferenceEdition_id = ConferenceEdition.calculate_conferenceEdition_id(input.conferenceName, input.conferenceEdition);
 
+		Conference_name_id = new Pair<String, String>(this.Conference_name,this.Conference_id);
+		ConferenceEdition_year_id = new Pair<Integer, String>(this.ConferenceEdition_year,this.ConferenceEdition_id);
+		
 		
 	}
 	public PublicationIO(InProceedings_simple_input input){

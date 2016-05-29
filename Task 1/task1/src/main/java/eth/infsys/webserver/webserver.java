@@ -1,5 +1,7 @@
 package eth.infsys.webserver;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -7,10 +9,16 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.xml.xquery.XQException;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -19,6 +27,8 @@ import com.sun.net.httpserver.HttpServer;
 
 import eth.infsys.group1.dbspec.DBProvider;
 import eth.infsys.group1.dbspec.DivIO;
+import eth.infsys.group1.dbspec.InProceedings_simple_input;
+import eth.infsys.group1.dbspec.Proceedings_simple_input;
 import eth.infsys.group1.dbspec.PublicationIO;
 import eth.infsys.group1.dbspec.WebFunc;
 import eth.infsys.group1.task1.T1DBProvider;
@@ -30,11 +40,14 @@ import javafx.util.Pair;
 @SuppressWarnings("restriction")
 public class Webserver {
 
+	static private Validator validator;
+
+
 	private Boolean zooDB_implementation = false;
 	private Boolean MongoDB_implementation = false;
 	private Boolean BaseXDB_implementation = false;
 	private String DB_Implementation="";
-	
+
 	private Boolean Benchmark_mode = false;
 
 	private DBProvider myDB;
@@ -57,17 +70,17 @@ public class Webserver {
 			BaseXDB_implementation = true;
 			this.DB_Implementation = DB_Implementation;
 		}
-		
+
 		this.Benchmark_mode = true;	
 	}
-	
+
 	public int benchmark(My_timer timer, String user_input){
-		
+
 		timer.new_run();
 		timer.start();
 		String response = backend(user_input);
 		timer.stop();
-		
+
 		return response.length();
 	}
 
@@ -83,13 +96,16 @@ public class Webserver {
 			MongoDB_implementation = true;
 			this.DB_Implementation = DB_Implementation;
 		}
-		
+
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
+
 		server = HttpServer.create(new InetSocketAddress(Port), 0);
 		server.createContext("/test", new MyHandler());
 		server.setExecutor(null); // creates a default executor
 		server.start();
 	}
-		
+
 	public Webserver(int Port, String DB_Implementation, String dbName, String User, String PW) throws IOException {
 
 		if ("BaseXDB".equals(DB_Implementation)){
@@ -97,6 +113,9 @@ public class Webserver {
 			BaseXDB_implementation = true;
 			this.DB_Implementation = DB_Implementation;
 		}
+
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
 
 		server = HttpServer.create(new InetSocketAddress(Port), 0);
 		server.createContext("/test", new MyHandler());
@@ -131,6 +150,15 @@ public class Webserver {
 		}
 
 	}
+
+
+	String readFile(String path, Charset encoding) 
+			throws IOException 
+	{
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
+	}
+
 
 	private static Pair<String,String> parse_name_value(String arg) {
 		final Pattern pattern = Pattern.compile("(?<name>^.+)=(?<value>.+)");
@@ -172,11 +200,20 @@ public class Webserver {
 
 		for (int i=0; i< arg_count; i++){
 			name_value = parse_name_value(args[i]);
+
+			//ignore empty parameters for add/update
+			if ( args[0].equals("func=add_inproc") || args[0].equals("func=update_inproc") || args[0].equals("func=add_proc") || args[0].equals("func=update_proc")){
+				if ( name_value == null ){
+					continue;
+				}
+			}	
+
 			if ( name_value == null ){
 				args_out.put("func", "ERROR");
 				args_out.put("error_message", "wrong_argument_syntax");				
 				return args_out;
 			}
+
 			args_out.put(name_value.getKey(), name_value.getValue());
 		}
 		return args_out;
@@ -198,6 +235,40 @@ public class Webserver {
 
 		WebFunc wf = WebFunc.fromString(func);
 		switch (wf) {
+		/**
+		 * data manipulation
+		 * 
+		 */
+		case add_inproc:
+			output += create_header(wf);
+			output += add_inproc(args);
+			output += create_footer(wf);
+			break;
+		case update_inproc:
+			output += create_header(wf);
+			output += update_inproc(args);
+			output += create_footer(wf);
+			break;
+
+		case add_proc:
+			output += create_header(wf);
+			output += add_proc(args);
+			output += create_footer(wf);
+			break;
+		case update_proc:
+			output += create_header(wf);
+			output += update_proc(args);
+			output += create_footer(wf);
+			break;
+
+
+
+
+			/**
+			 * Gui-Stuff
+			 * 
+			 * 
+			 */
 		case pupl_by_title_offset_order:
 			if ( !args.containsKey("order_by") || !args.containsKey("ob_direction")){
 				output += create_header(wf);
@@ -485,7 +556,7 @@ public class Webserver {
 			}
 
 			/**
-			 * Qeries
+			 * Queries
 			 */
 		case find_co_authors:
 			if ( !args.containsKey("name")){
@@ -699,7 +770,7 @@ public class Webserver {
 			return Output;
 		}
 		if (mode.equals("retrieve")){
-			
+
 			String[] editors_authors = myDB.IO_authors_editors_for_a_conference(conf_id, mode);
 			Output += "<p></p>";
 			Output += "<div>";
@@ -712,17 +783,17 @@ public class Webserver {
 			Output += "</ul>";
 			Output += "<!-- Tab panes -->";
 			Output += "<div class='tab-content'>";
-			
+
 			Output += "<div role='tabpanel' class='tab-pane active' id='Editors'>";
 			Output += "<!-- START Editors-->";
 			Output += editors_authors[0];
-			
+
 			if ("".equals(editors_authors[0])){
 				Output += "<h3>no editors...</h3>";
 			}
 			Output += "<!-- END Editors-->";
 			Output += "</div>";
-			
+
 			Output += "<div role='tabpanel' class='tab-pane' id='Authors'>";
 			Output += "<!-- START Authors-->";
 			Output += editors_authors[1];
@@ -731,9 +802,9 @@ public class Webserver {
 			}
 			Output += "<!-- END Authors-->";
 			Output += "</div>";
-		
+
 			Output += "<!-- END inPROCEEDINGS--></div></div></div>";
-						
+
 			return Output;
 		}
 		else{
@@ -809,7 +880,7 @@ public class Webserver {
 			eoff = 0;
 		}
 
-		
+
 		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 		String argument_next = "";
 		String argument_prev = "";
@@ -851,13 +922,13 @@ public class Webserver {
 
 		Output += "<!-- END Series-->";
 		Output += "</div></div></div>";
-		
+
 		return Output;
-		
-		
-		
-		
-		
+
+
+
+
+
 	}
 
 	private String series_by_id(String series_id) {
@@ -879,7 +950,7 @@ public class Webserver {
 			eoff = 0;
 		}
 
-		
+
 		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
 		String argument_next = "";
@@ -922,7 +993,7 @@ public class Webserver {
 
 		Output += "<!-- END Publishers-->";
 		Output += "</div></div></div>";
-		
+
 		return Output;
 	}
 
@@ -946,10 +1017,10 @@ public class Webserver {
 		}
 		if (MongoDB_implementation){
 			output = "<p>The co-authors and <font color='red'>the common publications</font> with <b>"+name+"</b> are:</p>";
-			
+
 			output += myDB.IO_find_co_authors_returns_String(name);
 		}
-		
+
 		if (BaseXDB_implementation){
 			output += "<p>The co-authors (and their publications) of <b>"+name+"</b> are:</p>";
 
@@ -958,8 +1029,8 @@ public class Webserver {
 				output += person.get_all();
 			} 		
 		}
-		
-		
+
+
 
 		return output;
 	}
@@ -1007,7 +1078,7 @@ public class Webserver {
 			boff = 0;
 			eoff = 0;
 		}
-		
+
 		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
 		String argument_next = "";
@@ -1049,7 +1120,7 @@ public class Webserver {
 		} 
 		Output += "<!-- END Conferences-->";
 		Output += "</div></div></div>";
-		
+
 		return Output;
 
 	}
@@ -1065,7 +1136,7 @@ public class Webserver {
 			boff = 0;
 			eoff = 0;
 		}
-		
+
 		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+" order="+order_by+"</p>";
 
 		String argument_next = "";
@@ -1107,7 +1178,7 @@ public class Webserver {
 		} 
 		Output += "<!-- END Persons-->";
 		Output += "</div></div></div>";
-		
+
 
 		return Output;
 	}
@@ -1189,7 +1260,7 @@ public class Webserver {
 		String Output = "<p></p>";//<p>filter="+filter+"<br>beginoffset="+boff+"<br>endoffset="+eoff+"</p>";
 
 		List<PublicationIO> publs = myDB.IO_get_publ_by_filter_offset(filter, boff, eoff, order_by);
-		
+
 		if (zooDB_implementation){
 			Output += "<div>";
 			for (PublicationIO publ: publs){
@@ -1294,7 +1365,7 @@ public class Webserver {
 		}
 		return output;
 	}
-	
+
 
 	private String get_page(String name) {
 		String path = "../task1/src/main/java/eth/infsys/webserver/page_"+name+".html";
@@ -1323,9 +1394,9 @@ public class Webserver {
 		}
 		return output;
 	}
-	
+
 	//private String create_header(WebFunc wf){
-		/*switch (wf) {
+	/*switch (wf) {
 		case inproceeding_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		case proceeding_by_id:
@@ -1333,7 +1404,7 @@ public class Webserver {
 		case publication_by_id:
 			return "<html><head><meta charset='utf-8'></head><body><a href='/test/?func=MAIN'>HOME</a>";
 		}*/
-		//return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><h1>"+DB_Implementation+"</h1><a href='/test/?func=MAIN'>HOME</a><FORM><INPUT Type='button' VALUE='Back' onClick='history.go(-1);return true;'></FORM><br>";
+	//return "<html><head><meta http-equiv='content-type' content='text/html; charset=UTF-8'></head><body><h1>"+DB_Implementation+"</h1><a href='/test/?func=MAIN'>HOME</a><FORM><INPUT Type='button' VALUE='Back' onClick='history.go(-1);return true;'></FORM><br>";
 	//}
 	private String create_footer(WebFunc wf){
 		/*switch (wf) {
@@ -1387,11 +1458,231 @@ public class Webserver {
 	}
 
 
-	String readFile(String path, Charset encoding) 
-			throws IOException 
-	{
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
+	/**
+	 * data manipulations
+	 * @param <T>
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+	private <T> String getConstraintViolationOutput(Set<ConstraintViolation<T>> constraintViolations){
+		String Output ="";
+
+		int numFailedConstraints = constraintViolations.size();
+		if (numFailedConstraints > 0){
+			Output += "<h3>There are some problems with the input!!!</h3>";
+			Output += "<ol type='1'>";
+			for( ConstraintViolation<T> constVio: 	constraintViolations){
+				String mess = constVio.getMessage();
+				String path = constVio.getPropertyPath().toString();
+				Output += "<li> Field = "+path+"; "+mess+"</li>";
+			}
+			Output += "</ol><hr>";
+		}
+		else {
+			Output += "There are no problems...<br>";
+		}
+
+
+		return Output;
 	}
+
+	private String add_inproc(HashMap<String, String> args) {
+
+		String Output ="";
+
+		InProceedings_simple_input inproc = new InProceedings_simple_input(args, "add", myDB);
+
+		Set<ConstraintViolation<InProceedings_simple_input>> constraintViolations = validator.validate( inproc );
+
+		int numFailedConstraints = constraintViolations.size();
+		if (numFailedConstraints > 0){
+			//get "problems as html output"	
+			Output += getConstraintViolationOutput(constraintViolations);
+
+			/**
+			 * Example Output
+			 */
+			//get "all problem fields"
+			HashSet<String> problemFields = new HashSet();
+			for( ConstraintViolation<InProceedings_simple_input> constVio: 	constraintViolations){
+				problemFields.add(constVio.getPropertyPath().toString());
+			}
+
+			Output += "<!-- Beispiel Fehler --><form><div class='form-group'>";
+			Output += "<label for='add_inproc'>add_inproc</label>";
+			Output += "<input type='hidden' id='add_inproc' name='func' value='add_inproc'>";
+
+			String temp = "<input type='text' class='form-control' placeholder='title' name='title' value='A Direct Algorithm to Find a Largest Common Connected Induced Subgraph of Two Graphs.'>";
+			if (problemFields.contains("title")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='id/key' name='id' value='conf/gbrpr/CuissartH05'>";
+			if (problemFields.contains("id")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='year' name='year' value='2005'>";
+			if (problemFields.contains("year")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='ee' name='ee' value='http://dx.doi.org/10.1007/978-3-540-31988-7_15'>";
+			if (problemFields.contains("electronicEdition")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='conference' name='conference' value='GbRPR'>";
+			if (problemFields.contains("conferenceName")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='author 1;author2;...;author n' name='authors' value='Bertrand Cuissart;Jean-Jacques Hébrard'>";
+			if (problemFields.contains("authors")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='note = {Draft|Submitted|Accepted|Published}' name='note' value='Draft'>";
+			if (problemFields.contains("note")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='pages' name='pages' value='162-171'>";
+			if (problemFields.contains("pages")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			temp = "<input type='text' class='form-control' placeholder='proceedings id/key' name='proc_id' value='conf/gbrpr/2005'>";
+			if (problemFields.contains("crossref")){
+				Output += getHasError(temp);
+			}
+			else {
+				Output += getHasNoError(temp);
+			}
+			
+			Output += "<button type='submit' class='btn btn-default'>add inproceedings</button>";
+			Output += "</div></form>";
+
+		} else {
+			//create inproceedings....
+
+			//tbd
+
+			Output += "<h3>Inproceedings created...</h3><hr>";
+			//print input
+			Output += (new PublicationIO(inproc)).get_all();
+		}
+
+		return Output;
+	}
+
+	private String update_inproc(HashMap<String, String> args) {
+
+		String Output ="";
+
+		InProceedings_simple_input inproc = new InProceedings_simple_input(args, "update", myDB);
+
+		Set<ConstraintViolation<InProceedings_simple_input>> constraintViolations = validator.validate( inproc );
+
+		int numFailedConstraints = constraintViolations.size();
+		if (numFailedConstraints > 0){
+			//get "problems as html output"	
+			Output += getConstraintViolationOutput(constraintViolations);
+		} else {
+			//update inproceedings....
+
+			//tbd
+
+			Output += "<h3>Inproceedings updated...</h3><hr>";
+			//print input
+			Output += (new PublicationIO(inproc)).get_all();
+		}
+
+		return Output;
+	}
+
+	private String add_proc(HashMap<String, String> args) {
+
+		String Output ="";
+
+		Proceedings_simple_input proc = new Proceedings_simple_input(args, "add", myDB);
+
+		Set<ConstraintViolation<Proceedings_simple_input>> constraintViolations = validator.validate( proc );
+
+		int numFailedConstraints = constraintViolations.size();
+		if (numFailedConstraints > 0){
+			//get "problems as html output"	
+			Output += getConstraintViolationOutput(constraintViolations);
+		} else {
+			//create inproceedings....
+
+			//tbd
+
+			Output += "<h3>Proceedings created...</h3><hr>";
+			Output += (new PublicationIO(proc)).get_all();
+		}
+
+		return Output;
+	}
+
+	private String update_proc(HashMap<String, String> args) {
+
+		String Output ="";
+
+		Proceedings_simple_input proc = new Proceedings_simple_input(args, "update", myDB);
+
+		Set<ConstraintViolation<Proceedings_simple_input>> constraintViolations = validator.validate( proc );
+
+		int numFailedConstraints = constraintViolations.size();
+		if (numFailedConstraints > 0){
+			//get "problems as html output"	
+			Output += getConstraintViolationOutput(constraintViolations);
+		} else {
+			//create inproceedings....
+
+			//tbd
+
+			Output += "<h3>Proceedings updated...</h3><hr>";
+			Output += (new PublicationIO(proc)).get_all();
+		}
+
+		return Output;
+	}
+
+
+	private String getHasError(String form){
+		return "<div class='form-group has-error has-feedback'>"+form+"<span class='glyphicon glyphicon-remove form-control-feedback'></span></div>";
+	}
+	
+	private String getHasNoError(String form){
+		return "<div class='form-group has-success has-feedback'>"+form+"<span class='glyphicon glyphicon-ok form-control-feedback'></span></div>";
+	}
+
 
 }

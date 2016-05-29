@@ -644,6 +644,7 @@ public class T1DBProvider extends DBProvider {
 			publication.id = proc.getId();
 			publication.title = proc.getTitle();
 			publication.year = proc.getYear();
+			publication.isbn = proc.getIsbn();
 			publication.electronicEdition = proc.getElectronicEdition();
 
 			if (proc.getConferenceEdition() != null){
@@ -1583,6 +1584,13 @@ public class T1DBProvider extends DBProvider {
 	}
 
 
+
+
+	@Override
+	public boolean IO_exists_inproceedings_id(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 
 }
