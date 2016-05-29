@@ -84,7 +84,8 @@ public class T1DBProvider extends DBProvider {
 				ZooHelper.removeDb(dbName);
 			}
 			this.pm = ZooJdoHelper.openOrCreateDB(dbName);
-
+			pm.currentTransaction().setRetainValues(true);
+			
 			schemaManager();
 		}
 	}

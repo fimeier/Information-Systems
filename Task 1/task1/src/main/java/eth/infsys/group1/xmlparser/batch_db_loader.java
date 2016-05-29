@@ -55,6 +55,8 @@ public class batch_db_loader {
 		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
 		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
 
+		//Bernina
+		//String dblp_data = "C:/Users/fimeier/zoodb/20 468 407 bis 24 468 423.xml";
 
 		File file = new File(dblp_data);
 		myParser.parseXMLFile(file);
