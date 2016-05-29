@@ -263,8 +263,18 @@ public class PublicationIO {
 			this.pages = input.pages;}
 		else {
 			this.pages = "";}
-		
+
 		this.proceeding_id = input.crossref;
+
+		//conference
+		this.Conference_name = input.conferenceName;
+		this.Conference_id = Conference.calculate_conference_id(input.conferenceName);
+		this.ConferenceEdition_year = input.conferenceEdition;
+		this.ConferenceEdition_id = ConferenceEdition.calculate_conferenceEdition_id(input.conferenceName, input.conferenceEdition);
+
+		Conference_name_id = new Pair<String, String>(this.Conference_name,this.Conference_id);
+		ConferenceEdition_year_id = new Pair<Integer, String>(this.ConferenceEdition_year,this.ConferenceEdition_id);
+
 	}
 	
 }

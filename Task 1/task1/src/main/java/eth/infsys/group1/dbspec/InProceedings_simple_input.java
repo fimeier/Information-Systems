@@ -6,12 +6,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.Range;
-
 import eth.infsys.webserver.ValidInproceedingsId;
+import eth.infsys.webserver.ValidInproceedingsProcId;
 import eth.infsys.webserver.ValidYear;
 
 @ValidInproceedingsId
+@ValidInproceedingsProcId
 public class InProceedings_simple_input{
 	
 	public String mode = "";
@@ -19,24 +19,18 @@ public class InProceedings_simple_input{
 
 	private static String[] noAuthors = new String[0];
 
-	/**object key/id
-	 * 
-	 */
+	
 	public String id;
 
-	/**publication
-	 * 
-	 */
-	@NotNull(message="The attribute 'Publication.title' must be of type string and must not be null.")
+	
+	@NotNull(message="The attribute Publication.title must be of type string and must not be null.")
 	public String title;
 	
 	@ValidYear
 	public int year; // => conferenceEdition
 	public String electronicEdition; //ee
 
-	/**inproceedings
-	 * 
-	 */
+
 	@Size(min=1, max=1000, message="There exists at least one author for each publication")
 	public String[] authors = noAuthors; //authors
 
@@ -44,8 +38,7 @@ public class InProceedings_simple_input{
 	@Pattern(regexp = "Draft|Submitted|Accepted|Published")
 	public String note = ""; //always empty
 
-	@Pattern(regexp = "\\d+-\\d+|\\d+", message="The attribute ’InProceedings.pages’ must match to one of the following three patterns: &lt;Integer&gt; (e.g.'750'), &lt;Integer&gt;-&lt;Integer&gt; (e.g. '750-757') or null")
-	//@Pattern(regexp = "(\\d+)")
+	@Pattern(regexp = "\\d+-\\d+|\\d+", message="The attribute InProceedings.page’ must match to one of the following three patterns: &lt;Integer&gt; (e.g.750), &lt;Integer&gt;-&lt;Integer&gt; (e.g. 750-757) or null")
 	public String pages; //pages
 
 	public String crossref; //crossref => proceedings

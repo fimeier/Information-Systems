@@ -205,6 +205,7 @@ public abstract class DBProvider {
 	
 	public abstract boolean IO_exists_inproceedings_id(String id);
 	public abstract boolean IO_exists_proceedings_id(String id);
+	public abstract String IO_get_isbn_by_proc_id(String id);
 
 	
 

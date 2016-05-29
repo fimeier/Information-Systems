@@ -4,12 +4,13 @@ import java.util.HashMap;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.Range;
-
 import eth.infsys.webserver.ValidProceedingsId;
+import eth.infsys.webserver.ValidProceedingsNote;
+import eth.infsys.webserver.ValidYear;
 
 
 @ValidProceedingsId
+@ValidProceedingsNote
 public class Proceedings_simple_input {
 	
 	public String mode = "";
@@ -18,25 +19,18 @@ public class Proceedings_simple_input {
 
 	private static String[] noEditors = new String[0];
 
-	/**
-	 * object key/id
-	 */
 	
 	public String id;
 
-	/**
-	 * publication
-	 */
-	@NotNull(message="The attribute 'Publication.title' must be of type string and must not be null.")
+	
+	@NotNull(message="The attribute Publication.title must be of type string and must not be null.")
 	public String title; //title
 	
-	@Range(min=1901, max=2017)
+	@ValidYear
 	public int year; //publication date proceedings (not conferenceEdition)
 	public String electronicEdition; //ee
 
-	/**proceedings
-	 * 
-	 */
+
 	public String[] editors = noEditors; //editors_name
 	public String note;
 	public int number; //number
@@ -45,9 +39,7 @@ public class Proceedings_simple_input {
 	public String isbn; //isbn
 	public String series; //series_name
 
-	/**
-	 * conference
-	 */
+	
 	public int conferenceEdition; //year from inproceedings
 	public String conferenceName; //booktitle from inproceedings
 
@@ -152,6 +144,16 @@ public class Proceedings_simple_input {
 				isbn=args.get("isbn");
 			} else {
 				isbn=null;
+			}
+			
+			/**update-mode: get current isbn and create note
+			 * 
+			 */
+			if ( mode.equals("update")){
+				String currentIsbn = myDB.IO_get_isbn_by_proc_id(id);
+				if (!currentIsbn.equals(isbn)){
+					this.note = "ISBN updated, old value was "+currentIsbn;	
+				}
 			}
 			
 			if (args.containsKey("volume")){

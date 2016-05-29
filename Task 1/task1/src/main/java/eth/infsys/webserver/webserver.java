@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1483,10 +1484,18 @@ public class Webserver {
 		else {
 			Output += "There are no problems...<br>";
 		}
-
-
 		return Output;
 	}
+
+	private <T> HashMap<String,String> getConstraintViolationHashMap(Set<ConstraintViolation<T>> constraintViolations){
+		//get "all problem fields and messages as HashMap"
+		HashMap<String,String> problemFieldsMessages = new HashMap<String, String>();
+		for( ConstraintViolation<T> constVio: 	constraintViolations){
+			problemFieldsMessages.put(constVio.getPropertyPath().toString(), constVio.getMessage());
+		}
+		return problemFieldsMessages;
+	}
+
 
 	private String add_inproc(HashMap<String, String> args) {
 
@@ -1498,94 +1507,17 @@ public class Webserver {
 
 		int numFailedConstraints = constraintViolations.size();
 		if (numFailedConstraints > 0){
+
 			//get "problems as html output"	
 			Output += getConstraintViolationOutput(constraintViolations);
 
-			/**
-			 * Example Output
-			 */
-			//get "all problem fields"
-			HashSet<String> problemFields = new HashSet();
-			for( ConstraintViolation<InProceedings_simple_input> constVio: 	constraintViolations){
-				problemFields.add(constVio.getPropertyPath().toString());
-			}
-
 			Output += "<!-- Beispiel Fehler --><form><div class='form-group'>";
-			Output += "<label for='add_inproc'>add_inproc</label>";
+			Output += "<label for='add_inproc'>add inproceedings</label>";
 			Output += "<input type='hidden' id='add_inproc' name='func' value='add_inproc'>";
 
-			String temp = "<input type='text' class='form-control' placeholder='title' name='title' value='A Direct Algorithm to Find a Largest Common Connected Induced Subgraph of Two Graphs.'>";
-			if (problemFields.contains("title")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='id/key' name='id' value='conf/gbrpr/CuissartH05'>";
-			if (problemFields.contains("id")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='year' name='year' value='2005'>";
-			if (problemFields.contains("year")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='ee' name='ee' value='http://dx.doi.org/10.1007/978-3-540-31988-7_15'>";
-			if (problemFields.contains("electronicEdition")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='conference' name='conference' value='GbRPR'>";
-			if (problemFields.contains("conferenceName")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='author 1;author2;...;author n' name='authors' value='Bertrand Cuissart;Jean-Jacques Hébrard'>";
-			if (problemFields.contains("authors")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='note = {Draft|Submitted|Accepted|Published}' name='note' value='Draft'>";
-			if (problemFields.contains("note")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='pages' name='pages' value='162-171'>";
-			if (problemFields.contains("pages")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
-			temp = "<input type='text' class='form-control' placeholder='proceedings id/key' name='proc_id' value='conf/gbrpr/2005'>";
-			if (problemFields.contains("crossref")){
-				Output += getHasError(temp);
-			}
-			else {
-				Output += getHasNoError(temp);
-			}
-			
+			Output += createFormBodyWithAnnotations(createInprocAttributInputList(inproc, args), constraintViolations);
+
+
 			Output += "<button type='submit' class='btn btn-default'>add inproceedings</button>";
 			Output += "</div></form>";
 
@@ -1614,6 +1546,18 @@ public class Webserver {
 		if (numFailedConstraints > 0){
 			//get "problems as html output"	
 			Output += getConstraintViolationOutput(constraintViolations);
+
+			Output += "<form><div class='form-group'>";
+			Output += "<label for='update_inproc'>update inproceedings</label>";
+			Output += "<input type='hidden' id='update_inproc' name='func' value='update_inproc'>";
+
+			Output += createFormBodyWithAnnotations(createInprocAttributInputList(inproc, args), constraintViolations);
+
+
+			Output += "<button type='submit' class='btn btn-default'>update inproceedings</button>";
+			Output += "</div></form>";
+			
+			
 		} else {
 			//update inproceedings....
 
@@ -1639,6 +1583,16 @@ public class Webserver {
 		if (numFailedConstraints > 0){
 			//get "problems as html output"	
 			Output += getConstraintViolationOutput(constraintViolations);
+
+			Output += "<form><div class='form-group'>";
+			Output += "<label for='add_proc'>add proceedings</label>";
+			Output += "<input type='hidden' id='add_proc' name='func' value='add_proc'>";
+
+			Output += createFormBodyWithAnnotations(createProcAttributInputList(proc, args), constraintViolations);
+
+
+			Output += "<button type='submit' class='btn btn-default'>add proceedings</button>";
+			Output += "</div></form>";
 		} else {
 			//create inproceedings....
 
@@ -1663,6 +1617,16 @@ public class Webserver {
 		if (numFailedConstraints > 0){
 			//get "problems as html output"	
 			Output += getConstraintViolationOutput(constraintViolations);
+
+			Output += "<form><div class='form-group'>";
+			Output += "<label for='update_proc'>update proceedings</label>";
+			Output += "<input type='hidden' id='update_proc' name='func' value='update_proc'>";
+
+			Output += createFormBodyWithAnnotations(createProcAttributInputList(proc, args), constraintViolations);
+
+
+			Output += "<button type='submit' class='btn btn-default'>update proceedings</button>";
+			Output += "</div></form>";
 		} else {
 			//create inproceedings....
 
@@ -1676,12 +1640,82 @@ public class Webserver {
 	}
 
 
-	private String getHasError(String form){
-		return "<div class='form-group has-error has-feedback'>"+form+"<span class='glyphicon glyphicon-remove form-control-feedback'></span></div>";
+
+	private <T> String createFormBodyWithAnnotations(List<Pair<String,String>> attributInputList, Set<ConstraintViolation<T>> constraintViolations){
+		String Output ="";
+
+		HashMap<String,String> problemFieldsMessages = getConstraintViolationHashMap(constraintViolations);
+
+		for (Pair<String,String> attributInput: attributInputList){
+			String attribut = attributInput.getKey();
+			String input = attributInput.getValue();
+			if (problemFieldsMessages.containsKey(attribut)){
+				String tooltip = problemFieldsMessages.get(attribut);
+				Output += getHasError(input, tooltip);
+			}
+			else {
+				Output += getHasNoError(input);
+			}
+		}
+		return Output;
+	}
+
+	private List<Pair<String,String>> createInprocAttributInputList(InProceedings_simple_input inproc, HashMap<String, String> args){
+
+		List<Pair<String,String>> attributInputList = new ArrayList<Pair<String,String>>();
+
+		attributInputList.add(new Pair("title","type='text' class='form-control' placeholder='title' name='title' value='"+inproc.title+"'>"));
+		attributInputList.add(new Pair("id","type='text' class='form-control' placeholder='id/key' name='id' value='"+inproc.id+"'>"));
+		attributInputList.add(new Pair("year","type='text' class='form-control' placeholder='year' name='year' value='"+inproc.year+"'>"));
+		attributInputList.add(new Pair("electronicEdition","type='text' class='form-control' placeholder='ee' name='ee' value='"+inproc.electronicEdition+"'>"));
+		attributInputList.add(new Pair("conferenceName","type='text' class='form-control' placeholder='conference' name='conference' value='"+inproc.conferenceName+"'>"));
+		attributInputList.add(new Pair("authors","type='text' class='form-control' placeholder='author 1;author2;...;author n' name='authors' value='"+args.get("authors")+"'>"));
+		attributInputList.add(new Pair("note","type='text' class='form-control' placeholder='note = {Draft|Submitted|Accepted|Published}' name='note' value='"+inproc.note+"'>"));
+		attributInputList.add(new Pair("pages","type='text' class='form-control' placeholder='pages' name='pages' value='"+inproc.pages+"'>"));
+		attributInputList.add(new Pair("crossref","type='text' class='form-control' placeholder='proceedings id/key' name='proc_id' value='"+inproc.crossref+"'>"));
+
+		return attributInputList;
 	}
 	
+	
+	private List<Pair<String,String>> createProcAttributInputList(Proceedings_simple_input proc, HashMap<String, String> args){
+
+		List<Pair<String,String>> attributInputList = new ArrayList<Pair<String,String>>();
+
+		attributInputList.add(new Pair("title","type='text' class='form-control' placeholder='title' name='title' value='"+proc.title+"'>"));
+		attributInputList.add(new Pair("id","type='text' class='form-control' placeholder='id/key' name='id' value='"+proc.id+"'>"));
+		attributInputList.add(new Pair("year","type='text' class='form-control' placeholder='year' name='year' value='"+proc.year+"'>"));
+		attributInputList.add(new Pair("electronicEdition","type='text' class='form-control' placeholder='ee' name='ee' value='"+proc.electronicEdition+"'>"));
+		attributInputList.add(new Pair("conferenceName","type='text' class='form-control' placeholder='conference' name='conference' value='"+proc.conferenceName+"'>"));
+		attributInputList.add(new Pair("conferenceEdition","type='text' class='form-control' placeholder='conference-edition' name='conference-edition' value='"+proc.conferenceEdition+"'>"));
+		attributInputList.add(new Pair("editors","type='text' class='form-control' placeholder='editor 1;editor 2;...;editor n' name='editors' value='"+args.get("editors")+"'>"));
+		attributInputList.add(new Pair("note","type='text' class='form-control' placeholder='note' name='note' value='"+proc.note+"'>"));
+		attributInputList.add(new Pair("number","type='text' class='form-control' placeholder='number' name='number' value='"+proc.number+"'>"));
+		attributInputList.add(new Pair("publisher","type='text' class='form-control' placeholder='publisher' name='publisher' value='"+proc.publisher+"'>"));
+		attributInputList.add(new Pair("isbn","type='text' class='form-control' placeholder='isbn' name='isbn' value='"+proc.isbn+"'>"));
+		attributInputList.add(new Pair("volume","type='text' class='form-control' placeholder='volume' name='volume' value='"+proc.volume+"'>"));
+		attributInputList.add(new Pair("series","type='text' class='form-control' placeholder='series' name='series' value='"+proc.series+"'>"));
+
+		return attributInputList;
+	}
+
+
+
+
+
+	private String getHasError(String form, String tooltip){
+		String Output = "<div class='form-group has-error has-feedback'>";
+		Output += "<input data-toggle='tooltip' data-placement='bottom' title='"+tooltip+"' "+form;
+		Output += "<span class='glyphicon glyphicon-remove form-control-feedback'></span></div>";
+		return Output;
+	}
+
 	private String getHasNoError(String form){
-		return "<div class='form-group has-success has-feedback'>"+form+"<span class='glyphicon glyphicon-ok form-control-feedback'></span></div>";
+		String Output = "<div class='form-group has-success has-feedback'>";
+		Output += "<input data-toggle='tooltip' data-placement='bottom' title='OK' "+form;
+		Output += "<span class='glyphicon glyphicon-ok form-control-feedback'></span></div>";
+		return Output;
+
 	}
 
 

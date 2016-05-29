@@ -1232,6 +1232,8 @@ public class T3DBProvider extends DBProvider {
 				Element result = (Element) doc.getObject();
 
 				Person_id=result.getAttribute("id");
+				//29.5.2016: ev ist der Fehler noch an anderen Orten
+				Person_id = "person/"+Person_id;
 				Person_name=result.getAttribute("name");
 
 				Proceeding_id =result.getAttribute("proc_key");
@@ -1366,6 +1368,32 @@ public class T3DBProvider extends DBProvider {
 		}
 
 		return return_list;
+	}
+
+	
+	
+	@Override
+	public String IO_get_isbn_by_proc_id(String publ_id) {
+		XQResultSequence publ;
+		try {
+			publ = get_proceedings_by_id(publ_id);
+			//check for empty sequence			
+			if(!publ.next()){
+				publ = null;
+			}
+		} catch (XQException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			publ = null;
+		}
+		if ( publ != null ){
+			PublicationIO temp = fill_PublicationIO(publ, "is_a_proceeding");
+			String isbn = temp.isbn;
+			return isbn;
+		}
+		else {
+			return "Error getting old isbn...";
+		}
 	}
 
 	

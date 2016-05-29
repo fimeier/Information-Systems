@@ -7,10 +7,13 @@
 <form>
 <!-- func=add_inproc#...... -->
 <div class="form-group">
-	<label for="add_inproc">add_inproc</label>
+	<label for="add_inproc">add inproceedings</label>
 	<input type="hidden" id="add_inproc" name="func" value="add_inproc">
 	
-	<input type="text" class="form-control" placeholder="title" name="title" value="A Direct Algorithm to Find a Largest Common Connected Induced Subgraph of Two Graphs.">
+
+	<input data-toggle="tooltip" data-placement="bottom" title="Bla bla bla bla bla bla bla bla bla bla " type="text" class="form-control" placeholder="title" name="title" value="A Direct Algorithm to Find a Largest Common Connected Induced Subgraph of Two Graphs.">
+
+	
 	<input type="text" class="form-control" placeholder="id/key" name="id" value="conf/gbrpr/CuissartH05">
 	<input type="text" class="form-control" placeholder="year" name="year" value="2005">
 	<input type="text" class="form-control" placeholder="ee" name="ee" value="http://dx.doi.org/10.1007/978-3-540-31988-7_15">
@@ -31,7 +34,7 @@
 <form>
 <!-- func=update_inproc#...... -->
 <div class="form-group">
-	<label for="update_inproc">update_inproc</label>
+	<label for="update_inproc">update inproceedings</label>
 	<input type="hidden" id="update_inproc" name="func" value="update_inproc">
 	
 	<input type="text" class="form-control" placeholder="title" name="title" value="A Direct Algorithm to Find a Largest Common Connected Induced Subgraph of Two Graphs.">
@@ -55,7 +58,7 @@
 <form>
 <!-- func=add_proc#...... -->
 <div class="form-group">
-	<label for="add_proc">add_proc</label>
+	<label for="add_proc">add proceedings</label>
 	<input type="hidden" id="add_proc" name="func" value="add_proc">
 	
 	<input type="text" class="form-control" placeholder="title" name="title" value="Graph-Based Representations in Pattern Recognition, 5th IAPR InternationalWorkshop, GbRPR 2005, Poitiers, France, April 11-13, 2005, Proceedings">
@@ -65,7 +68,7 @@
 	<input type="text" class="form-control" placeholder="conference" name="conference" value="GbRPR">
 	<input type="text" class="form-control" placeholder="conference-edition" name="conference-edition" value="2005">
 	<input type="text" class="form-control" placeholder="editor 1;editor 2;...;editor n" name="editors" value="Luc Brun;Mario Vento">
-	<input type="text" class="form-control" placeholder="note = {Draft|Submitted|Accepted|Published}" name="note" value="">
+	<input type="text" class="form-control" placeholder="note" name="note" value="">
 	<input type="text" class="form-control" placeholder="number" name="number" value="">
 	<input type="text" class="form-control" placeholder="publisher" name="publisher" value="Springer">
 	<input type="text" class="form-control" placeholder="isbn" name="isbn" value="3-540-25270-3">
@@ -82,7 +85,7 @@
 <form>
 <!-- func=update_proc#...... -->
 <div class="form-group">
-	<label for="update_proc">update_proc</label>
+	<label for="update_proc">update proceedings</label>
 	<input type="hidden" id="update_proc" name="func" value="update_proc">
 	
 	<input type="text" class="form-control" placeholder="title" name="title" value="Graph-Based Representations in Pattern Recognition, 5th IAPR InternationalWorkshop, GbRPR 2005, Poitiers, France, April 11-13, 2005, Proceedings">
@@ -92,7 +95,7 @@
 	<input type="text" class="form-control" placeholder="conference" name="conference" value="GbRPR">
 	<input type="text" class="form-control" placeholder="conference-edition" name="conference-edition" value="2005">
 	<input type="text" class="form-control" placeholder="editor 1;editor 2;...;editor n" name="editors" value="Luc Brun;Mario Vento">
-	<input type="text" class="form-control" placeholder="note = {Draft|Submitted|Accepted|Published}" name="note" value="">
+	<input type="text" class="form-control" placeholder="note" name="note" value="">
 	<input type="text" class="form-control" placeholder="number" name="number" value="">
 	<input type="text" class="form-control" placeholder="publisher" name="publisher" value="Springer">
 	<input type="text" class="form-control" placeholder="isbn" name="isbn" value="3-540-25270-3">
@@ -103,5 +106,13 @@
 	<button type="submit" class="btn btn-default">update proceedings</button>
 </div>
 </form>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+
 
 

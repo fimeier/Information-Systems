@@ -4,7 +4,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import eth.infsys.group1.dbspec.InProceedings_simple_input;
-import eth.infsys.group1.dbspec.MyCustomConstraints.CaseMode;
 
 public class ValidInproceedingsIdValidator
 implements ConstraintValidator<ValidInproceedingsId, InProceedings_simple_input> {
@@ -19,7 +18,7 @@ implements ConstraintValidator<ValidInproceedingsId, InProceedings_simple_input>
 			return false;
 		} else if (inproc.id == null){
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate( "The attribute 'DomainObject.id' must not be null" )
+			context.buildConstraintViolationWithTemplate( "The attribute DomainObject.id must not be null" )
 					.addPropertyNode( "id" ).addConstraintViolation();
 			return false;
 		}
@@ -29,7 +28,7 @@ implements ConstraintValidator<ValidInproceedingsId, InProceedings_simple_input>
 			boolean result = inproc.myDB.IO_exists_inproceedings_id(inproc.id);
 			
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate( "The attribute 'DomainObject.id' must be unique." )
+			context.buildConstraintViolationWithTemplate( "The attribute DomainObject.id must be unique." )
 					.addPropertyNode( "id" ).addConstraintViolation();
 			
 			return !result;
@@ -40,7 +39,7 @@ implements ConstraintValidator<ValidInproceedingsId, InProceedings_simple_input>
 			boolean result = inproc.myDB.IO_exists_inproceedings_id(inproc.id);
 			
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate( "The attribute 'DomainObject.id' must exist." )
+			context.buildConstraintViolationWithTemplate( "The attribute DomainObject.id must exist." )
 					.addPropertyNode( "id" ).addConstraintViolation();
 			
 			return result;

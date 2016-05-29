@@ -13,11 +13,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ TYPE, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = { ValidProceedingsIdValidator.class })
+@Constraint(validatedBy = { ValidInproceedingsProcIdValidator.class })
 @Documented
-public @interface ValidProceedingsId {
+public @interface ValidInproceedingsProcId {
 
-	String message() default "The id must be unique.";
+	String message() default "blabla default ValidInproceedingsProcId...";
 
 	Class<?>[] groups() default { };
 
