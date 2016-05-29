@@ -53,8 +53,8 @@ public class batch_db_loader {
 		XMLParser<Proceedings> myParser = new XMLParser<>(myDB);
 		
 		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/AssesmentTask1.xml";
-		String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
-
+		//String dblp_data = "../task1/src/main/java/eth/infsys/group1/xmlparser/20 468 407 bis 24 468 423.xml";
+		String dblp_data = "fake";
 		//Bernina
 		//String dblp_data = "C:/Users/fimeier/zoodb/20 468 407 bis 24 468 423.xml";
 

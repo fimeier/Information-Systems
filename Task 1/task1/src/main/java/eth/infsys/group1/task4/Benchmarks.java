@@ -111,7 +111,7 @@ public class Benchmarks {
 
 		switch(DB_Implementation){
 		case "zooDB":
-			dbName = "Project1_test.zdb";
+			dbName = "ZooDB_big.zdb";
 			System.out.println("Start webserver for zooDB="+dbName +" in Benchmark-Mode");
 			Benchmark_Server = new Webserver(DB_Implementation, dbName, User, PW, Benchmark_mode);
 			Thread.sleep(sleep_time);

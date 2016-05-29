@@ -31,14 +31,15 @@ public class InProceedings_simple_input{
 	public String electronicEdition; //ee
 
 
+	@NotNull(message="cannot be null")
 	@Size(min=1, max=1000, message="There exists at least one author for each publication")
 	public String[] authors = noAuthors; //authors
 
-	@NotNull
-	@Pattern(regexp = "Draft|Submitted|Accepted|Published")
+	@NotNull(message="cannot be null")
+	@Pattern(regexp = "Draft|Submitted|Accepted|Published", message="must be one of the following: Draft|Submitted|Accepted|Published")
 	public String note = ""; //always empty
 
-	@Pattern(regexp = "\\d+-\\d+|\\d+", message="The attribute InProceedings.page’ must match to one of the following three patterns: &lt;Integer&gt; (e.g.750), &lt;Integer&gt;-&lt;Integer&gt; (e.g. 750-757) or null")
+	@Pattern(regexp = "\\d+-\\d+|\\d+", message="The attribute InProceedings.page must match to one of the following three patterns: &lt;Integer&gt; (e.g.750), &lt;Integer&gt;-&lt;Integer&gt; (e.g. 750-757) or null")
 	public String pages; //pages
 
 	public String crossref; //crossref => proceedings

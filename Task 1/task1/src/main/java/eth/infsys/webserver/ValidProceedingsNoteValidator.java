@@ -21,11 +21,17 @@ implements ConstraintValidator<ValidProceedingsNote, Proceedings_simple_input> {
 			context.buildConstraintViolationWithTemplate( "Wrong DomainObject.id, cannot validate note..." )
 					.addPropertyNode( "note" ).addConstraintViolation();
 			return false;
-		}
+		} 
 
 		//no constraints for new proceedings
 		if (proc.mode.equals("add")){
 			return true;
+		}
+		if ( ! proc.myDB.IO_exists_proceedings_id(proc.id)){
+			context.disableDefaultConstraintViolation();
+			context.buildConstraintViolationWithTemplate( "Wrong DomainObject.id, cannot validate note..." )
+					.addPropertyNode( "note" ).addConstraintViolation();
+			return false;
 		}
 		
 		String currentIsbn = proc.myDB.IO_get_isbn_by_proc_id(proc.id);
@@ -42,7 +48,7 @@ implements ConstraintValidator<ValidProceedingsNote, Proceedings_simple_input> {
 		}
 		else {	
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate( "expected entry: ISBN updated, old value was &lt;old ISBN&gt;" )
+			context.buildConstraintViolationWithTemplate( compareNote )
 					.addPropertyNode( "note" ).addConstraintViolation();
 			return false;
 		}

@@ -982,7 +982,7 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public boolean IO_exists_inproceedings_id(String id){
-		System.out.println("T3DBProvider: IO_exists_inproceedings_id...");
+		//System.out.println("T3DBProvider: IO_exists_inproceedings_id...");
 		XQResultSequence publ;
 		try {
 			publ = get_inproceedings_by_id(id);
@@ -1004,7 +1004,7 @@ public class T3DBProvider extends DBProvider {
 
 	@Override
 	public boolean IO_exists_proceedings_id(String id) {
-		System.out.println("T3DBProvider: IO_exists_proceedings_id...");
+		//System.out.println("T3DBProvider: IO_exists_proceedings_id...");
 		XQResultSequence publ;
 		try {
 			publ = exists_proceedings_by_id(id);
