@@ -1523,12 +1523,14 @@ public class Webserver {
 
 		} else {
 			//create inproceedings....
-
-			//tbd
-
 			Output += "<h3>Inproceedings created...</h3><hr>";
-			//print input
-			Output += (new PublicationIO(inproc)).get_all();
+			inproc.mode = "log";
+			Output += myDB.batch_createInProceedings(inproc);
+			
+			Output += "<hr>";
+			
+			Output += myDB.IO_get_publication_by_id(inproc.id).get_all();
+			//Output += (new PublicationIO(inproc)).get_all();
 		}
 
 		return Output;
@@ -1594,12 +1596,15 @@ public class Webserver {
 			Output += "<button type='submit' class='btn btn-default'>add proceedings</button>";
 			Output += "</div></form>";
 		} else {
-			//create inproceedings....
-
-			//tbd
-
+			//create proceedings....
 			Output += "<h3>Proceedings created...</h3><hr>";
-			Output += (new PublicationIO(proc)).get_all();
+			proc.mode = "log";
+			Output += myDB.batch_createProceedings(proc);
+			
+			Output += "<hr>";
+			
+			Output += myDB.IO_get_publication_by_id(proc.id).get_all();
+			//Output += (new PublicationIO(proc)).get_all();
 		}
 
 		return Output;
@@ -1628,7 +1633,7 @@ public class Webserver {
 			Output += "<button type='submit' class='btn btn-default'>update proceedings</button>";
 			Output += "</div></form>";
 		} else {
-			//create inproceedings....
+			//update proceedings....
 
 			//tbd
 
@@ -1664,15 +1669,57 @@ public class Webserver {
 
 		List<Pair<String,String>> attributInputList = new ArrayList<Pair<String,String>>();
 
-		attributInputList.add(new Pair("title","type='text' class='form-control' placeholder='title' name='title' value='"+inproc.title+"'>"));
-		attributInputList.add(new Pair("id","type='text' class='form-control' placeholder='id/key' name='id' value='"+inproc.id+"'>"));
-		attributInputList.add(new Pair("year","type='text' class='form-control' placeholder='year' name='year' value='"+inproc.year+"'>"));
-		attributInputList.add(new Pair("electronicEdition","type='text' class='form-control' placeholder='ee' name='ee' value='"+inproc.electronicEdition+"'>"));
-		attributInputList.add(new Pair("conferenceName","type='text' class='form-control' placeholder='conference' name='conference' value='"+inproc.conferenceName+"'>"));
-		attributInputList.add(new Pair("authors","type='text' class='form-control' placeholder='author 1;author2;...;author n' name='authors' value='"+args.get("authors")+"'>"));
-		attributInputList.add(new Pair("note","type='text' class='form-control' placeholder='note = {Draft|Submitted|Accepted|Published}' name='note' value='"+inproc.note+"'>"));
-		attributInputList.add(new Pair("pages","type='text' class='form-control' placeholder='pages' name='pages' value='"+inproc.pages+"'>"));
-		attributInputList.add(new Pair("crossref","type='text' class='form-control' placeholder='proceedings id/key' name='proc_id' value='"+inproc.crossref+"'>"));
+		String temp = "";
+		
+		if ( (temp = inproc.title) == null ){
+			temp = "";
+		}	
+		attributInputList.add(new Pair("title","type='text' class='form-control' placeholder='title' name='title' value='"+temp+"'>"));
+		
+		if ( (temp = inproc.id) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("id","type='text' class='form-control' placeholder='id/key' name='id' value='"+temp+"'>"));
+		
+		//year cannot be null
+		if ( inproc.year == 0 ){
+			temp = "";
+			attributInputList.add(new Pair("year","type='text' class='form-control' placeholder='year' name='year' value='"+temp+"'>"));
+		}
+		else {
+			attributInputList.add(new Pair("year","type='text' class='form-control' placeholder='year' name='year' value='"+inproc.year+"'>"));
+		}
+		
+		
+		if ( (temp = inproc.electronicEdition) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("electronicEdition","type='text' class='form-control' placeholder='ee' name='ee' value='"+temp+"'>"));
+		
+		if ( (temp = inproc.conferenceName) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("conferenceName","type='text' class='form-control' placeholder='conference' name='conference' value='"+temp+"'>"));
+		
+		if ( (temp = args.get("authors")) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("authors","type='text' class='form-control' placeholder='author 1;author2;...;author n' name='authors' value='"+temp+"'>"));
+		
+		if ( (temp = inproc.note) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("note","type='text' class='form-control' placeholder='note = {Draft|Submitted|Accepted|Published}' name='note' value='"+temp+"'>"));
+		
+		if ( (temp = inproc.pages) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("pages","type='text' class='form-control' placeholder='pages' name='pages' value='"+temp+"'>"));
+		
+		if ( (temp = inproc.crossref) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("crossref","type='text' class='form-control' placeholder='proceedings id/key' name='proc_id' value='"+temp+"'>"));
 
 		return attributInputList;
 	}
@@ -1682,19 +1729,68 @@ public class Webserver {
 
 		List<Pair<String,String>> attributInputList = new ArrayList<Pair<String,String>>();
 
-		attributInputList.add(new Pair("title","type='text' class='form-control' placeholder='title' name='title' value='"+proc.title+"'>"));
-		attributInputList.add(new Pair("id","type='text' class='form-control' placeholder='id/key' name='id' value='"+proc.id+"'>"));
+		String temp = "";
+		
+		if ( (temp = proc.title) == null ){
+			temp = "";
+		}	
+		attributInputList.add(new Pair("title","type='text' class='form-control' placeholder='title' name='title' value='"+temp+"'>"));
+		
+		if ( (temp = proc.id) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("id","type='text' class='form-control' placeholder='id/key' name='id' value='"+temp+"'>"));
+		
+		//year cannot be null
 		attributInputList.add(new Pair("year","type='text' class='form-control' placeholder='year' name='year' value='"+proc.year+"'>"));
-		attributInputList.add(new Pair("electronicEdition","type='text' class='form-control' placeholder='ee' name='ee' value='"+proc.electronicEdition+"'>"));
-		attributInputList.add(new Pair("conferenceName","type='text' class='form-control' placeholder='conference' name='conference' value='"+proc.conferenceName+"'>"));
+		
+		if ( (temp = proc.electronicEdition) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("electronicEdition","type='text' class='form-control' placeholder='ee' name='ee' value='"+temp+"'>"));
+		
+		
+		if ( (temp = proc.conferenceName) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("conferenceName","type='text' class='form-control' placeholder='conference' name='conference' value='"+temp+"'>"));
+		
+		//conferenceEdition cannot be null
 		attributInputList.add(new Pair("conferenceEdition","type='text' class='form-control' placeholder='conference-edition' name='conference-edition' value='"+proc.conferenceEdition+"'>"));
-		attributInputList.add(new Pair("editors","type='text' class='form-control' placeholder='editor 1;editor 2;...;editor n' name='editors' value='"+args.get("editors")+"'>"));
-		attributInputList.add(new Pair("note","type='text' class='form-control' placeholder='note' name='note' value='"+proc.note+"'>"));
+		
+		if ( (temp = args.get("editors")) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("editors","type='text' class='form-control' placeholder='editor 1;editor 2;...;editor n' name='editors' value='"+temp+"'>"));
+		
+		if ( (temp = proc.note) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("note","type='text' class='form-control' placeholder='note' name='note' value='"+temp+"'>"));
+		
+		//number cannot be null
 		attributInputList.add(new Pair("number","type='text' class='form-control' placeholder='number' name='number' value='"+proc.number+"'>"));
-		attributInputList.add(new Pair("publisher","type='text' class='form-control' placeholder='publisher' name='publisher' value='"+proc.publisher+"'>"));
-		attributInputList.add(new Pair("isbn","type='text' class='form-control' placeholder='isbn' name='isbn' value='"+proc.isbn+"'>"));
-		attributInputList.add(new Pair("volume","type='text' class='form-control' placeholder='volume' name='volume' value='"+proc.volume+"'>"));
-		attributInputList.add(new Pair("series","type='text' class='form-control' placeholder='series' name='series' value='"+proc.series+"'>"));
+		
+		
+		if ( (temp = proc.publisher) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("publisher","type='text' class='form-control' placeholder='publisher' name='publisher' value='"+temp+"'>"));
+		
+		if ( (temp = proc.isbn) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("isbn","type='text' class='form-control' placeholder='isbn' name='isbn' value='"+temp+"'>"));
+		
+		if ( (temp = proc.volume) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("volume","type='text' class='form-control' placeholder='volume' name='volume' value='"+temp+"'>"));
+		
+		if ( (temp = proc.series) == null ){
+			temp = "";
+		}
+		attributInputList.add(new Pair("series","type='text' class='form-control' placeholder='series' name='series' value='"+temp+"'>"));
 
 		return attributInputList;
 	}

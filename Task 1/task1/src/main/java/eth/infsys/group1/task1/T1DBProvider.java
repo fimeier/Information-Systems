@@ -426,6 +426,8 @@ public class T1DBProvider extends DBProvider {
 	 * @return String proc_id which is always equal to args.id
 	 */
 	public String batch_createProceedings(Proceedings_simple_input args) {
+		
+		String log = "Logfile:<ol type='1'>"; 
 
 		pm.currentTransaction().begin();
 		Proceedings proc = get_proceeding_by_id(args.id);
@@ -435,13 +437,13 @@ public class T1DBProvider extends DBProvider {
 		//return existing proceeding
 		if ( ! (proc == null) ){
 			pm.currentTransaction().begin();
-			System.out.println("proceeding already exists... id=" + proc.getId() + " and title=" + proc.getTitle());
+			log += "<li>" + ("proceeding already exists... id=" + proc.getId() + " and title=" + proc.getTitle());
 			String ret_val = proc.getId();
 			pm.currentTransaction().commit();
 			return ret_val;
 		}
 		//create new proceeding
-		System.out.println("create new proceeding...");
+		log += "<li>" + ("create new proceeding...");
 
 
 		//Conference
@@ -450,10 +452,10 @@ public class T1DBProvider extends DBProvider {
 		Conference conf = get_conference_by_id(conf_id);
 		if ( conf == null ){
 			conf = create_conference(args.conferenceName);
-			System.out.println("Conference(" + conf_id + ") created...");
+			log += "<li>" + ("Conference(" + conf_id + ") created...");
 		}
 		else {
-			System.out.println("Conference(" + conf_id + ") already exists...");
+			log += "<li>" + ("Conference(" + conf_id + ") already exists...");
 		}
 		pm.currentTransaction().commit();
 
@@ -463,10 +465,10 @@ public class T1DBProvider extends DBProvider {
 		ConferenceEdition confEd = get_conferenceEdition_by_id(confEd_id);
 		if (confEd == null){
 			confEd = create_conferenceEdition(conf, args.conferenceEdition);
-			System.out.println("ConferenceEdition(" + confEd_id + ") created...");
+			log += "<li>" + ("ConferenceEdition(" + confEd_id + ") created...");
 		}
 		else {
-			System.out.println("ConferenceEdition(" + conf_id + ") already exists...");
+			log += "<li>" + ("ConferenceEdition(" + conf_id + ") already exists...");
 		}
 		pm.currentTransaction().commit();
 
@@ -479,10 +481,10 @@ public class T1DBProvider extends DBProvider {
 			Person editor = get_person_by_id(person_id);
 			if ( editor == null ){
 				editor = create_person(editor_name);
-				System.out.println("Editor (" + editor_name + ") created...");
+				log += "<li>" + ("Editor (" + editor_name + ") created...");
 			}
 			else {
-				System.out.println("Editor(" + editor_name + ") already exists...");
+				log += "<li>" + ("Editor(" + editor_name + ") already exists...");
 			}
 			edit.add(editor);
 			pm.currentTransaction().commit();
@@ -495,10 +497,10 @@ public class T1DBProvider extends DBProvider {
 		Publisher publ = get_publisher_by_id(publ_id);
 		if ( publ == null ){
 			publ = create_publisher(args.publisher);
-			System.out.println("Publisher (" + args.publisher + ") created...");
+			log += "<li>" + ("Publisher (" + args.publisher + ") created...");
 		}
 		else {
-			System.out.println("Publisher(" + args.publisher + ") already exists...");
+			log += "<li>" + ("Publisher(" + args.publisher + ") already exists...");
 		}
 		pm.currentTransaction().commit();
 
@@ -508,10 +510,10 @@ public class T1DBProvider extends DBProvider {
 		Series serie = get_series_by_id(series_id);
 		if ( serie == null ){
 			serie = create_serie(args.series);
-			System.out.println("Series (" + args.series + ") created...");
+			log += "<li>" + ("Series (" + args.series + ") created...");
 		}
 		else {
-			System.out.println("Series (" + args.series + ") already exists...");
+			log += "<li>" + ("Series (" + args.series + ") already exists...");
 		}
 		pm.currentTransaction().commit();
 
@@ -542,6 +544,10 @@ public class T1DBProvider extends DBProvider {
 		//??
 		String ret_val = proc.getId();
 		pm.currentTransaction().commit();
+		
+		if (args.mode.equals("log")){
+			return log+"</ol>";
+		}
 
 		return ret_val;
 
@@ -555,6 +561,7 @@ public class T1DBProvider extends DBProvider {
 	 * @return String inproc_id which is always equal to args.id
 	 */
 	public String batch_createInProceedings(InProceedings_simple_input args) {
+		String log = "Logfile:<ol type='1'>";
 
 		pm.currentTransaction().begin();
 		pm.currentTransaction().setRetainValues(true);
@@ -564,7 +571,7 @@ public class T1DBProvider extends DBProvider {
 		//return existing InProceeding
 		if ( ! (inproc == null) ){
 			pm.currentTransaction().begin();
-			System.out.println("!!!!!!!! InProceeding already exists... id=" + inproc.getId() + " and title=" + inproc.getTitle());
+			log += "<li>" +("!!!!!!!! InProceeding already exists... id=" + inproc.getId() + " and title=" + inproc.getTitle());
 			String ret_val = inproc.getId();
 			pm.currentTransaction().commit();
 			return ret_val;
@@ -576,12 +583,12 @@ public class T1DBProvider extends DBProvider {
 		Proceedings proc = get_proceeding_by_id(proc_id);
 		pm.currentTransaction().commit();
 		if ( proc == null ){
-			System.out.println("Proceeding with id=" + proc_id + " is not existing. Error Inproceeding creation... 66666666666");
+			log += "<li>" +("Proceeding with id=" + proc_id + " is not existing. Error Inproceeding creation... 66666666666");
 			return null;
 		}
 
 		//create new inproceeding (one big transaction)
-		System.out.println("create new inproceeding for proceeding with id=" + proc_id);
+		log += "<li>" +("create new inproceeding for proceeding with id=" + proc_id);
 
 		//Authors
 		List<Person> auth = new ArrayList<>();
@@ -591,10 +598,10 @@ public class T1DBProvider extends DBProvider {
 			Person author = get_person_by_id(person_id);
 			if ( author == null ){
 				author = create_person(author_name);
-				//System.out.println("Author (" + author_name + ") created...");
+				log += "<li>" +("Author (" + author_name + ") created...");
 			}
 			else {
-				System.out.println("Author(" + author_name + ") already exists...");
+				log += "<li>" +("Author(" + author_name + ") already exists...");
 			}
 			auth.add(author);
 			pm.currentTransaction().commit();
@@ -606,6 +613,10 @@ public class T1DBProvider extends DBProvider {
 		inproc = new InProceedings(args, auth, proc);
 		String ret_val = inproc.getId();
 		pm.currentTransaction().commit();
+		
+		if (args.mode.equals("log")){
+			return log+"</ol>";
+		}
 		return ret_val;
 	}
 
